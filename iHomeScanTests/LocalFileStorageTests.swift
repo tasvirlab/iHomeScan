@@ -21,7 +21,7 @@ struct LocalFileStorageTests {
     }
 
     @Test("Each asset type goes to its folder", arguments: [
-        (AssetType.roomGeometry, "Scans"), (.usdzModel, "Models"), (.inspectionPhoto, "Photos"),
+        (AssetType.roomPlanSource, "Scans"), (.roomGeometry, "Scans"), (.usdzModel, "Models"), (.inspectionPhoto, "Photos"),
         (.projectThumbnail, "Photos"), (.pdfReport, "Reports"),
     ])
     func folders(type: AssetType, folder: String) throws {

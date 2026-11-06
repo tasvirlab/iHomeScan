@@ -4,8 +4,12 @@ import SwiftUI
 /// are explicitly marked as not processed yet, and the scan is clearly marked as not saved.
 struct ScanResultView: View {
     let summary: RoomScanSummary
+    let completeness: RoomPlanGeometryMetadata.Completeness
+    let savedAssociation: SavedScanAssociation?
+    let onSave: () -> Void
     let onScanAgain: () -> Void
-    let onClose: () -> Void
+    let onDiscard: () -> Void
+    let onOpenProject: () -> Void
 
     @Environment(AppSettings.self) private var settings
 
@@ -65,29 +69,58 @@ struct ScanResultView: View {
                 .padding(16)
                 .cardSurface()
 
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: "exclamationmark.circle")
-                        .font(.headline)
-                        .foregroundStyle(Palette.accentText)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(settings.t("scan.result.notSaved.title"))
-                            .font(Typography.rowTitle)
-                            .foregroundStyle(Palette.ink)
-                        Text(settings.t("scan.result.notSaved.body"))
-                            .font(Typography.meta)
-                            .foregroundStyle(Palette.inkSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                if completeness != .complete {
+                    ScanResultNotice(
+                        systemImage: "exclamationmark.triangle",
+                        title: settings.t("scan.result.incomplete.title"),
+                        message: settings.t("scan.result.incomplete.body")
+                    )
                 }
-                .padding(16)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Palette.accentTint, in: .rect(cornerRadius: Radius.card))
-                .accessibilityElement(children: .combine)
+
+                if let savedAssociation {
+                    ScanResultNotice(
+                        systemImage: "checkmark.seal.fill",
+                        title: settings.t("scan.saved.title"),
+                        message: settings.t(
+                            "scan.saved.body",
+                            savedAssociation.projectName,
+                            savedAssociation.roomName
+                        ),
+                        isSuccess: true
+                    )
+                } else {
+                    ScanResultNotice(
+                        systemImage: "externaldrive",
+                        title: settings.t("scan.result.readyToSave.title"),
+                        message: settings.t("scan.result.readyToSave.body")
+                    )
+                }
 
                 VStack(spacing: 10) {
-                    ActionButton(title: settings.t("scan.result.again"), systemImage: "arrow.counterclockwise",
-                                 kind: .secondary, action: onScanAgain)
-                    ActionButton(title: settings.t("scan.result.close"), kind: .primary, action: onClose)
+                    if savedAssociation == nil {
+                        ActionButton(
+                            title: settings.t("scan.save.action"),
+                            systemImage: "square.and.arrow.down",
+                            action: onSave
+                        )
+                    } else {
+                        ActionButton(
+                            title: settings.t("scan.saved.openProject"),
+                            systemImage: "folder",
+                            action: onOpenProject
+                        )
+                    }
+                    ActionButton(
+                        title: settings.t("scan.result.again"),
+                        systemImage: "arrow.counterclockwise",
+                        kind: .secondary,
+                        action: onScanAgain
+                    )
+                    ActionButton(
+                        title: settings.t(savedAssociation == nil ? "scan.discard.action" : "common.close"),
+                        kind: savedAssociation == nil ? .destructive : .secondary,
+                        action: onDiscard
+                    )
                 }
                 .padding(.top, 4)
             }
@@ -121,6 +154,34 @@ struct ScanResultView: View {
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Palette.surface, in: .rect(cornerRadius: Radius.small))
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct ScanResultNotice: View {
+    let systemImage: String
+    let title: String
+    let message: String
+    var isSuccess = false
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.headline)
+                .foregroundStyle(isSuccess ? Palette.success : Palette.accentText)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(Typography.rowTitle)
+                    .foregroundStyle(Palette.ink)
+                Text(message)
+                    .font(Typography.meta)
+                    .foregroundStyle(Palette.inkSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.accentTint, in: .rect(cornerRadius: Radius.card))
         .accessibilityElement(children: .combine)
     }
 }

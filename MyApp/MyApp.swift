@@ -44,6 +44,7 @@ import SwiftData
         do {
             try SampleProjectSeeder.seedIfNeeded(context: context, files: fileStorage, settings: settings)
             try ProjectRepository(context: context, files: fileStorage).removeOrphanedFiles()
+            try fileStorage.removeStaleScanStagingDirectories()
         } catch {
             model.showError(error)
         }

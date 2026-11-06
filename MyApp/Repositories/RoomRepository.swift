@@ -56,10 +56,16 @@ struct RoomRepository {
     func deleteFloor(_ floor: Floor) throws {
         guard let project = floor.project, project.floors.count > 1 else { throw RepositoryError.lastFloor }
         let paths = floor.assets.map(\.relativeFilePath) + floor.rooms.flatMap { $0.assets.map(\.relativeFilePath) }
+        let floorID = floor.id
+        let scans = try context.fetch(
+            FetchDescriptor<SavedScan>(predicate: #Predicate { $0.floorID == floorID })
+        )
         project.updatedAt = .now
+        for scan in scans { context.delete(scan) }
         context.delete(floor)
         try context.save()
         removeFiles(paths)
+        for scan in scans { try? files.deleteScanDirectory(projectID: project.id, scanID: scan.id) }
     }
 
     // MARK: - Rooms
@@ -84,10 +90,19 @@ struct RoomRepository {
 
     func deleteRoom(_ room: Room) throws {
         let paths = room.assets.map(\.relativeFilePath)
+        let roomID = room.id
+        let scans = try context.fetch(
+            FetchDescriptor<SavedScan>(predicate: #Predicate { $0.roomID == roomID })
+        )
+        let projectID = room.floor?.project?.id
         room.floor?.project?.updatedAt = .now
+        for scan in scans { context.delete(scan) }
         context.delete(room)
         try context.save()
         removeFiles(paths)
+        if let projectID {
+            for scan in scans { try? files.deleteScanDirectory(projectID: projectID, scanID: scan.id) }
+        }
     }
 
     // MARK: - Helpers

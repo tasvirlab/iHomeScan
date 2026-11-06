@@ -90,6 +90,7 @@ extension RoomPlanCaptureController: RoomCaptureViewDelegate {
                 RoomGeometrySource(capturedRoom: processedResult)
             )
             onEvent?(.completed(RoomScanOutput(
+                scanID: UUID(),
                 summary: RoomScanSummary(processedResult),
                 floorPlan: floorPlan,
                 capturedAt: .now,

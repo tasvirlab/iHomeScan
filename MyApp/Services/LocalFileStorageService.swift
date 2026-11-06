@@ -25,6 +25,13 @@ struct StoredFile: Equatable {
     let checksum: String
 }
 
+struct StoredScanBundle: Equatable {
+    let scanID: UUID
+    let source: StoredFile
+    let geometry: StoredFile
+    let model: StoredFile
+}
+
 /// Manages project files inside the app's private Application Support directory:
 ///
 ///     <root>/Projects/<projectUUID>/{Scans,Models,Photos,Reports}/<file>
@@ -111,6 +118,74 @@ final class LocalFileStorageService {
         )
     }
 
+    /// Commits all required scan artifacts as one directory. Files are first written to a
+    /// staging directory and validated, then the directory is atomically renamed into place.
+    func saveScanBundle(
+        sourceData: Data,
+        geometryData: Data,
+        modelURL: URL,
+        projectID: UUID,
+        scanID: UUID
+    ) throws -> StoredScanBundle {
+        guard !sourceData.isEmpty, !geometryData.isEmpty else {
+            throw FileStorageError.writeFailed("empty scan data")
+        }
+
+        let scansDirectory = projectDirectory(for: projectID)
+            .appending(path: AssetType.roomGeometry.folderName, directoryHint: .isDirectory)
+        let destination = scansDirectory.appending(path: scanID.uuidString, directoryHint: .isDirectory)
+        let staging = scansDirectory.appending(
+            path: ".staging-\(scanID.uuidString)-\(UUID().uuidString)",
+            directoryHint: .isDirectory
+        )
+        guard !fileManager.fileExists(atPath: destination.path(percentEncoded: false)) else {
+            throw FileStorageError.writeFailed("scan already exists")
+        }
+
+        do {
+            try fileManager.createDirectory(at: staging, withIntermediateDirectories: true)
+            let sourceURL = staging.appending(path: "roomplan.json")
+            let geometryURL = staging.appending(path: "geometry.json")
+            let stagedModelURL = staging.appending(path: "room.usdz")
+            try sourceData.write(
+                to: sourceURL,
+                options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
+            )
+            try geometryData.write(
+                to: geometryURL,
+                options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
+            )
+            try fileManager.copyItem(at: modelURL, to: stagedModelURL)
+
+            let sourceFile = try validatedStoredFile(at: sourceURL)
+            let geometryFile = try validatedStoredFile(at: geometryURL)
+            let modelFile = try validatedStoredFile(at: stagedModelURL)
+            try fileManager.moveItem(at: staging, to: destination)
+
+            return StoredScanBundle(
+                scanID: scanID,
+                source: replacingRoot(sourceFile, from: staging, to: destination),
+                geometry: replacingRoot(geometryFile, from: staging, to: destination),
+                model: replacingRoot(modelFile, from: staging, to: destination)
+            )
+        } catch let error as FileStorageError {
+            try? fileManager.removeItem(at: staging)
+            throw error
+        } catch {
+            try? fileManager.removeItem(at: staging)
+            throw FileStorageError.writeFailed(error.localizedDescription)
+        }
+    }
+
+    func deleteScanDirectory(projectID: UUID, scanID: UUID) throws {
+        let directory = projectDirectory(for: projectID)
+            .appending(path: AssetType.roomGeometry.folderName, directoryHint: .isDirectory)
+            .appending(path: scanID.uuidString, directoryHint: .isDirectory)
+        if fileManager.fileExists(atPath: directory.path(percentEncoded: false)) {
+            try fileManager.removeItem(at: directory)
+        }
+    }
+
     // MARK: - Reading
 
     func fileExists(atRelativePath relativePath: String) -> Bool {
@@ -155,7 +230,58 @@ final class LocalFileStorageService {
         return Set(names.compactMap(UUID.init(uuidString:)))
     }
 
+    /// Removes only scan staging directories left by an interrupted save. Final UUID-named scan
+    /// directories are never touched.
+    @discardableResult
+    func removeStaleScanStagingDirectories() throws -> Int {
+        var removed = 0
+        for projectID in storedProjectIDs() {
+            let scans = projectDirectory(for: projectID)
+                .appending(path: AssetType.roomGeometry.folderName, directoryHint: .isDirectory)
+            let entries = (try? fileManager.contentsOfDirectory(
+                at: scans,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: []
+            )) ?? []
+            for entry in entries where entry.lastPathComponent.hasPrefix(".staging-") {
+                try fileManager.removeItem(at: entry)
+                removed += 1
+            }
+        }
+        return removed
+    }
+
     // MARK: - Helpers
+
+    private func validatedStoredFile(at url: URL) throws -> StoredFile {
+        guard fileManager.fileExists(atPath: url.path(percentEncoded: false)) else {
+            throw FileStorageError.fileMissing(url.lastPathComponent)
+        }
+        let data = try Data(contentsOf: url, options: .mappedIfSafe)
+        guard !data.isEmpty else { throw FileStorageError.corrupted(url.lastPathComponent) }
+        return StoredFile(
+            relativePath: relativePath(for: url),
+            fileName: url.lastPathComponent,
+            fileSize: Int64(data.count),
+            checksum: Self.checksum(of: data)
+        )
+    }
+
+    private func replacingRoot(_ file: StoredFile, from staging: URL, to destination: URL) -> StoredFile {
+        let stagedPrefix = relativePath(for: staging)
+        let destinationPrefix = relativePath(for: destination)
+        let path = file.relativePath.replacingOccurrences(
+            of: stagedPrefix,
+            with: destinationPrefix,
+            options: [.anchored]
+        )
+        return StoredFile(
+            relativePath: path,
+            fileName: file.fileName,
+            fileSize: file.fileSize,
+            checksum: file.checksum
+        )
+    }
 
     static func checksum(of data: Data) -> String {
         SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()

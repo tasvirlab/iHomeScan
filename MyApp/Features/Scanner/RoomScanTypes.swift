@@ -112,6 +112,7 @@ struct RoomScanSummary: Equatable {
 
 /// The in-memory result of a finished scan. Not persisted in Stage 2.2.
 struct RoomScanOutput {
+    let scanID: UUID
     let summary: RoomScanSummary
     /// Versioned iHomeScan geometry converted directly from this capture.
     let floorPlan: FloorPlan

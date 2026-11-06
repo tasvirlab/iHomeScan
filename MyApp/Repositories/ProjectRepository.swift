@@ -52,6 +52,10 @@ struct ProjectRepository {
     /// Files are removed after the database commit so metadata never points at deleted files.
     func delete(_ project: Project) throws {
         let projectID = project.id
+        let scans = try context.fetch(
+            FetchDescriptor<SavedScan>(predicate: #Predicate { $0.projectID == projectID })
+        )
+        for scan in scans { context.delete(scan) }
         context.delete(project)
         try context.save()
         try files.deleteProjectDirectory(for: projectID)

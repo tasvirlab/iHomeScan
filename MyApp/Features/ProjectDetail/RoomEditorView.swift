@@ -70,7 +70,12 @@ struct RoomEditorView: View {
                 .padding(16)
                 .cardSurface()
 
-                if existingRoom != nil {
+                if let room = existingRoom {
+                    let savedScanCount = room.assets.filter { $0.type == .roomPlanSource }.count
+                    if savedScanCount > 0 {
+                        SavedRoomScanStatus(count: savedScanCount)
+                    }
+
                     ActionButton(title: settings.t("room.delete"), systemImage: "trash", kind: .destructive) {
                         confirmsDelete = true
                     }
@@ -183,5 +188,31 @@ struct RoomEditorView: View {
         } catch {
             model.showError(error)
         }
+    }
+}
+
+private struct SavedRoomScanStatus: View {
+    let count: Int
+
+    @Environment(AppSettings.self) private var settings
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(Palette.success)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(settings.t("room.savedScan.title"))
+                    .font(Typography.rowTitle)
+                    .foregroundStyle(Palette.ink)
+                Text(settings.t("room.savedScan.count", count))
+                    .font(Typography.meta)
+                    .foregroundStyle(Palette.inkSecondary)
+            }
+            Spacer()
+        }
+        .padding(16)
+        .cardSurface()
+        .accessibilityElement(children: .combine)
     }
 }

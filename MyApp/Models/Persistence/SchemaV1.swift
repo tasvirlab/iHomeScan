@@ -26,6 +26,7 @@ enum RoomType: String, CaseIterable, Codable, Identifiable {
 }
 
 enum AssetType: String, CaseIterable, Codable {
+    case roomPlanSource
     case roomGeometry
     case usdzModel
     case inspectionPhoto
@@ -35,7 +36,7 @@ enum AssetType: String, CaseIterable, Codable {
     /// Subfolder inside the project directory.
     var folderName: String {
         switch self {
-        case .roomGeometry: "Scans"
+        case .roomPlanSource, .roomGeometry: "Scans"
         case .usdzModel: "Models"
         case .inspectionPhoto, .projectThumbnail: "Photos"
         case .pdfReport: "Reports"

@@ -68,6 +68,7 @@ struct RoomScanSessionTests {
 
     private func output(walls: Int = 1, objects: Int = 0) -> RoomScanOutput {
         RoomScanOutput(
+            scanID: UUID(),
             summary: RoomScanSummary(
                 walls: walls,
                 doors: 0,

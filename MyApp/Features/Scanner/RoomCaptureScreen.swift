@@ -8,6 +8,7 @@ import UIKit
 struct RoomCaptureScreen: View {
     let context: ScannerContext
 
+    @Environment(AppModel.self) private var appModel
     @Environment(AppSettings.self) private var settings
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -16,6 +17,8 @@ struct RoomCaptureScreen: View {
     @State private var model: RoomScanSessionModel
     @State private var confirmsCancel = false
     @State private var confirmsDiscard = false
+    @State private var showsSaveSheet = false
+    @State private var savedAssociation: SavedScanAssociation?
 
     init(context: ScannerContext, model: RoomScanSessionModel? = nil) {
         self.context = context
@@ -45,6 +48,13 @@ struct RoomCaptureScreen: View {
                 setIdleTimerDisabled(false)
             }
             .animation(.easeInOut(duration: 0.2), value: model.state)
+            .sheet(isPresented: $showsSaveSheet) {
+                if let output = model.output {
+                    ScanSaveSheet(output: output, scannerContext: context) { association in
+                        savedAssociation = association
+                    }
+                }
+            }
     }
 
     @ViewBuilder
@@ -53,19 +63,45 @@ struct RoomCaptureScreen: View {
         case .idle, .preparing, .scanning, .processing, .cancelled:
             captureLayer
         case .completed(let summary):
-            ScanResultView(
-                summary: summary,
-                onScanAgain: { model.scanAgain() },
-                onClose: { confirmsDiscard = true }
-            )
-            .confirmationDialog(settings.t("scan.discard.title"), isPresented: $confirmsDiscard, titleVisibility: .visible) {
-                Button(settings.t("scan.discard.action"), role: .destructive) {
-                    model.discardResult()
-                    dismiss()
+            if let output = model.output {
+                ScanResultView(
+                    summary: summary,
+                    completeness: output.floorPlan.roomPlanMetadata?.completeness ?? .incomplete,
+                    savedAssociation: savedAssociation,
+                    onSave: { showsSaveSheet = true },
+                    onScanAgain: {
+                        savedAssociation = nil
+                        model.scanAgain()
+                    },
+                    onDiscard: {
+                        if savedAssociation == nil {
+                            confirmsDiscard = true
+                        } else {
+                            dismiss()
+                        }
+                    },
+                    onOpenProject: openSavedProject
+                )
+                .confirmationDialog(
+                    settings.t("scan.discard.title"),
+                    isPresented: $confirmsDiscard,
+                    titleVisibility: .visible
+                ) {
+                    Button(settings.t("scan.discard.action"), role: .destructive) {
+                        model.discardResult()
+                        dismiss()
+                    }
+                    Button(settings.t("common.cancel"), role: .cancel) {}
+                } message: {
+                    Text(settings.t("scan.discard.message"))
                 }
-                Button(settings.t("common.cancel"), role: .cancel) {}
-            } message: {
-                Text(settings.t("scan.discard.message"))
+            } else {
+                ScanFailureView(
+                    failure: .processingFailed,
+                    onRetry: { model.scanAgain() },
+                    onOpenSettings: openAppSettings,
+                    onClose: { dismiss() }
+                )
             }
         case .failed(let failure):
             ScanFailureView(
@@ -187,6 +223,14 @@ struct RoomCaptureScreen: View {
         } else {
             confirmsCancel = true
         }
+    }
+
+    private func openSavedProject() {
+        guard let savedAssociation else { return }
+        appModel.selectedTab = .projects
+        appModel.path.removeAll()
+        appModel.path.append(.project(savedAssociation.projectID))
+        appModel.scanner = nil
     }
 
     private func openAppSettings() {
