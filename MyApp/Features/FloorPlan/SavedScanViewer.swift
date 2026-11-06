@@ -23,6 +23,7 @@ struct SavedScanViewerScreen: View {
     @State private var contentCache: [UUID: SavedScanContent] = [:]
     @State private var loadError: SavedScanLoadingError?
     @State private var selectedPlanRoomID: String?
+    @State private var showsParametricInspector = false
 
     init(projectID: UUID, roomID: UUID, scanID: UUID? = nil) {
         self.projectID = projectID
@@ -66,6 +67,20 @@ struct SavedScanViewerScreen: View {
                 .padding(.horizontal, Spacing.screenEdge)
                 .padding(.bottom, 12)
 
+                if content != nil {
+                    Button {
+                        showsParametricInspector = true
+                    } label: {
+                        Label(settings.t("precision.edit.title"), systemImage: "point.3.connected.trianglepath.dotted")
+                            .font(Typography.control)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Palette.accent)
+                    .padding(.horizontal, Spacing.screenEdge)
+                    .padding(.bottom, 12)
+                }
+
                 viewerContent
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipShape(.rect(cornerRadius: Radius.large))
@@ -81,6 +96,11 @@ struct SavedScanViewerScreen: View {
             if selectedScanID == nil { selectedScanID = scans.first?.id }
         }
         .task(id: selectedScan?.id) { loadSelectedScan() }
+        .sheet(isPresented: $showsParametricInspector) {
+            if let selectedScan, let content {
+                ParametricPlanInspectorScreen(scan: selectedScan, floorPlan: content.floorPlan)
+            }
+        }
     }
 
     @ViewBuilder

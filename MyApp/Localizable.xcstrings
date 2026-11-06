@@ -1057,6 +1057,342 @@
         }
       }
     },
+    "precision.edit.title" : {
+      "comment" : "Button that opens the read-only parametric floor plan inspector",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edit Floor Plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Изменить план этажа"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qavat rejasini tahrirlash"
+          }
+        }
+      }
+    },
+    "precision.editor.canvas" : {
+      "comment" : "Accessibility label for the parametric plan canvas",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Selectable parametric floor plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Интерактивный параметрический план этажа"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tanlanadigan parametrik qavat rejasi"
+          }
+        }
+      }
+    },
+    "precision.editor.error.body" : {
+      "comment" : "Explanation shown when parametric conversion fails",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The saved scan could not be converted into parametric geometry."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Не удалось преобразовать сохранённое сканирование в параметрическую геометрию."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlangan skanni parametrik geometriyaga aylantirib bo‘lmadi."
+          }
+        }
+      }
+    },
+    "precision.editor.error.title" : {
+      "comment" : "Title shown when parametric geometry cannot be loaded",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Geometry unavailable"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Геометрия недоступна"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Geometriya mavjud emas"
+          }
+        }
+      }
+    },
+    "precision.editor.incomplete.body" : {
+      "comment" : "Warning explaining honest handling of a partial scan",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open wall chains are preserved. Missing boundaries are not fabricated."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Разомкнутые цепочки стен сохранены. Недостающие границы не создаются."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ochiq devor zanjirlari saqlanadi. Yetishmayotgan chegaralar sun’iy yaratilmaydi."
+          }
+        }
+      }
+    },
+    "precision.editor.incomplete.title" : {
+      "comment" : "Warning title for a partial RoomPlan scan",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Incomplete geometry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Неполная геометрия"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Geometriya to‘liq emas"
+          }
+        }
+      }
+    },
+    "precision.editor.selectWall" : {
+      "comment" : "Instruction displayed below the parametric plan",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Select a wall to inspect its measurements."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Выберите стену, чтобы просмотреть её размеры."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamlarini ko‘rish uchun devorni tanlang."
+          }
+        }
+      }
+    },
+    "precision.editor.title" : {
+      "comment" : "Navigation title for the parametric geometry inspector",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Precision Geometry"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Точная геометрия"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Aniq geometriya"
+          }
+        }
+      }
+    },
+    "precision.editor.wallDetails" : {
+      "comment" : "Heading for selected wall metadata",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Wall details"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Параметры стены"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Devor ma’lumotlari"
+          }
+        }
+      }
+    },
+    "precision.source.lidar" : {
+      "comment" : "Measurement provenance from RoomPlan and LiDAR",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "LiDAR estimate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Оценка LiDAR"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "LiDAR bahosi"
+          }
+        }
+      }
+    },
+    "precision.verification.estimated" : {
+      "comment" : "Verification state for an unverified LiDAR measurement",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Estimated · not verified"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Расчётное · не проверено"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Taxminiy · tasdiqlanmagan"
+          }
+        }
+      }
+    },
+    "precision.wall.height" : {
+      "comment" : "Wall height label",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Height"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Balandlik"
+          }
+        }
+      }
+    },
+    "precision.wall.length" : {
+      "comment" : "Derived wall length label",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Length"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Длина"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Uzunlik"
+          }
+        }
+      }
+    },
+    "precision.wall.thickness" : {
+      "comment" : "Wall thickness label",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Thickness"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Толщина"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qalinlik"
+          }
+        }
+      }
+    },
     "project.3d.body" : {
       "comment" : "3D placeholder body",
       "extractionState" : "manual",
@@ -4277,9 +4613,24 @@
       "comment" : "Shown when RoomPlan did not provide a reliable floor area",
       "extractionState" : "manual",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Measurement unavailable" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Размер недоступен" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "O‘lchov mavjud emas" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Measurement unavailable"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер недоступен"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O‘lchov mavjud emas"
+          }
+        }
       }
     },
     "scan.result.measurements.value" : {
@@ -4546,87 +4897,6 @@
         }
       }
     },
-    "scan.save.createProject" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create New Project" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Создать проект" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Yangi loyiha yaratish" } }
-      }
-    },
-    "scan.save.existingProject" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Project" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующий проект" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud loyiha" } }
-      }
-    },
-    "scan.save.defaultProjectName" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Scan — %@" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Скан комнаты — %@" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Xona skani — %@" } }
-      }
-    },
-    "scan.save.defaultRoomName" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room %lld" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Комната %lld" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Xona %lld" } }
-      }
-    },
-    "scan.save.floorAutomatic" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Created automatically when you save" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Будет создан автоматически" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlashda avtomatik yaratiladi" } }
-      }
-    },
-    "scan.save.existingFloor" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Floor" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующий этаж" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud qavat" } }
-      }
-    },
-    "scan.save.createFloor" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create Floor" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Создать этаж" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Yangi qavat" } }
-      }
-    },
-    "scan.save.existingRoom" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Room" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующая комната" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud xona" } }
-      }
-    },
-    "scan.save.saveAndView" : {
-      "comment" : "Stage 2.4.1 scan-first save workflow",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save and View" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранить и открыть" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlash va ko‘rish" } }
-      }
-    },
     "scan.save.action" : {
       "comment" : "Stage 2.4 scan persistence UI",
       "extractionState" : "manual",
@@ -4647,6 +4917,102 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loyihaga saqlash"
+          }
+        }
+      }
+    },
+    "scan.save.createFloor" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Floor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать этаж"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yangi qavat"
+          }
+        }
+      }
+    },
+    "scan.save.createProject" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create New Project"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать проект"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yangi loyiha yaratish"
+          }
+        }
+      }
+    },
+    "scan.save.defaultProjectName" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room Scan — %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скан комнаты — %@"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xona skani — %@"
+          }
+        }
+      }
+    },
+    "scan.save.defaultRoomName" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Room %lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комната %lld"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xona %lld"
           }
         }
       }
@@ -4723,6 +5089,78 @@
         }
       }
     },
+    "scan.save.existingFloor" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing Floor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Существующий этаж"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mavjud qavat"
+          }
+        }
+      }
+    },
+    "scan.save.existingProject" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing Project"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Существующий проект"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mavjud loyiha"
+          }
+        }
+      }
+    },
+    "scan.save.existingRoom" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existing Room"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Существующая комната"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mavjud xona"
+          }
+        }
+      }
+    },
     "scan.save.floor" : {
       "comment" : "Stage 2.4 scan persistence UI",
       "extractionState" : "manual",
@@ -4743,6 +5181,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Qavat"
+          }
+        }
+      }
+    },
+    "scan.save.floorAutomatic" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created automatically when you save"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Будет создан автоматически"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlashda avtomatik yaratiladi"
           }
         }
       }
@@ -4843,6 +5305,30 @@
         }
       }
     },
+    "scan.save.saveAndView" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save and View"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить и открыть"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlash va ko‘rish"
+          }
+        }
+      }
+    },
     "scan.save.selectFloor" : {
       "comment" : "Stage 2.4 scan persistence UI",
       "extractionState" : "manual",
@@ -4913,96 +5399,6 @@
             "value" : "Skanni saqlash"
           }
         }
-      }
-    },
-    "scan.viewer.title" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved Scan" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённый скан" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan skan" } }
-      }
-    },
-    "scan.viewer.loading" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Loading scan…" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Загрузка скана…" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skan yuklanmoqda…" } }
-      }
-    },
-    "scan.viewer.version" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scan version" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Версия скана" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skan versiyasi" } }
-      }
-    },
-    "scan.viewer.versions" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "%lld versions" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Версий: %lld" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "%lld ta versiya" } }
-      }
-    },
-    "scan.viewer.empty.title" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No saved scans" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Нет сохранённых сканов" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan skan yo‘q" } }
-      }
-    },
-    "scan.viewer.empty.body" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save a room scan to view its 2D plan and 3D model here." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохраните скан комнаты, чтобы открыть 2D-план и 3D-модель." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "2D reja va 3D modelni ko‘rish uchun xona skanini saqlang." } }
-      }
-    },
-    "scan.viewer.error.title" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn’t open scan" } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Не удалось открыть скан" } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skanni ochib bo‘lmadi" } }
-      }
-    },
-    "scan.viewer.error.model" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The saved 3D model is missing or invalid." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённая 3D-модель отсутствует или повреждена." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan 3D model mavjud emas yoki yaroqsiz." } }
-      }
-    },
-    "scan.viewer.error.geometry" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "The saved floor plan is missing or invalid." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённый план этажа отсутствует или повреждён." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan qavat rejasi mavjud emas yoki yaroqsiz." } }
-      }
-    },
-    "scan.viewer.3d.unavailable" : {
-      "comment" : "Stage 2.5 saved scan viewer",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "3D preview isn’t available on this device." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "3D-просмотр недоступен на этом устройстве." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Bu qurilmada 3D ko‘rish mavjud emas." } }
       }
     },
     "scan.saved.body" : {
@@ -5097,6 +5493,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skanerlashni boshlash"
+          }
+        }
+      }
+    },
+    "scan.viewer.3d.unavailable" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3D preview isn’t available on this device."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3D-просмотр недоступен на этом устройстве."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu qurilmada 3D ko‘rish mavjud emas."
+          }
+        }
+      }
+    },
+    "scan.viewer.empty.body" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save a room scan to view its 2D plan and 3D model here."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраните скан комнаты, чтобы открыть 2D-план и 3D-модель."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2D reja va 3D modelni ko‘rish uchun xona skanini saqlang."
+          }
+        }
+      }
+    },
+    "scan.viewer.empty.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved scans"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет сохранённых сканов"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlangan skan yo‘q"
+          }
+        }
+      }
+    },
+    "scan.viewer.error.geometry" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved floor plan is missing or invalid."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранённый план этажа отсутствует или повреждён."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlangan qavat rejasi mavjud emas yoki yaroqsiz."
+          }
+        }
+      }
+    },
+    "scan.viewer.error.model" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The saved 3D model is missing or invalid."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранённая 3D-модель отсутствует или повреждена."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlangan 3D model mavjud emas yoki yaroqsiz."
+          }
+        }
+      }
+    },
+    "scan.viewer.error.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t open scan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось открыть скан"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skanni ochib bo‘lmadi"
+          }
+        }
+      }
+    },
+    "scan.viewer.loading" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading scan…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка скана…"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skan yuklanmoqda…"
+          }
+        }
+      }
+    },
+    "scan.viewer.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved Scan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранённый скан"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlangan skan"
+          }
+        }
+      }
+    },
+    "scan.viewer.version" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan version"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версия скана"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skan versiyasi"
+          }
+        }
+      }
+    },
+    "scan.viewer.versions" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld versions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версий: %lld"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ta versiya"
           }
         }
       }

@@ -186,6 +186,50 @@ final class LocalFileStorageService {
         }
     }
 
+    /// Lazily stores the editable parametric artifact beside an existing scan bundle.
+    /// Original RoomPlan, FloorPlan and USDZ files are never modified.
+    @discardableResult
+    func saveParametricPlan(_ data: Data, projectID: UUID, scanID: UUID) throws -> StoredFile {
+        guard !data.isEmpty else { throw FileStorageError.writeFailed("empty parametric geometry") }
+        let directory = projectDirectory(for: projectID)
+            .appending(path: AssetType.roomGeometry.folderName, directoryHint: .isDirectory)
+            .appending(path: scanID.uuidString, directoryHint: .isDirectory)
+        guard fileManager.fileExists(atPath: directory.path(percentEncoded: false)) else {
+            throw FileStorageError.fileMissing(scanID.uuidString)
+        }
+        let destination = directory.appending(path: "parametric-v1.json", directoryHint: .notDirectory)
+        do {
+            try data.write(
+                to: destination,
+                options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
+            )
+        } catch {
+            throw FileStorageError.writeFailed(error.localizedDescription)
+        }
+        return StoredFile(
+            relativePath: relativePath(for: destination),
+            fileName: destination.lastPathComponent,
+            fileSize: Int64(data.count),
+            checksum: Self.checksum(of: data)
+        )
+    }
+
+    func readParametricPlan(projectID: UUID, scanID: UUID) throws -> Data {
+        let relativePath = [
+            "Projects", projectID.uuidString, AssetType.roomGeometry.folderName,
+            scanID.uuidString, "parametric-v1.json",
+        ].joined(separator: "/")
+        return try read(relativePath: relativePath)
+    }
+
+    func parametricPlanExists(projectID: UUID, scanID: UUID) -> Bool {
+        let relativePath = [
+            "Projects", projectID.uuidString, AssetType.roomGeometry.folderName,
+            scanID.uuidString, "parametric-v1.json",
+        ].joined(separator: "/")
+        return fileExists(atRelativePath: relativePath)
+    }
+
     // MARK: - Reading
 
     func fileExists(atRelativePath relativePath: String) -> Bool {
