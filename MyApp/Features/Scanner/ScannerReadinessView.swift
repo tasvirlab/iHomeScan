@@ -19,6 +19,7 @@ struct ScannerReadinessView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @State private var model: ScannerReadinessModel
+    @State private var showsCapture = false
 
     init(context: ScannerContext, model: ScannerReadinessModel = ScannerReadinessModel()) {
         self.context = context
@@ -47,6 +48,9 @@ struct ScannerReadinessView: View {
             if phase == .active { model.refresh() }
         }
         .animation(.snappy(duration: 0.25), value: model.state)
+        .fullScreenCover(isPresented: $showsCapture, onDismiss: { model.refresh() }) {
+            RoomCaptureScreen(context: context)
+        }
     }
 
     // MARK: - Sections
@@ -174,7 +178,11 @@ struct ScannerReadinessView: View {
             ActionButton(title: settings.t("scanner.retry"), systemImage: "arrow.clockwise", kind: .secondary) {
                 model.refresh()
             }
-        case .unsupportedDevice, .cameraRestricted, .readyToScan:
+        case .readyToScan:
+            ActionButton(title: settings.t("scan.start"), systemImage: "viewfinder") {
+                showsCapture = true
+            }
+        case .unsupportedDevice, .cameraRestricted:
             ActionButton(title: settings.t("common.close"), kind: .secondary) { dismiss() }
         case .checkingDevice:
             EmptyView()

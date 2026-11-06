@@ -3265,6 +3265,1158 @@
         }
       }
     },
+    "scan.camera.accessibility": {
+      "comment": "Accessibility label for the camera view",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live room scanning camera"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xonani skanerlash kamerasi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камера сканирования комнаты"
+          }
+        }
+      }
+    },
+    "scan.cancel.action": {
+      "comment": "Destructive confirm button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard scan"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanni bekor qilish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отменить скан"
+          }
+        }
+      }
+    },
+    "scan.cancel.message": {
+      "comment": "Cancel confirmation message",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything captured so far will be discarded."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shu paytgacha skanerlangan hamma narsa oʻchiriladi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Всё отсканированное будет удалено."
+          }
+        }
+      }
+    },
+    "scan.cancel.title": {
+      "comment": "Cancel confirmation title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel scanning?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlash bekor qilinsinmi?"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отменить сканирование?"
+          }
+        }
+      }
+    },
+    "scan.continue": {
+      "comment": "Keep scanning button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue scanning"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashni davom ettirish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить сканирование"
+          }
+        }
+      }
+    },
+    "scan.discard.action": {
+      "comment": "Destructive confirm button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻchirish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить"
+          }
+        }
+      }
+    },
+    "scan.discard.message": {
+      "comment": "Discard confirmation message",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The result is not saved and can’t be recovered."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Natija saqlanmagan va uni tiklab boʻlmaydi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Результат не сохранён, восстановить его нельзя."
+          }
+        }
+      }
+    },
+    "scan.discard.title": {
+      "comment": "Discard confirmation title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discard this scan?"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu skan oʻchirilsinmi?"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Удалить этот скан?"
+          }
+        }
+      }
+    },
+    "scan.failure.empty.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The scan ended before any walls or objects were found. Point the camera at the walls and move slowly around the room."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skan devor yoki jihoz topilmasdan tugadi. Kamerani devorlarga qarating va xona boʻylab sekin yuring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Скан завершился, прежде чем были найдены стены или предметы. Направьте камеру на стены и медленно обойдите комнату."
+          }
+        }
+      }
+    },
+    "scan.failure.empty.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing was detected"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hech narsa aniqlanmadi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ничего не найдено"
+          }
+        }
+      }
+    },
+    "scan.failure.hot.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Let your iPhone cool down for a few minutes, then scan again."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone bir necha daqiqa sovisin, keyin qayta skanerlang."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дайте iPhone остыть несколько минут и повторите сканирование."
+          }
+        }
+      }
+    },
+    "scan.failure.hot.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone is too warm"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone juda qizib ketdi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone слишком нагрелся"
+          }
+        }
+      }
+    },
+    "scan.failure.interrupted.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app left the screen during the scan, so the camera was stopped. Start a new scan to continue."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlash paytida ilova ekrandan chiqdi, shuning uchun kamera toʻxtatildi. Davom etish uchun yangi skan boshlang."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Во время сканирования приложение было свёрнуто, поэтому камера остановлена. Начните новый скан."
+          }
+        }
+      }
+    },
+    "scan.failure.interrupted.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanning was interrupted"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlash uzildi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканирование прервано"
+          }
+        }
+      }
+    },
+    "scan.failure.nothingSaved": {
+      "comment": "Note on failure screen",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No scan data was saved."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hech qanday skan maʼlumoti saqlanmadi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Данные скана не сохранены."
+          }
+        }
+      }
+    },
+    "scan.failure.permission.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on camera access in Settings → iHomeScan → Camera, then try again."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sozlamalar → iHomeScan → Kamera’da ruxsatni yoqing va qayta urinib koʻring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Включите доступ: Настройки → iHomeScan → Камера, затем попробуйте снова."
+          }
+        }
+      }
+    },
+    "scan.failure.permission.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is off"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga ruxsat berilmagan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступ к камере выключен"
+          }
+        }
+      }
+    },
+    "scan.failure.processing.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan couldn’t process this scan. Try again and capture the walls more completely."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan bu skanni qayta ishlay olmadi. Qayta urinib, devorlarni toʻliqroq qamrab oling."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan не смог обработать скан. Повторите и захватите стены полнее."
+          }
+        }
+      }
+    },
+    "scan.failure.processing.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn’t build the room model"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xona modelini tayyorlab boʻlmadi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось построить модель комнаты"
+          }
+        }
+      }
+    },
+    "scan.failure.session.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera session stopped unexpectedly. Close other camera apps and try again."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera sessiyasi kutilmaganda toʻxtadi. Kamerani ishlatayotgan boshqa ilovalarni yoping va qayta urinib koʻring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сеанс камеры неожиданно остановился. Закройте другие приложения с камерой и попробуйте снова."
+          }
+        }
+      }
+    },
+    "scan.failure.session.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanning couldn’t start"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashni boshlab boʻlmadi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось начать сканирование"
+          }
+        }
+      }
+    },
+    "scan.failure.tooLarge.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan one room at a time instead of the whole home in a single session."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Butun uyni bir martada emas, har bir xonani alohida skanerlang."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканируйте по одной комнате, а не весь дом за один сеанс."
+          }
+        }
+      }
+    },
+    "scan.failure.tooLarge.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The area is too large"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hudud juda katta"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Слишком большая область"
+          }
+        }
+      }
+    },
+    "scan.failure.tracking.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make sure the room is well lit, don’t cover the camera, and move more slowly."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xona yorugʻ boʻlsin, kamerani yopmang va sekinroq harakatlaning."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Убедитесь, что в комнате светло, не закрывайте камеру и двигайтесь медленнее."
+          }
+        }
+      }
+    },
+    "scan.failure.tracking.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lost track of the room"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xona kuzatuvi yoʻqoldi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Потеряно отслеживание комнаты"
+          }
+        }
+      }
+    },
+    "scan.failure.unsupported.body": {
+      "comment": "Failure body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room scanning needs an iPhone or iPad with a LiDAR Scanner."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xonani skanerlash uchun LiDAR skanerli iPhone yoki iPad kerak."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для сканирования нужен iPhone или iPad со сканером LiDAR."
+          }
+        }
+      }
+    },
+    "scan.failure.unsupported.title": {
+      "comment": "Failure title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR scanning isn’t available"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qurilmada LiDAR skanerlash mavjud emas"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR-сканирование недоступно"
+          }
+        }
+      }
+    },
+    "scan.finish": {
+      "comment": "Button ending the capture",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finish"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tugatish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Завершить"
+          }
+        }
+      }
+    },
+    "scan.finish.hint": {
+      "comment": "Accessibility hint for Finish",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stops scanning and builds the room model."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashni toʻxtatib, xona modelini tayyorlaydi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Останавливает сканирование и строит модель комнаты."
+          }
+        }
+      }
+    },
+    "scan.preparing": {
+      "comment": "Live capture: starting",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting camera…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera ishga tushirilmoqda…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запуск камеры…"
+          }
+        }
+      }
+    },
+    "scan.processing.body": {
+      "comment": "Processing overlay body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan is building the room model. This usually takes a few seconds."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan xona modelini tayyorlamoqda. Bu odatda bir necha soniya davom etadi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan строит модель комнаты. Обычно это занимает несколько секунд."
+          }
+        }
+      }
+    },
+    "scan.processing.title": {
+      "comment": "Processing overlay title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processing scan…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skan qayta ishlanmoqda…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обработка скана…"
+          }
+        }
+      }
+    },
+    "scan.result.again": {
+      "comment": "Result button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan again"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qayta skanerlash"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканировать заново"
+          }
+        }
+      }
+    },
+    "scan.result.close": {
+      "comment": "Result button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close and discard"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yopish va oʻchirish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть и удалить"
+          }
+        }
+      }
+    },
+    "scan.result.detected": {
+      "comment": "Result section header",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detected by RoomPlan"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RoomPlan aniqlagan elementlar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Найдено RoomPlan"
+          }
+        }
+      }
+    },
+    "scan.result.doors": {
+      "comment": "Result count label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doors"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eshiklar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Двери"
+          }
+        }
+      }
+    },
+    "scan.result.floors": {
+      "comment": "Result count label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Floor areas"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pol yuzalari"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поверхности пола"
+          }
+        }
+      }
+    },
+    "scan.result.measurements": {
+      "comment": "Result row label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimensions and area"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻlchamlar va maydon"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Размеры и площадь"
+          }
+        }
+      }
+    },
+    "scan.result.measurements.value": {
+      "comment": "Result row value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not processed yet"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hali hisoblanmagan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё не рассчитаны"
+          }
+        }
+      }
+    },
+    "scan.result.notSaved.body": {
+      "comment": "Result notice body",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The result exists only on this screen. Saving scans to a project arrives in a later update — closing this screen discards it."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Natija faqat shu ekranda mavjud. Skanni loyihaga saqlash keyingi yangilanishda qoʻshiladi — ekranni yopsangiz, natija oʻchadi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Результат существует только на этом экране. Сохранение в проект появится в следующем обновлении — при закрытии экрана скан будет удалён."
+          }
+        }
+      }
+    },
+    "scan.result.notSaved.title": {
+      "comment": "Result notice title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This scan is not saved"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu skan saqlanmagan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этот скан не сохранён"
+          }
+        }
+      }
+    },
+    "scan.result.objects": {
+      "comment": "Result count label (furniture etc.)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Objects"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jihozlar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Предметы"
+          }
+        }
+      }
+    },
+    "scan.result.openings": {
+      "comment": "Result count label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Openings"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oʻtish joylari"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проёмы"
+          }
+        }
+      }
+    },
+    "scan.result.subtitle": {
+      "comment": "Result subtitle",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Real RoomPlan result captured on this device."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qurilmada olingan haqiqiy RoomPlan natijasi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Реальный результат RoomPlan с этого устройства."
+          }
+        }
+      }
+    },
+    "scan.result.title": {
+      "comment": "Result title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan complete"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skan yakunlandi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканирование завершено"
+          }
+        }
+      }
+    },
+    "scan.result.walls": {
+      "comment": "Result count label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walls"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devorlar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Стены"
+          }
+        }
+      }
+    },
+    "scan.result.windows": {
+      "comment": "Result count label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Windows"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derazalar"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окна"
+          }
+        }
+      }
+    },
+    "scan.start": {
+      "comment": "Button opening the live camera",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start scanning"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashni boshlash"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начать сканирование"
+          }
+        }
+      }
+    },
     "scanner.checking.body": {
       "comment": "Scanner state",
       "extractionState": "manual",
@@ -3560,19 +4712,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The scanning engine will be connected in the next update (Stage 2.2). Nothing is captured or saved yet."
+            "value": "Scans are kept only until you close the result. Saving scans to a project arrives in a later update."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skanerlash dvigateli keyingi yangilanishda (Stage 2.2) ulanadi. Hozircha hech narsa yozib olinmaydi va saqlanmaydi."
+            "value": "Skan natijasi faqat oyna yopilguncha saqlanadi. Skanni loyihaga saqlash keyingi yangilanishda qoʻshiladi."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Модуль сканирования будет подключён в следующем обновлении (Stage 2.2). Пока ничего не записывается и не сохраняется."
+            "value": "Результат хранится только до закрытия экрана. Сохранение сканов в проект появится в следующем обновлении."
           }
         }
       }
