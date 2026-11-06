@@ -1,0 +1,54 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "iHomeScan"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "iHomeScan"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Camera permission prompt shown by iOS before scanning",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iHomeScan uses the camera and LiDAR Scanner only while you scan a room, to measure walls, doors and windows. Camera images are not saved."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iHomeScan использует камеру и сканер LiDAR только во время сканирования комнаты, чтобы измерить стены, двери и окна. Изображения с камеры не сохраняются."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iHomeScan kamera va LiDAR skaneridan faqat xonani skanerlayotganingizda devorlar, eshiklar va derazalarni oʻlchash uchun foydalanadi. Kamera tasvirlari saqlanmaydi."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

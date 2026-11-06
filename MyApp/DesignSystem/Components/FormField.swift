@@ -63,6 +63,9 @@ struct ActionButton: View {
             }
             .font(Typography.button)
             .foregroundStyle(foreground)
+            .multilineTextAlignment(.center)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, minHeight: 52)
             .background(background, in: .rect(cornerRadius: Radius.medium))
         }

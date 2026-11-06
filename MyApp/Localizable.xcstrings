@@ -169,6 +169,30 @@
         }
       }
     },
+    "common.close": {
+      "comment": "Button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yopish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Закрыть"
+          }
+        }
+      }
+    },
     "common.create": {
       "comment": "Button",
       "extractionState": "manual",
@@ -872,19 +896,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A floor plan will appear here after scanning. Scanning arrives in the next version — you can already add rooms and measurements manually."
+            "value": "A floor plan will appear here after scanning. You can also add rooms and measurements manually."
           }
         },
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skanerlangandan soʻng reja shu yerda paydo boʻladi. Skanerlash keyingi versiyada qoʻshiladi — hozircha xonalar va oʻlchovlarni qoʻlda kiritishingiz mumkin."
+            "value": "Skanerlangandan soʻng reja shu yerda paydo boʻladi. Xonalar va oʻlchovlarni qoʻlda ham kiritishingiz mumkin."
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "План появится здесь после сканирования. Сканирование появится в следующей версии — пока можно добавить комнаты и размеры вручную."
+            "value": "План появится здесь после сканирования. Комнаты и размеры можно также добавить вручную."
           }
         }
       }
@@ -909,6 +933,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Вписать в экран"
+          }
+        }
+      }
+    },
+    "plan.scanAction": {
+      "comment": "Button in the empty plan area",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan this floor"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qavatni skanerlash"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканировать этаж"
           }
         }
       }
@@ -2198,7 +2246,7 @@
         "uz": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hali hisobot yoʻq. Yaratilgan PDF’lar shu qurilmada saqlanadi."
+            "value": "Hali hisobot yoʻq. Yaratilgan PDFʼlar shu qurilmada saqlanadi."
           }
         },
         "ru": {
@@ -3217,6 +3265,894 @@
         }
       }
     },
+    "scanner.checking.body": {
+      "comment": "Scanner state",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Making sure LiDAR room scanning is available."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR orqali xonani skanerlash mavjudligi tekshirilmoqda."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверяем, доступно ли LiDAR-сканирование."
+          }
+        }
+      }
+    },
+    "scanner.checking.title": {
+      "comment": "Scanner state",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking your device…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qurilma tekshirilmoqda…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверяем устройство…"
+          }
+        }
+      }
+    },
+    "scanner.denied.body": {
+      "comment": "Scanner state: denied",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To scan rooms, turn on camera access in Settings → iHomeScan → Camera."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xonalarni skanerlash uchun Sozlamalar → iHomeScan → Kameraʼda ruxsatni yoqing."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Чтобы сканировать комнаты, включите доступ: Настройки → iHomeScan → Камера."
+          }
+        }
+      }
+    },
+    "scanner.denied.title": {
+      "comment": "Scanner state: denied",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is off"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga ruxsat berilmagan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступ к камере выключен"
+          }
+        }
+      }
+    },
+    "scanner.error.body": {
+      "comment": "Scanner state: unexpected error",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn’t check whether the scanner is ready. Please try again."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skaner tayyorligini tekshirib boʻlmadi. Qayta urinib koʻring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не удалось проверить готовность сканера. Попробуйте ещё раз."
+          }
+        }
+      }
+    },
+    "scanner.error.title": {
+      "comment": "Scanner state: unexpected error",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Something went wrong"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xatolik yuz berdi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Что-то пошло не так"
+          }
+        }
+      }
+    },
+    "scanner.openSettings": {
+      "comment": "Button opening the app's iOS Settings page",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sozlamalarni ochish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Открыть настройки"
+          }
+        }
+      }
+    },
+    "scanner.permission.allow": {
+      "comment": "Button that shows the system camera prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow camera access"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga ruxsat berish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешить доступ к камере"
+          }
+        }
+      }
+    },
+    "scanner.permission.body": {
+      "comment": "Explanation before the system camera prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iHomeScan uses the camera and LiDAR Scanner only while you scan, to measure walls, doors and windows."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iHomeScan kamera va LiDAR skaneridan faqat skanerlash vaqtida devorlar, eshiklar va derazalarni oʻlchash uchun foydalanadi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iHomeScan использует камеру и сканер LiDAR только во время сканирования, чтобы измерить стены, двери и окна."
+          }
+        }
+      }
+    },
+    "scanner.permission.note": {
+      "comment": "Privacy note before the camera prompt",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera images are not saved. Everything stays on this device."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamera tasvirlari saqlanmaydi. Hammasi shu qurilmada qoladi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Изображения с камеры не сохраняются. Всё остаётся на этом устройстве."
+          }
+        }
+      }
+    },
+    "scanner.permission.title": {
+      "comment": "Scanner state: permission not yet asked",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access needed"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga ruxsat kerak"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нужен доступ к камере"
+          }
+        }
+      }
+    },
+    "scanner.ready.body": {
+      "comment": "Scanner state: ready",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device supports LiDAR room scanning and camera access is allowed."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qurilma LiDAR orqali xonani skanerlashni qoʻllab-quvvatlaydi va kameraga ruxsat berilgan."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Устройство поддерживает LiDAR-сканирование, доступ к камере разрешён."
+          }
+        }
+      }
+    },
+    "scanner.ready.stageNote": {
+      "comment": "Note in ready state",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The scanning engine will be connected in the next update (Stage 2.2). Nothing is captured or saved yet."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlash dvigateli keyingi yangilanishda (Stage 2.2) ulanadi. Hozircha hech narsa yozib olinmaydi va saqlanmaydi."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Модуль сканирования будет подключён в следующем обновлении (Stage 2.2). Пока ничего не записывается и не сохраняется."
+          }
+        }
+      }
+    },
+    "scanner.ready.title": {
+      "comment": "Scanner state: ready",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready to Scan"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashga tayyor"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Готово к сканированию"
+          }
+        }
+      }
+    },
+    "scanner.restricted.body": {
+      "comment": "Scanner state: restricted",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera use is blocked on this device, for example by Screen Time or a device management profile. Ask the person who manages this device to allow it."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qurilmada kameradan foydalanish cheklangan, masalan Ekran vaqti yoki qurilma boshqaruvi profili orqali. Qurilmani boshqaruvchi shaxsdan ruxsat soʻrang."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Камера заблокирована на этом устройстве, например «Экранным временем» или профилем управления. Обратитесь к тому, кто управляет устройством."
+          }
+        }
+      }
+    },
+    "scanner.restricted.title": {
+      "comment": "Scanner state: restricted",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is restricted"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameradan foydalanish cheklangan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступ к камере ограничен"
+          }
+        }
+      }
+    },
+    "scanner.retry": {
+      "comment": "Button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qayta urinish"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Повторить"
+          }
+        }
+      }
+    },
+    "scanner.simulator.body": {
+      "comment": "Scanner state: running in Simulator",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iOS Simulator has no camera or LiDAR Scanner. Run iHomeScan on a LiDAR iPhone to scan rooms."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS simulyatorida kamera va LiDAR skaneri yoʻq. Xonalarni skanerlash uchun iHomeScanʼni LiDARʼli iPhoneʼda ishga tushiring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "В симуляторе iOS нет камеры и сканера LiDAR. Запустите iHomeScan на iPhone с LiDAR, чтобы сканировать комнаты."
+          }
+        }
+      }
+    },
+    "scanner.simulator.title": {
+      "comment": "Scanner state: running in Simulator",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not available in the Simulator"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simulyatorda mavjud emas"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Недоступно в симуляторе"
+          }
+        }
+      }
+    },
+    "scanner.status.camera": {
+      "comment": "Status row label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kameraga ruxsat"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Доступ к камере"
+          }
+        }
+      }
+    },
+    "scanner.status.lidar": {
+      "comment": "Status row label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR room scanning"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR skanerlash"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR-сканирование"
+          }
+        }
+      }
+    },
+    "scanner.tip1": {
+      "comment": "Scanning tip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hold your iPhone at chest height."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonni koʻkrak balandligida tuting."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Держите iPhone на уровне груди."
+          }
+        }
+      }
+    },
+    "scanner.tip2": {
+      "comment": "Scanning tip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walk slowly along the walls."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devorlar boʻylab sekin yuring."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Медленно идите вдоль стен."
+          }
+        }
+      }
+    },
+    "scanner.tip3": {
+      "comment": "Scanning tip",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture doors and windows too, with good lighting."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eshik va derazalarni ham qamrab oling, xona yorugʻ boʻlsin."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Захватите двери и окна, при хорошем освещении."
+          }
+        }
+      }
+    },
+    "scanner.tips.title": {
+      "comment": "Tips header",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before you scan"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skanerlashdan oldin"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перед сканированием"
+          }
+        }
+      }
+    },
+    "scanner.title": {
+      "comment": "Scanner readiness screen title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room scanner"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xona skaneri"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сканер помещений"
+          }
+        }
+      }
+    },
+    "scanner.unsupported.body": {
+      "comment": "Scanner state: device not supported",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room scanning needs an iPhone or iPad with a LiDAR Scanner, such as an iPhone Pro model."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xonani skanerlash uchun LiDAR skanerli iPhone yoki iPad kerak, masalan iPhone Pro modellari."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для сканирования нужен iPhone или iPad со сканером LiDAR, например iPhone Pro."
+          }
+        }
+      }
+    },
+    "scanner.unsupported.note": {
+      "comment": "Hint under unsupported state",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can still add rooms and measurements manually in any project."
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istalgan loyihada xonalar va oʻlchovlarni qoʻlda kiritishingiz mumkin."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вы по-прежнему можете добавлять комнаты и размеры вручную в любом проекте."
+          }
+        }
+      }
+    },
+    "scanner.unsupported.title": {
+      "comment": "Scanner state: device not supported",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR scanning isn’t available"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu qurilmada LiDAR skanerlash mavjud emas"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiDAR-сканирование недоступно"
+          }
+        }
+      }
+    },
+    "scanner.value.allowed": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allowed"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruxsat berilgan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Разрешён"
+          }
+        }
+      }
+    },
+    "scanner.value.checking": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking…"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tekshirilmoqda…"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Проверка…"
+          }
+        }
+      }
+    },
+    "scanner.value.denied": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denied"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rad etilgan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запрещён"
+          }
+        }
+      }
+    },
+    "scanner.value.notAsked": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not asked yet"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hali soʻralmagan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё не запрошен"
+          }
+        }
+      }
+    },
+    "scanner.value.notNeeded": {
+      "comment": "Status value on unsupported devices",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not needed"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Talab qilinmaydi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не требуется"
+          }
+        }
+      }
+    },
+    "scanner.value.notSupported": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not supported"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qoʻllab-quvvatlanmaydi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не поддерживается"
+          }
+        }
+      }
+    },
+    "scanner.value.restricted": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restricted"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cheklangan"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ограничен"
+          }
+        }
+      }
+    },
+    "scanner.value.supported": {
+      "comment": "Status value",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supported"
+          }
+        },
+        "uz": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qoʻllab-quvvatlanadi"
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поддерживается"
+          }
+        }
+      }
+    },
     "settings.about": {
       "comment": "Settings section",
       "extractionState": "manual",
@@ -3549,30 +4485,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "PDF-отчёт сохранён"
-          }
-        }
-      }
-    },
-    "toast.scanLater": {
-      "comment": "Toast for not-yet-implemented scanning",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scanning arrives in a later version"
-          }
-        },
-        "uz": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Skanerlash keyingi versiyada qoʻshiladi"
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Сканирование появится в следующей версии"
           }
         }
       }

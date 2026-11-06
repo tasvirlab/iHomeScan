@@ -23,6 +23,13 @@ enum Route: Hashable {
     case reports(UUID)
 }
 
+/// Where a scan was started from. Stage 2.2 saves the captured plan to this floor.
+struct ScannerContext: Identifiable, Equatable {
+    let id = UUID()
+    var projectID: UUID?
+    var floorID: UUID?
+}
+
 /// Transient UI message shown at the top of the screen.
 struct Toast: Equatable, Identifiable {
     let id = UUID()
@@ -37,6 +44,12 @@ final class AppModel {
     var toast: Toast?
     /// Presents the "New project" sheet from anywhere in the app.
     var isCreatingProject = false
+    /// Presents the scanner readiness screen.
+    var scanner: ScannerContext?
+
+    func openScanner(projectID: UUID? = nil, floorID: UUID? = nil) {
+        scanner = ScannerContext(projectID: projectID, floorID: floorID)
+    }
 
     func open(_ project: Project) {
         path.append(.project(project.id))

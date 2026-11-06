@@ -19,7 +19,7 @@ struct ContentView: View {
             .background(Palette.background.ignoresSafeArea())
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 FloatingTabBar(selection: $model.selectedTab) {
-                    model.showToast("toast.scanLater")
+                    model.openScanner()
                 }
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -36,6 +36,9 @@ struct ContentView: View {
         .sheet(isPresented: $model.isCreatingProject) {
             NewProjectSheet()
                 .toastOverlay(model, settings: settings)
+        }
+        .fullScreenCover(item: $model.scanner) { context in
+            ScannerReadinessView(context: context)
         }
         .toastOverlay(model, settings: settings)
     }

@@ -143,7 +143,10 @@ struct ProjectDetailView: View {
             PlanPlaceholder(systemImage: "exclamationmark.triangle",
                             titleKey: "plan.error.title", bodyKey: "plan.error.body")
         } else {
-            PlanPlaceholder(systemImage: nil, titleKey: "plan.notScanned", bodyKey: "plan.notScanned.body")
+            PlanPlaceholder(systemImage: nil, titleKey: "plan.notScanned", bodyKey: "plan.notScanned.body",
+                            actionKey: "plan.scanAction") {
+                model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
+            }
         }
     }
 
@@ -152,8 +155,8 @@ struct ProjectDetailView: View {
             Button(settings.t("project.pdf"), systemImage: "doc.text") {
                 model.path.append(.reports(project.id))
             }
-            Button(settings.t("project.rescan"), systemImage: "viewfinder") {
-                model.showToast("toast.scanLater")
+            Button(settings.t(plan == nil ? "plan.scanAction" : "project.rescan"), systemImage: "viewfinder") {
+                model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
             }
             Button(settings.t("project.rename"), systemImage: "pencil") {
                 renaming = project
@@ -165,6 +168,8 @@ struct ProjectDetailView: View {
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(Palette.ink)
+                .frame(minWidth: 44, minHeight: 44)
+                .contentShape(.rect)
         }
         .accessibilityLabel(settings.t("project.more"))
     }
@@ -201,6 +206,8 @@ private struct PlanPlaceholder: View {
     let systemImage: String?
     let titleKey: String
     let bodyKey: String
+    var actionKey: String?
+    var action: (() -> Void)?
     @Environment(AppSettings.self) private var settings
 
     var body: some View {
@@ -220,6 +227,23 @@ private struct PlanPlaceholder: View {
                 .font(Typography.body)
                 .foregroundStyle(Palette.inkSecondary)
                 .frame(maxWidth: 270)
+            if let actionKey, let action {
+                Button(action: action) {
+                    HStack(spacing: 8) {
+                        ScanFrameGlyph(showsCenterLine: true, cornerColor: Palette.onAccent,
+                                       lineColor: Palette.onAccent, lineWidth: 2.3)
+                            .frame(width: 20, height: 20)
+                        Text(settings.t(actionKey))
+                    }
+                    .font(Typography.control)
+                    .foregroundStyle(Palette.onAccent)
+                    .padding(.horizontal, 18)
+                    .frame(minHeight: 44)
+                    .background(Palette.accent, in: .capsule)
+                }
+                .buttonStyle(.pressable)
+                .padding(.top, 6)
+            }
         }
         .multilineTextAlignment(.center)
         .padding(24)
