@@ -4915,6 +4915,96 @@
         }
       }
     },
+    "scan.viewer.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Saved Scan" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённый скан" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan skan" } }
+      }
+    },
+    "scan.viewer.loading" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Loading scan…" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Загрузка скана…" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skan yuklanmoqda…" } }
+      }
+    },
+    "scan.viewer.version" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scan version" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Версия скана" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skan versiyasi" } }
+      }
+    },
+    "scan.viewer.versions" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "%lld versions" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Версий: %lld" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "%lld ta versiya" } }
+      }
+    },
+    "scan.viewer.empty.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No saved scans" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Нет сохранённых сканов" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan skan yo‘q" } }
+      }
+    },
+    "scan.viewer.empty.body" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save a room scan to view its 2D plan and 3D model here." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохраните скан комнаты, чтобы открыть 2D-план и 3D-модель." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "2D reja va 3D modelni ko‘rish uchun xona skanini saqlang." } }
+      }
+    },
+    "scan.viewer.error.title" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Couldn’t open scan" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Не удалось открыть скан" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Skanni ochib bo‘lmadi" } }
+      }
+    },
+    "scan.viewer.error.model" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The saved 3D model is missing or invalid." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённая 3D-модель отсутствует или повреждена." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan 3D model mavjud emas yoki yaroqsiz." } }
+      }
+    },
+    "scan.viewer.error.geometry" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "The saved floor plan is missing or invalid." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранённый план этажа отсутствует или повреждён." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlangan qavat rejasi mavjud emas yoki yaroqsiz." } }
+      }
+    },
+    "scan.viewer.3d.unavailable" : {
+      "comment" : "Stage 2.5 saved scan viewer",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "3D preview isn’t available on this device." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "3D-просмотр недоступен на этом устройстве." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Bu qurilmada 3D ko‘rish mavjud emas." } }
+      }
+    },
     "scan.saved.body" : {
       "comment" : "Stage 2.4 scan persistence UI",
       "extractionState" : "manual",

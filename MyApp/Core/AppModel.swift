@@ -21,6 +21,7 @@ enum AppTab: String, CaseIterable, Identifiable {
 enum Route: Hashable {
     case project(UUID)
     case reports(UUID)
+    case savedScan(projectID: UUID, roomID: UUID, scanID: UUID?)
 }
 
 /// Where a scan was started from. Stage 2.2 saves the captured plan to this floor.
@@ -53,6 +54,19 @@ final class AppModel {
 
     func open(_ project: Project) {
         path.append(.project(project.id))
+    }
+
+    func openSavedScan(_ association: SavedScanAssociation) {
+        selectedTab = .projects
+        path = [
+            .project(association.projectID),
+            .savedScan(
+                projectID: association.projectID,
+                roomID: association.roomID,
+                scanID: association.scanID
+            ),
+        ]
+        scanner = nil
     }
 
     func showToast(_ messageKey: String) {

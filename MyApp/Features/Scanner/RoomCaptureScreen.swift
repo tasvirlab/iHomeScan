@@ -52,6 +52,7 @@ struct RoomCaptureScreen: View {
                 if let output = model.output {
                     ScanSaveSheet(output: output, scannerContext: context) { association in
                         savedAssociation = association
+                        appModel.openSavedScan(association)
                     }
                 }
             }
@@ -228,10 +229,7 @@ struct RoomCaptureScreen: View {
 
     private func openSavedProject() {
         guard let savedAssociation else { return }
-        appModel.selectedTab = .projects
-        appModel.path.removeAll()
-        appModel.path.append(.project(savedAssociation.projectID))
-        appModel.scanner = nil
+        appModel.openSavedScan(savedAssociation)
     }
 
     private func openAppSettings() {

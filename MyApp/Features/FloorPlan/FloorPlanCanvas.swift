@@ -132,6 +132,10 @@ struct FloorPlanCanvas: View {
         }
         context.stroke(inner, with: .color(Palette.wall), style: StrokeStyle(lineWidth: 130, lineCap: .square))
 
+        // Real RoomPlan openings are preserved as rotated projected segments in metadata.
+        // Cut them out of the wall before drawing door leaves and window center lines.
+        drawRoomPlanOpenings(plan, in: &context)
+
         // Door leaves and swing arcs
         var doors = Path()
         for door in plan.doors {
@@ -146,8 +150,9 @@ struct FloorPlanCanvas: View {
         }
         context.stroke(doors, with: .color(Palette.inkTertiary), lineWidth: 22)
 
-        // Windows
-        for window in plan.windows {
+        // Legacy/sample windows. Real RoomPlan windows use their rotated metadata segments below.
+        if plan.roomPlanMetadata == nil {
+            for window in plan.windows {
             context.fill(Path(window), with: .color(Palette.planFloor))
             context.stroke(Path(window), with: .color(Palette.wall), lineWidth: 26)
             var center = Path()
@@ -159,10 +164,35 @@ struct FloorPlanCanvas: View {
                 center.addLine(to: CGPoint(x: window.midX, y: window.maxY))
             }
             context.stroke(center, with: .color(Palette.wall), lineWidth: 22)
+            }
         }
 
         if style == .draft {
             drawDimensionLines(plan, in: &context)
+        }
+    }
+
+    private func drawRoomPlanOpenings(_ plan: FloorPlan, in context: inout GraphicsContext) {
+        guard let metadata = plan.roomPlanMetadata else { return }
+        for surface in metadata.surfaces {
+            guard [.door, .window, .opening].contains(surface.kind),
+                  let segment = surface.projectedSegment else { continue }
+            let start = CGPoint(x: segment.start.x * Self.millimetersPerMeter,
+                                y: segment.start.y * Self.millimetersPerMeter)
+            let end = CGPoint(x: segment.end.x * Self.millimetersPerMeter,
+                              y: segment.end.y * Self.millimetersPerMeter)
+            var path = Path()
+            path.move(to: start)
+            path.addLine(to: end)
+            context.stroke(path, with: .color(Palette.planFloor),
+                           style: StrokeStyle(lineWidth: 245, lineCap: .butt))
+            if surface.kind == .window {
+                context.stroke(path, with: .color(Palette.accentText),
+                               style: StrokeStyle(lineWidth: 34, lineCap: .butt))
+            } else if surface.kind == .opening {
+                context.stroke(path, with: .color(Palette.inkTertiary.opacity(0.45)),
+                               style: StrokeStyle(lineWidth: 14, lineCap: .butt, dash: [70, 55]))
+            }
         }
     }
 

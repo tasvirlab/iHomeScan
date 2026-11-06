@@ -29,6 +29,8 @@ struct ContentView: View {
                 switch route {
                 case .project(let id): ProjectDetailScreen(projectID: id)
                 case .reports(let id): ReportsScreen(projectID: id)
+                case .savedScan(let projectID, let roomID, let scanID):
+                    SavedScanViewerScreen(projectID: projectID, roomID: roomID, scanID: scanID)
                 }
             }
         }

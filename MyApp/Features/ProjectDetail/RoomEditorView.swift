@@ -72,8 +72,13 @@ struct RoomEditorView: View {
 
                 if let room = existingRoom {
                     let savedScanCount = room.assets.filter { $0.type == .roomPlanSource }.count
-                    if savedScanCount > 0 {
-                        SavedRoomScanStatus(count: savedScanCount)
+                    if savedScanCount > 0, let projectID = room.floor?.project?.id {
+                        NavigationLink {
+                            SavedScanViewerScreen(projectID: projectID, roomID: room.id)
+                        } label: {
+                            SavedRoomScanStatus(count: savedScanCount)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     ActionButton(title: settings.t("room.delete"), systemImage: "trash", kind: .destructive) {
