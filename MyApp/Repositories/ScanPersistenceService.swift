@@ -8,6 +8,28 @@ enum ScanPersistenceError: Error, Equatable {
     case missingGeometryMetadata
 }
 
+enum ScanProjectDestination: Equatable {
+    case new(name: String)
+    case existing(projectID: UUID)
+}
+
+enum ScanFloorDestination: Equatable {
+    case automatic
+    case new
+    case existing(floorID: UUID)
+}
+
+enum ScanRoomDestination: Equatable {
+    case new(name: String)
+    case existing(roomID: UUID)
+}
+
+struct ScanSaveRequest: Equatable {
+    let project: ScanProjectDestination
+    let floor: ScanFloorDestination
+    let room: ScanRoomDestination
+}
+
 struct SavedScanAssociation: Equatable {
     let scanID: UUID
     let projectID: UUID
@@ -38,6 +60,50 @@ struct ScanPersistenceService {
 
     func save(
         output: RoomScanOutput,
+        request: ScanSaveRequest
+    ) throws -> SavedScanAssociation {
+        guard try savedScan(id: output.scanID) == nil else {
+            throw ScanPersistenceError.duplicateScan
+        }
+        guard output.floorPlan.roomPlanMetadata != nil else {
+            throw ScanPersistenceError.missingGeometryMetadata
+        }
+
+        let prepared = try artifactProducer.prepareArtifacts(for: output)
+        defer { try? FileManager.default.removeItem(at: prepared.temporaryDirectory) }
+
+        var projectIDForCleanup: UUID?
+        do {
+            let project = try resolveProject(request.project)
+            projectIDForCleanup = project.id
+            let floor = try resolveFloor(request.floor, project: project)
+            let existingRoom = try resolveRoom(request.room, floor: floor)
+            let roomName: String
+            switch request.room {
+            case .new(let name): roomName = name
+            case .existing:
+                guard let existingRoom else { throw ScanPersistenceError.invalidAssociation }
+                roomName = existingRoom.name
+            }
+            return try persist(
+                output: output,
+                prepared: prepared,
+                project: project,
+                floor: floor,
+                existingRoom: existingRoom,
+                roomName: roomName
+            )
+        } catch {
+            context.rollback()
+            if let projectIDForCleanup {
+                try? files.deleteScanDirectory(projectID: projectIDForCleanup, scanID: output.scanID)
+            }
+            throw error
+        }
+    }
+
+    func save(
+        output: RoomScanOutput,
         project: Project,
         floor: Floor,
         existingRoom: Room?,
@@ -55,13 +121,35 @@ struct ScanPersistenceService {
         guard let name = roomName.nilIfBlank else {
             throw ScanPersistenceError.emptyRoomName
         }
-        guard let metadata = output.floorPlan.roomPlanMetadata else {
+        guard output.floorPlan.roomPlanMetadata != nil else {
             throw ScanPersistenceError.missingGeometryMetadata
         }
 
         let prepared = try artifactProducer.prepareArtifacts(for: output)
         defer { try? FileManager.default.removeItem(at: prepared.temporaryDirectory) }
 
+        return try persist(
+            output: output,
+            prepared: prepared,
+            project: project,
+            floor: floor,
+            existingRoom: existingRoom,
+            roomName: name
+        )
+    }
+
+    private func persist(
+        output: RoomScanOutput,
+        prepared: PreparedScanArtifacts,
+        project: Project,
+        floor: Floor,
+        existingRoom: Room?,
+        roomName: String
+    ) throws -> SavedScanAssociation {
+        guard let metadata = output.floorPlan.roomPlanMetadata else {
+            throw ScanPersistenceError.missingGeometryMetadata
+        }
+        guard let name = roomName.nilIfBlank else { throw ScanPersistenceError.emptyRoomName }
         let bundle = try files.saveScanBundle(
             sourceData: prepared.sourceData,
             geometryData: prepared.geometryData,
@@ -126,6 +214,59 @@ struct ScanPersistenceService {
             context.rollback()
             try? files.deleteScanDirectory(projectID: project.id, scanID: output.scanID)
             throw error
+        }
+    }
+
+    private func resolveProject(_ destination: ScanProjectDestination) throws -> Project {
+        switch destination {
+        case .new(let name):
+            guard let name = name.nilIfBlank else { throw RepositoryError.emptyName }
+            let project = Project(name: name)
+            context.insert(project)
+            return project
+        case .existing(let projectID):
+            var descriptor = FetchDescriptor<Project>(predicate: #Predicate { $0.id == projectID })
+            descriptor.fetchLimit = 1
+            guard let project = try context.fetch(descriptor).first, !project.isSample else {
+                throw ScanPersistenceError.invalidAssociation
+            }
+            return project
+        }
+    }
+
+    private func resolveFloor(_ destination: ScanFloorDestination, project: Project) throws -> Floor {
+        switch destination {
+        case .automatic:
+            if let floor = project.sortedFloors.first { return floor }
+            return makeFloor(project: project)
+        case .new:
+            return makeFloor(project: project)
+        case .existing(let floorID):
+            guard let floor = project.floors.first(where: { $0.id == floorID }) else {
+                throw ScanPersistenceError.invalidAssociation
+            }
+            return floor
+        }
+    }
+
+    private func makeFloor(project: Project) -> Floor {
+        let level = (project.floors.map(\.level).max() ?? 0) + 1
+        let floor = Floor(level: level, name: "")
+        context.insert(floor)
+        floor.project = project
+        return floor
+    }
+
+    private func resolveRoom(_ destination: ScanRoomDestination, floor: Floor) throws -> Room? {
+        switch destination {
+        case .new(let name):
+            guard name.nilIfBlank != nil else { throw ScanPersistenceError.emptyRoomName }
+            return nil
+        case .existing(let roomID):
+            guard let room = floor.rooms.first(where: { $0.id == roomID }) else {
+                throw ScanPersistenceError.invalidAssociation
+            }
+            return room
         }
     }
 

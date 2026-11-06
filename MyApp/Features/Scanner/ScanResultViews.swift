@@ -5,6 +5,7 @@ import SwiftUI
 struct ScanResultView: View {
     let summary: RoomScanSummary
     let completeness: RoomPlanGeometryMetadata.Completeness
+    let floorArea: Double?
     let savedAssociation: SavedScanAssociation?
     let onSave: () -> Void
     let onScanAgain: () -> Void
@@ -59,9 +60,9 @@ struct ScanResultView: View {
                             .font(Typography.body)
                             .foregroundStyle(Palette.inkSecondary)
                         Spacer(minLength: 8)
-                        Text(settings.t("scan.result.measurements.value"))
+                        Text(floorArea.map(settings.area) ?? settings.t("scan.result.measurements.unavailable"))
                             .font(Typography.rowTitle)
-                            .foregroundStyle(Palette.inkTertiary)
+                            .foregroundStyle(floorArea == nil ? Palette.inkTertiary : Palette.ink)
                     }
                     .padding(.top, 4)
                     .accessibilityElement(children: .combine)

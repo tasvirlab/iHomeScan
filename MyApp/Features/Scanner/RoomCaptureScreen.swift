@@ -67,6 +67,7 @@ struct RoomCaptureScreen: View {
                 ScanResultView(
                     summary: summary,
                     completeness: output.floorPlan.roomPlanMetadata?.completeness ?? .incomplete,
+                    floorArea: output.floorPlan.roomPlanMetadata?.floorArea,
                     savedAssociation: savedAssociation,
                     onSave: { showsSaveSheet = true },
                     onScanAgain: {

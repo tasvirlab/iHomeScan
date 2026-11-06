@@ -414,4 +414,129 @@ struct ScanPersistenceTests {
             try RoomPlanScanArtifactProducer().prepareArtifacts(for: output)
         }
     }
+
+    @Test("Scan-first save creates project, default floor and room atomically")
+    func scanFirstCreation() throws {
+        let environment = try TestEnvironment()
+        let output = try output()
+        let service = ScanPersistenceService(
+            context: environment.context,
+            files: environment.files,
+            artifactProducer: FakeScanArtifactProducer()
+        )
+
+        let association = try service.save(
+            output: output,
+            request: ScanSaveRequest(
+                project: .new(name: "November scan"),
+                floor: .automatic,
+                room: .new(name: "Room 1")
+            )
+        )
+
+        let project = try #require(try environment.projects.project(id: association.projectID))
+        let floor = try #require(project.sortedFloors.first)
+        let room = try #require(floor.sortedRooms.first)
+        #expect(project.name == "November scan")
+        #expect(floor.level == 1)
+        #expect(floor.name.isEmpty)
+        #expect(room.name == "Room 1")
+        #expect(association.floorID == floor.id)
+        #expect(association.roomID == room.id)
+    }
+
+    @Test("Existing project can receive a new floor inline")
+    func inlineFloorCreation() throws {
+        let environment = try TestEnvironment()
+        let project = try environment.projects.create(name: "Existing")
+        let output = try output()
+        let association = try ScanPersistenceService(
+            context: environment.context,
+            files: environment.files,
+            artifactProducer: FakeScanArtifactProducer()
+        ).save(
+            output: output,
+            request: ScanSaveRequest(
+                project: .existing(projectID: project.id),
+                floor: .new,
+                room: .new(name: "Room 1")
+            )
+        )
+
+        #expect(project.sortedFloors.count == 2)
+        #expect(project.sortedFloors.last?.level == 2)
+        #expect(project.sortedFloors.last?.id == association.floorID)
+    }
+
+    @Test("Existing project, floor and room remain the selected association")
+    func existingDestinationSelection() throws {
+        let environment = try TestEnvironment()
+        let project = try environment.projects.create(name: "Existing")
+        let floor = try #require(project.sortedFloors.first)
+        let room = try environment.rooms.addRoom(to: floor, draft: RoomDraft(name: "Office"))
+        let association = try ScanPersistenceService(
+            context: environment.context,
+            files: environment.files,
+            artifactProducer: FakeScanArtifactProducer()
+        ).save(
+            output: try output(),
+            request: ScanSaveRequest(
+                project: .existing(projectID: project.id),
+                floor: .existing(floorID: floor.id),
+                room: .existing(roomID: room.id)
+            )
+        )
+
+        #expect(association.projectID == project.id)
+        #expect(association.floorID == floor.id)
+        #expect(association.roomID == room.id)
+        #expect(room.name == "Office")
+    }
+
+    @Test("Opening or cancelling save performs no writes")
+    func cancelWithoutEntities() throws {
+        let environment = try TestEnvironment()
+        _ = ScanSaveRequest(
+            project: .new(name: "Pending"),
+            floor: .automatic,
+            room: .new(name: "Room 1")
+        )
+        #expect(try environment.count(Project.self) == 0)
+        #expect(try environment.count(Floor.self) == 0)
+        #expect(try environment.count(Room.self) == 0)
+        #expect(try environment.count(SavedScan.self) == 0)
+    }
+
+    @Test("Failed atomic save removes newly created entities and files")
+    func scanFirstRollback() throws {
+        let environment = try TestEnvironment()
+        let output = try output()
+        let service = ScanPersistenceService(
+            context: environment.context,
+            files: environment.files,
+            artifactProducer: FakeScanArtifactProducer(),
+            saveContext: { throw FileStorageError.writeFailed("database injected") }
+        )
+
+        #expect(throws: FileStorageError.self) {
+            try service.save(
+                output: output,
+                request: ScanSaveRequest(
+                    project: .new(name: "Should roll back"),
+                    floor: .automatic,
+                    room: .new(name: "Room 1")
+                )
+            )
+        }
+        #expect(try environment.count(Project.self) == 0)
+        #expect(try environment.count(Floor.self) == 0)
+        #expect(try environment.count(Room.self) == 0)
+        #expect(try environment.count(SavedScan.self) == 0)
+    }
+
+    @Test("Default room names skip names already used")
+    func defaultRoomNaming() {
+        let name = ScanSaveDefaults.nextRoomName(existingNames: ["Room 1", "room 2"]) { "Room \($0)" }
+        #expect(name == "Room 3")
+    }
 }

@@ -4273,6 +4273,15 @@
         }
       }
     },
+    "scan.result.measurements.unavailable" : {
+      "comment" : "Shown when RoomPlan did not provide a reliable floor area",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Measurement unavailable" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Размер недоступен" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "O‘lchov mavjud emas" } }
+      }
+    },
     "scan.result.measurements.value" : {
       "comment" : "Result row value",
       "extractionState" : "manual",
@@ -4535,6 +4544,87 @@
             "value" : "Derazalar"
           }
         }
+      }
+    },
+    "scan.save.createProject" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create New Project" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Создать проект" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Yangi loyiha yaratish" } }
+      }
+    },
+    "scan.save.existingProject" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Project" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующий проект" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud loyiha" } }
+      }
+    },
+    "scan.save.defaultProjectName" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room Scan — %@" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Скан комнаты — %@" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Xona skani — %@" } }
+      }
+    },
+    "scan.save.defaultRoomName" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Room %lld" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Комната %lld" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Xona %lld" } }
+      }
+    },
+    "scan.save.floorAutomatic" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Created automatically when you save" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Будет создан автоматически" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlashda avtomatik yaratiladi" } }
+      }
+    },
+    "scan.save.existingFloor" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Floor" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующий этаж" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud qavat" } }
+      }
+    },
+    "scan.save.createFloor" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Create Floor" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Создать этаж" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Yangi qavat" } }
+      }
+    },
+    "scan.save.existingRoom" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Existing Room" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Существующая комната" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Mavjud xona" } }
+      }
+    },
+    "scan.save.saveAndView" : {
+      "comment" : "Stage 2.4.1 scan-first save workflow",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save and View" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сохранить и открыть" } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Saqlash va ko‘rish" } }
       }
     },
     "scan.save.action" : {
