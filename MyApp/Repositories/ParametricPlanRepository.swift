@@ -49,6 +49,31 @@ struct ParametricPlanRepository {
         return plan
     }
 
+    func loadPrecisionDocument(scan: SavedScan, floorPlan: FloorPlan) throws -> PrecisionPlanDocument {
+        if files.precisionPlanExists(projectID: scan.projectID, scanID: scan.id) {
+            let data = try files.readPrecisionPlan(projectID: scan.projectID, scanID: scan.id)
+            let document = try PrecisionPlanDocument.decode(from: data)
+            try requireValid(document.currentPlan)
+            return document
+        }
+        let baseline = try loadOrCreate(scan: scan, floorPlan: floorPlan)
+        return PrecisionPlanDocument(
+            baselinePlan: baseline,
+            currentPlan: baseline,
+            constraints: [],
+            revisions: []
+        )
+    }
+
+    func savePrecisionDocument(_ document: PrecisionPlanDocument, scan: SavedScan) throws {
+        try requireValid(document.currentPlan)
+        try files.savePrecisionPlan(
+            document.encoded(),
+            projectID: scan.projectID,
+            scanID: scan.id
+        )
+    }
+
     private func requireValid(_ plan: ParametricFloorPlan) throws {
         let result = validator.validate(plan)
         guard result.isValid else {

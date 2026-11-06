@@ -1057,6 +1057,54 @@
         }
       }
     },
+    "precision.anchor.end" : {
+      "comment" : "Keeps the wall end endpoint fixed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep end"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранить конец"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Oxirini saqlash"
+          }
+        }
+      }
+    },
+    "precision.anchor.start" : {
+      "comment" : "Keeps the wall start endpoint fixed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep start"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранить начало"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshlanishni saqlash"
+          }
+        }
+      }
+    },
     "precision.edit.title" : {
       "comment" : "Button that opens the read-only parametric floor plan inspector",
       "extractionState" : "extracted_with_value",
@@ -1081,6 +1129,54 @@
         }
       }
     },
+    "precision.editor.anchor" : {
+      "comment" : "Picker title for the endpoint that remains fixed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fixed endpoint"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Фиксированная точка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qotirilgan uch"
+          }
+        }
+      }
+    },
+    "precision.editor.apply" : {
+      "comment" : "Commits a valid geometry preview",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Apply"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Применить"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qo‘llash"
+          }
+        }
+      }
+    },
     "precision.editor.canvas" : {
       "comment" : "Accessibility label for the parametric plan canvas",
       "extractionState" : "extracted_with_value",
@@ -1101,6 +1197,54 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Tanlanadigan parametrik qavat rejasi"
+          }
+        }
+      }
+    },
+    "precision.editor.conflict" : {
+      "comment" : "Constraint solver conflict warning",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This change conflicts with protected geometry."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Изменение конфликтует с защищённой геометрией."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bu o‘zgarish himoyalangan geometriyaga zid."
+          }
+        }
+      }
+    },
+    "precision.editor.dimension" : {
+      "comment" : "Field for entering a revised wall length",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "New length"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Новая длина"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Yangi uzunlik"
           }
         }
       }
@@ -1201,6 +1345,102 @@
         }
       }
     },
+    "precision.editor.original3D" : {
+      "comment" : "Clarifies that USDZ does not reflect precision edits",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "3D remains original scan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "3D остаётся исходным сканом"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "3D original scan holatida"
+          }
+        }
+      }
+    },
+    "precision.editor.redo" : {
+      "comment" : "Reapplies the last undone geometry revision",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Redo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Повторить"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qayta qo‘llash"
+          }
+        }
+      }
+    },
+    "precision.editor.saveError.body" : {
+      "comment" : "Precision geometry persistence recovery message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The previous saved geometry is unchanged. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Предыдущая сохранённая геометрия не изменена. Повторите попытку."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Avvalgi saqlangan geometriya o‘zgarmadi. Qayta urinib ko‘ring."
+          }
+        }
+      }
+    },
+    "precision.editor.saveError.title" : {
+      "comment" : "Precision geometry persistence error title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Could not save changes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Не удалось сохранить изменения"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘zgarishlarni saqlab bo‘lmadi"
+          }
+        }
+      }
+    },
     "precision.editor.selectWall" : {
       "comment" : "Instruction displayed below the parametric plan",
       "extractionState" : "extracted_with_value",
@@ -1221,6 +1461,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "O‘lchamlarini ko‘rish uchun devorni tanlang."
+          }
+        }
+      }
+    },
+    "precision.editor.source" : {
+      "comment" : "Picker title for measurement provenance",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measurement source"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Источник измерения"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchov manbasi"
           }
         }
       }
@@ -1249,6 +1513,30 @@
         }
       }
     },
+    "precision.editor.undo" : {
+      "comment" : "Reverts the last committed geometry revision",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Undo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Не применять"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bekor qilish"
+          }
+        }
+      }
+    },
     "precision.editor.wallDetails" : {
       "comment" : "Heading for selected wall metadata",
       "extractionState" : "extracted_with_value",
@@ -1273,6 +1561,30 @@
         }
       }
     },
+    "precision.source.laserVerified" : {
+      "comment" : "Explicitly marks a manually entered laser measurement as verified",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Laser verified"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Проверено лазером"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Lazer bilan tasdiqlangan"
+          }
+        }
+      }
+    },
     "precision.source.lidar" : {
       "comment" : "Measurement provenance from RoomPlan and LiDAR",
       "extractionState" : "extracted_with_value",
@@ -1293,6 +1605,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "LiDAR bahosi"
+          }
+        }
+      }
+    },
+    "precision.source.manual" : {
+      "comment" : "A manually entered, unverified measurement",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Manual"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Вручную"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qo‘lda"
           }
         }
       }

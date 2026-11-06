@@ -160,13 +160,18 @@ final class LocalFileStorageService {
             let sourceFile = try validatedStoredFile(at: sourceURL)
             let geometryFile = try validatedStoredFile(at: geometryURL)
             let modelFile = try validatedStoredFile(at: stagedModelURL)
+            // Resolve final relative paths while the staging URL still exists. Some file-system
+            // URL standardization behaviors change after the directory has been moved.
+            let committedSource = storedScanFile(sourceFile, projectID: projectID, scanID: scanID)
+            let committedGeometry = storedScanFile(geometryFile, projectID: projectID, scanID: scanID)
+            let committedModel = storedScanFile(modelFile, projectID: projectID, scanID: scanID)
             try fileManager.moveItem(at: staging, to: destination)
 
             return StoredScanBundle(
                 scanID: scanID,
-                source: replacingRoot(sourceFile, from: staging, to: destination),
-                geometry: replacingRoot(geometryFile, from: staging, to: destination),
-                model: replacingRoot(modelFile, from: staging, to: destination)
+                source: committedSource,
+                geometry: committedGeometry,
+                model: committedModel
             )
         } catch let error as FileStorageError {
             try? fileManager.removeItem(at: staging)
@@ -228,6 +233,48 @@ final class LocalFileStorageService {
             scanID.uuidString, "parametric-v1.json",
         ].joined(separator: "/")
         return fileExists(atRelativePath: relativePath)
+    }
+
+    /// Stores accepted precision edits separately, preserving `parametric-v1.json` as the baseline.
+    @discardableResult
+    func savePrecisionPlan(_ data: Data, projectID: UUID, scanID: UUID) throws -> StoredFile {
+        guard !data.isEmpty else { throw FileStorageError.writeFailed("empty precision geometry") }
+        let directory = projectDirectory(for: projectID)
+            .appending(path: AssetType.roomGeometry.folderName, directoryHint: .isDirectory)
+            .appending(path: scanID.uuidString, directoryHint: .isDirectory)
+        guard fileManager.fileExists(atPath: directory.path(percentEncoded: false)) else {
+            throw FileStorageError.fileMissing(scanID.uuidString)
+        }
+        let destination = directory.appending(path: "precision-v2.json", directoryHint: .notDirectory)
+        do {
+            try data.write(
+                to: destination,
+                options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
+            )
+        } catch {
+            throw FileStorageError.writeFailed(error.localizedDescription)
+        }
+        return StoredFile(
+            relativePath: relativePath(for: destination),
+            fileName: destination.lastPathComponent,
+            fileSize: Int64(data.count),
+            checksum: Self.checksum(of: data)
+        )
+    }
+
+    func readPrecisionPlan(projectID: UUID, scanID: UUID) throws -> Data {
+        try read(relativePath: precisionPlanPath(projectID: projectID, scanID: scanID))
+    }
+
+    func precisionPlanExists(projectID: UUID, scanID: UUID) -> Bool {
+        fileExists(atRelativePath: precisionPlanPath(projectID: projectID, scanID: scanID))
+    }
+
+    private func precisionPlanPath(projectID: UUID, scanID: UUID) -> String {
+        [
+            "Projects", projectID.uuidString, AssetType.roomGeometry.folderName,
+            scanID.uuidString, "precision-v2.json",
+        ].joined(separator: "/")
     }
 
     // MARK: - Reading
@@ -311,16 +358,12 @@ final class LocalFileStorageService {
         )
     }
 
-    private func replacingRoot(_ file: StoredFile, from staging: URL, to destination: URL) -> StoredFile {
-        let stagedPrefix = relativePath(for: staging)
-        let destinationPrefix = relativePath(for: destination)
-        let path = file.relativePath.replacingOccurrences(
-            of: stagedPrefix,
-            with: destinationPrefix,
-            options: [.anchored]
-        )
-        return StoredFile(
-            relativePath: path,
+    private func storedScanFile(_ file: StoredFile, projectID: UUID, scanID: UUID) -> StoredFile {
+        StoredFile(
+            relativePath: [
+                "Projects", projectID.uuidString, AssetType.roomGeometry.folderName,
+                scanID.uuidString, file.fileName,
+            ].joined(separator: "/"),
             fileName: file.fileName,
             fileSize: file.fileSize,
             checksum: file.checksum

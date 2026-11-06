@@ -192,6 +192,18 @@ struct ParametricFloorPlan: Codable, Hashable, Identifiable, Sendable {
         }
     }
 
+    /// Shoelace area for one reliable closed boundary. Open or invalid boundaries stay unavailable.
+    var derivedFloorArea: Double? {
+        guard let polygon = floorBoundary?.first, polygon.count >= 3,
+              polygon.allSatisfy(\.isFinite) else { return nil }
+        let doubledArea = polygon.indices.reduce(0.0) { result, index in
+            let next = polygon[(index + 1) % polygon.count]
+            return result + polygon[index].x * next.y - next.x * polygon[index].y
+        }
+        let area = abs(doubledArea) / 2
+        return area.isFinite && area > 0 ? area : nil
+    }
+
     func encoded() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]

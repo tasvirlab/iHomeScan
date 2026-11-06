@@ -72,4 +72,18 @@ enum PrecisionLocalization {
         defaultValue: "Estimated · not verified",
         comment: "Verification state for an unverified LiDAR measurement"
     )
+    static let dimension = LocalizedStringResource("precision.editor.dimension", defaultValue: "New length", comment: "Field for entering a revised wall length")
+    static let anchor = LocalizedStringResource("precision.editor.anchor", defaultValue: "Fixed endpoint", comment: "Picker title for the endpoint that remains fixed")
+    static let anchorStart = LocalizedStringResource("precision.anchor.start", defaultValue: "Keep start", comment: "Keeps the wall start endpoint fixed")
+    static let anchorEnd = LocalizedStringResource("precision.anchor.end", defaultValue: "Keep end", comment: "Keeps the wall end endpoint fixed")
+    static let measurementSource = LocalizedStringResource("precision.editor.source", defaultValue: "Measurement source", comment: "Picker title for measurement provenance")
+    static let manualSource = LocalizedStringResource("precision.source.manual", defaultValue: "Manual", comment: "A manually entered, unverified measurement")
+    static let laserSource = LocalizedStringResource("precision.source.laserVerified", defaultValue: "Laser verified", comment: "Explicitly marks a manually entered laser measurement as verified")
+    static let conflict = LocalizedStringResource("precision.editor.conflict", defaultValue: "This change conflicts with protected geometry.", comment: "Constraint solver conflict warning")
+    static let apply = LocalizedStringResource("precision.editor.apply", defaultValue: "Apply", comment: "Commits a valid geometry preview")
+    static let undo = LocalizedStringResource("precision.editor.undo", defaultValue: "Undo", comment: "Reverts the last committed geometry revision")
+    static let redo = LocalizedStringResource("precision.editor.redo", defaultValue: "Redo", comment: "Reapplies the last undone geometry revision")
+    static let original3D = LocalizedStringResource("precision.editor.original3D", defaultValue: "3D remains original scan", comment: "Clarifies that USDZ does not reflect precision edits")
+    static let saveErrorTitle = LocalizedStringResource("precision.editor.saveError.title", defaultValue: "Could not save changes", comment: "Precision geometry persistence error title")
+    static let saveErrorBody = LocalizedStringResource("precision.editor.saveError.body", defaultValue: "The previous saved geometry is unchanged. Try again.", comment: "Precision geometry persistence recovery message")
 }

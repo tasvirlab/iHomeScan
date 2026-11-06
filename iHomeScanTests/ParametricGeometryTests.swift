@@ -286,6 +286,19 @@ struct ParametricGeometryTests {
         let created = try repository.loadOrCreate(scan: scan, floorPlan: sourcePlan)
         #expect(files.parametricPlanExists(projectID: projectID, scanID: scanID))
         #expect(try repository.load(scan: scan) == created)
+
+        var edited = created
+        edited.vertices[1].position.x += 0.2
+        let document = PrecisionPlanDocument(
+            baselinePlan: created,
+            currentPlan: edited,
+            constraints: [],
+            revisions: []
+        )
+        try repository.savePrecisionDocument(document, scan: scan)
+        let reopened = try repository.loadPrecisionDocument(scan: scan, floorPlan: sourcePlan)
+        #expect(reopened.currentPlan == edited)
+        #expect(reopened.baselinePlan == created)
     }
 
     @Test("Existing scan artifacts remain byte-for-byte compatible")
