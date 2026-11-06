@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+:root,[data-theme="light"]{--bg:#F4F3F0;--card:#FFFFFF;--surface-2:#E9E7E2;--graphite:#23272A;--on-graphite:#F2F0EB;--on-graphite-2:#A9ADAA;--line:#DDDAD3;--ink:#1A1C1D;--ink-2:#5C605D;--ink-3:#8B8E8A;--accent:#D2401C;--accent-press:#B23516;--accent-text:#B8381A;--accent-tint:#F6E2DA;--on-accent:#FFFFFF;--success:#2E7D4F;--error:#B3261E;--bar:rgba(244,243,240,.86);--plan-bg:#F7F6F3;--plan-floor:#FFFFFF;--grid:rgba(26,28,29,.055);--wall:#1A1C1D;--wall-side:#CFCBC3;--dim:#5C605D;--shadow:0 1px 2px rgba(26,28,29,.05),0 6px 18px rgba(26,28,29,.07);--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Helvetica Neue",sans-serif;--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+[data-theme="dark"]{--bg:#121314;--card:#1E2123;--surface-2:#25282B;--graphite:#2A2E31;--on-graphite:#EEECE7;--on-graphite-2:#A5A8A4;--line:#2F3336;--ink:#EEECE7;--ink-2:#A5A8A4;--ink-3:#74787A;--accent:#FF6A42;--accent-press:#FF8463;--accent-text:#FF8A66;--accent-tint:#3B2119;--on-accent:#1A0D08;--success:#5CC28A;--error:#FF6B60;--bar:rgba(18,19,20,.86);--plan-bg:#151719;--plan-floor:#1C1F21;--grid:rgba(238,236,231,.05);--wall:#EEECE7;--wall-side:#3A3F42;--dim:#A5A8A4;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25)}
+@keyframes ihs-spin{to{transform:rotate(360deg)}}
+@keyframes ihs-up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes ihs-fade{from{opacity:0}to{opacity:1}}
+html,body{margin:0;height:100%;background:#E4E2DC;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#B8381A;text-decoration:none}a:hover{color:#8F2A12}
+button{font-family:inherit}
+input{font-family:inherit}
+input::placeholder{color:var(--ink-3)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;justify-content:center;align-items:flex-start;gap:40px;padding:20px;box-sizing:border-box;flex-wrap:wrap">
+<div style="width:190px;padding-top:24px;display:flex;flex-direction:column;gap:6px">
+<div style="font:700 15px -apple-system,system-ui,sans-serif;color:#1A1C1D">iHomeScan</div>
+<div style="font:12px/1.45 -apple-system,system-ui,sans-serif;color:#5C605D;margin-bottom:12px">Interaktiv prototip · 1b + 1c + 1f. Reja — namuna maʼlumot.</div>
+<sc-for list="{{ jumps }}" as="j" hint-placeholder-count="7">
+<button onClick="{{ j.go }}" style="text-align:left;padding:8px 12px;border-radius:10px;border:0;background:{{ j.bg }};color:#1A1C1D;font:500 13px -apple-system,system-ui,sans-serif;cursor:pointer">{{ j.label }}</button>
+</sc-for>
+</div>
+<div style="width:{{ frameW }}px;height:{{ frameH }}px;flex:none">
+<div data-theme="{{ themeName }}" style="width:426px;height:898px;transform-origin:0 0;transform:scale({{ scale }})">
+<div data-screen-label="iPhone" style="position:relative;width:402px;height:874px;margin:12px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font)">
+
+<div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;box-sizing:border-box;font:600 17px var(--font);color:{{ statusColor }};pointer-events:none"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+
+<div style="position:absolute;inset:0;z-index:1">
+<div style="position:absolute;top:54px;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 20px;z-index:5">
+<div style="display:flex;align-items:center;gap:9px;opacity:{{ logoOpacity }}"><div style="width:30px;height:30px;border-radius:9px;background:var(--graphite);display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="#F2F0EB"></path><path d="M8 12h8" stroke="#E5542F"></path></svg></div><span style="font:700 21px var(--font);letter-spacing:-.4px">iHomeScan</span></div>
+<div style="display:flex;align-items:center;gap:8px">
+<button onClick="{{ toggleLang }}" aria-label="Til" style="height:34px;padding:0 9px 0 12px;border-radius:999px;border:0;background:var(--surface-2);color:var(--ink);font:650 13px var(--font);display:flex;align-items:center;gap:3px;cursor:pointer;letter-spacing:.3px">{{ langCode }}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+<button onClick="{{ openProfile }}" aria-label="Profil" style="width:36px;height:36px;border-radius:999px;border:0;padding:0;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;cursor:pointer;color:var(--ink-3)">
+<sc-if value="{{ hasPhoto }}" hint-placeholder-val="{{ false }}"><div style="width:100%;height:100%;background-position:center;background-size:cover;background-image:{{ photoBg }}"></div></sc-if>
+<sc-if value="{{ noPhoto }}" hint-placeholder-val="{{ true }}"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.5" r="4"></circle><path d="M4 20.5c1.1-3.9 4.2-6 8-6s6.9 2.1 8 6z"></path></svg></sc-if>
+</button>
+</div>
+</div>
+
+<div style="position:absolute;top:106px;left:0;right:0;bottom:0;overflow-y:auto;scrollbar-width:none">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="font:600 15px var(--font);color:var(--ink-2);padding:12px 20px 10px">{{ t.cont }}</div>
+<sc-if value="{{ homeFull }}" hint-placeholder-val="{{ true }}">
+<div onClick="{{ openProject }}" style="position:relative;margin:0 16px;height:400px;border-radius:26px;overflow:hidden;border:0.5px solid var(--line);cursor:pointer">
+<dc-import name="FloorPlan" kind="plain" lang="{{ lang }}" controls="{{ false }}" style="position:absolute;inset:0 0 70px 0" hint-size="100%,330px"></dc-import>
+<div style="position:absolute;left:12px;top:12px;padding:5px 10px;border-radius:999px;background:var(--bar);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--line);font:600 11px var(--font);color:var(--ink-2)">{{ t.sample }}</div>
+<div style="position:absolute;left:10px;right:10px;bottom:10px;padding:14px 14px 14px 16px;border-radius:18px;background:var(--card);box-shadow:var(--shadow);display:flex;align-items:center;gap:12px">
+<div style="flex:1;min-width:0"><div style="font:600 17px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.p1 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">{{ meta1 }}</div></div>
+<div style="width:40px;height:40px;flex:none;border-radius:999px;background:var(--accent-tint);color:var(--accent-text);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"></path></svg></div>
+</div>
+</div>
+<div style="font:600 15px var(--font);color:var(--ink-2);padding:24px 20px 6px">{{ t.other }}</div>
+<div style="margin:0 16px;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden">
+<button onClick="{{ onlyChil }}" style="width:100%;border:0;background:none;color:inherit;text-align:left;display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer">
+<div style="width:48px;height:48px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="34" height="34" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 8H92V92H8Z" stroke-width="6"></path><path d="M50 8V55M8 55H92M36 55V92M66 55V92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">{{ t.p2 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">{{ meta2 }}</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+<div style="height:0.5px;background:var(--line);margin-left:76px"></div>
+<button onClick="{{ onlyChil }}" style="width:100%;border:0;background:none;color:inherit;text-align:left;display:flex;align-items:center;gap:14px;padding:12px 14px;cursor:pointer">
+<div style="width:48px;height:48px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="34" height="34" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 18H92V82H8Z" stroke-width="6"></path><path d="M60 18V82M60 50H92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">{{ t.p3 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">{{ meta3 }}</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+</div>
+<div style="height:120px"></div>
+</sc-if>
+<sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="position:relative;margin:0 16px;height:420px;border-radius:26px;overflow:hidden;border:0.5px solid var(--line);background-color:var(--plan-bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:18px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;box-sizing:border-box;text-align:center">
+<div style="width:150px;height:120px;border:2px dashed var(--ink-3);border-radius:6px"></div>
+<div style="font:650 18px var(--font);margin-top:10px">{{ t.emptyTitle }}</div>
+<div style="font:400 15px/21px var(--font);color:var(--ink-2);max-width:270px">{{ t.emptyBody }}</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 0 20px"><span style="font:700 34px/40px var(--font);letter-spacing:-.8px">{{ t.tabProjects }}</span><button onClick="{{ openScanner }}" aria-label="{{ t.newProject }}" style="width:36px;height:36px;border-radius:999px;border:0;background:var(--accent-tint);color:var(--accent-text);display:grid;place-items:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+<div style="margin:12px 16px 16px;height:38px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--ink-3);font:400 17px var(--font)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>{{ t.search }}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 130px">
+<button onClick="{{ openProject }}" style="border:0;padding:0;text-align:left;color:inherit;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="86" height="86" viewBox="-400 -400 8600 8400"><rect x="0" y="0" width="7800" height="7600" style="fill:var(--plan-floor)"></rect><path d="M0 0H7800V7600H0Z" style="fill:none;stroke:var(--wall);stroke-width:240"></path><path d="M4200 0V4800M0 4800H7800M3000 4800V7600M5800 4800V7600" style="fill:none;stroke:var(--wall);stroke-width:150"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">{{ t.p1 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">{{ card1 }}</div></div></button>
+<button onClick="{{ onlyChil }}" style="border:0;padding:0;text-align:left;color:inherit;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="80" height="80" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 8H92V92H8Z" stroke-width="3"></path><path d="M50 8V55M8 55H92M36 55V92M66 55V92" stroke-width="2"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">{{ t.p2 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">{{ card2 }}</div></div></button>
+<button onClick="{{ onlyChil }}" style="border:0;padding:0;text-align:left;color:inherit;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="80" height="80" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 18H92V82H8Z" stroke-width="3"></path><path d="M60 18V82M60 50H92" stroke-width="2"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">{{ t.p3 }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">{{ card3 }}</div></div></button>
+<button onClick="{{ openScanner }}" style="border:1.5px dashed var(--line);padding:0;text-align:left;color:inherit;background:transparent;border-radius:20px;overflow:hidden;cursor:pointer"><div style="height:118px;display:grid;place-items:center;color:var(--ink-3)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">{{ t.p4 }}</div><div style="font:500 13px var(--font);color:var(--accent-text);margin-top:4px">{{ t.notScanned }}</div></div></button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+<div style="font:700 34px/40px var(--font);letter-spacing:-.8px;padding:4px 20px 14px">{{ t.tabSettings }}</div>
+<button onClick="{{ openProfile }}" style="width:calc(100% - 32px);margin:0 16px;border:0;text-align:left;color:inherit;background:var(--card);border-radius:20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:14px;cursor:pointer;box-sizing:border-box">
+<div style="width:60px;height:60px;flex:none;border-radius:999px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-3)">
+<sc-if value="{{ hasPhoto }}" hint-placeholder-val="{{ false }}"><div style="width:100%;height:100%;background-position:center;background-size:cover;background-image:{{ photoBg }}"></div></sc-if>
+<sc-if value="{{ noPhoto }}" hint-placeholder-val="{{ true }}"><svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.5" r="4"></circle><path d="M4 20.5c1.1-3.9 4.2-6 8-6s6.9 2.1 8 6z"></path></svg></sc-if>
+</div>
+<div style="flex:1;min-width:0"><div style="font:650 18px var(--font)">{{ profTitle }}</div><div style="font:400 14px/19px var(--font);color:var(--ink-2);margin-top:3px">{{ profSub }}</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3);flex:none"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+<div style="font:600 13px var(--font);color:var(--ink-2);padding:26px 20px 8px">{{ t.language }}</div>
+<div style="margin:0 16px;display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;background:var(--surface-2)">
+<sc-for list="{{ segLang }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="height:36px;border:0;border-radius:9px;font:600 14px var(--font);cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+</div>
+<div style="font:600 13px var(--font);color:var(--ink-2);padding:22px 20px 8px">{{ t.appearance }}</div>
+<div style="margin:0 16px;display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;background:var(--surface-2)">
+<sc-for list="{{ segTheme }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="height:36px;border:0;border-radius:9px;font:600 14px var(--font);cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+</div>
+<div style="font:600 13px var(--font);color:var(--ink-2);padding:22px 20px 8px">{{ t.units }}</div>
+<div style="margin:0 16px;display:grid;grid-template-columns:repeat(2,1fr);padding:3px;border-radius:12px;background:var(--surface-2)">
+<sc-for list="{{ segUnits }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="height:36px;border:0;border-radius:9px;font:600 14px var(--font);cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+</div>
+<div style="font:600 13px var(--font);color:var(--ink-2);padding:22px 20px 8px">{{ t.about }}</div>
+<div style="margin:0 16px 130px;background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:16px;display:flex;gap:14px;align-items:flex-start">
+<div style="width:44px;height:44px;flex:none;border-radius:12px;background:var(--graphite);display:grid;place-items:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="#F2F0EB"></path><path d="M8 12h8" stroke="#E5542F"></path></svg></div>
+<div><div style="font:650 16px var(--font)">iHomeScan</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:2px">{{ t.version }}</div><div style="font:400 14px/20px var(--font);color:var(--ink-2);margin-top:8px">{{ t.aboutBody }}</div></div>
+</div>
+</sc-if>
+</div>
+
+<div style="position:absolute;left:16px;right:16px;bottom:28px;height:64px;border-radius:999px;background:var(--graphite);box-shadow:0 12px 30px rgba(0,0,0,.25);display:flex;align-items:center;padding:0 6px 0 8px;gap:2px;z-index:6">
+<sc-for list="{{ tabs }}" as="b" hint-placeholder-count="3">
+<button onClick="{{ b.go }}" aria-label="{{ b.label }}" style="height:48px;border:0;border-radius:999px;padding:0 13px;display:flex;align-items:center;gap:7px;cursor:pointer;background:{{ b.bg }};color:{{ b.c }};font:600 14px var(--font);white-space:nowrap">
+<sc-if value="{{ b.isHome }}"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"></path></svg></sc-if>
+<sc-if value="{{ b.isProjects }}"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg></sc-if>
+<sc-if value="{{ b.isSettings }}"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H4"></path><circle cx="7" cy="7" r="3"></circle><circle cx="17" cy="17" r="3"></circle></svg></sc-if>
+<sc-if value="{{ b.on }}"><span>{{ b.label }}</span></sc-if>
+</button>
+</sc-for>
+<div style="flex:1"></div>
+<button onClick="{{ openScanner }}" aria-label="{{ t.scan }}" style="height:52px;min-width:52px;padding:0 {{ scanPad }}px;border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;flex:none;font:650 15px var(--font)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 12h8"></path></svg><sc-if value="{{ scanLabel }}"><span>{{ t.scan }}</span></sc-if></button>
+</div>
+</div>
+
+<div style="position:absolute;inset:0;z-index:10;background:var(--bg);display:flex;flex-direction:column;transform:{{ projT }};transition:transform .4s cubic-bezier(.3,.8,.2,1);box-shadow:-10px 0 30px rgba(0,0,0,.08)">
+<div style="height:54px;flex:none"></div>
+<div style="height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 8px">
+<button onClick="{{ closeProject }}" style="border:0;background:none;display:flex;align-items:center;gap:2px;color:var(--accent-text);font:400 17px var(--font);cursor:pointer;padding:6px 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>{{ t.tabProjects }}</button>
+<button onClick="{{ openMenu }}" aria-label="Menu" style="width:34px;height:34px;border-radius:999px;border:0;background:var(--surface-2);display:grid;place-items:center;color:var(--ink);cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+</div>
+<div style="padding:4px 20px 14px">
+<div style="font:700 25px/30px var(--font);letter-spacing:-.5px">{{ t.p1 }}</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap"><span style="font:400 14px var(--font);color:var(--ink-2)">{{ projMeta }}</span><span style="padding:3px 8px;border-radius:999px;background:var(--surface-2);font:600 11px var(--font);color:var(--ink-2)">{{ t.sample }}</span></div>
+</div>
+<div style="margin:0 20px 12px;display:grid;grid-template-columns:1fr 1fr;padding:2px;border-radius:10px;background:var(--surface-2)">
+<sc-for list="{{ segMode }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.pick }}" style="height:32px;border:0;border-radius:8px;font:600 14px var(--font);cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+</div>
+<div style="flex:1;margin:0 12px;border-radius:22px;overflow:hidden;border:0.5px solid var(--line);position:relative;min-height:0">
+<dc-import name="FloorPlan" kind="draft" mode="{{ mode }}" units="{{ units }}" lang="{{ lang }}" controls="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+</div>
+<div style="flex:none;display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px 16px 34px">
+<button onClick="{{ openRooms }}" style="height:52px;padding:0 18px;border:0;border-radius:15px;background:var(--surface-2);color:var(--ink);font:600 16px var(--font);cursor:pointer">{{ roomsBtn }}</button>
+<button onClick="{{ openReport }}" style="height:52px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7zM14 3v4h4M9 13h6M9 17h4"></path></svg>{{ t.pdf }}</button>
+</div>
+</div>
+
+<div style="position:absolute;inset:0;z-index:12;background:var(--bg);display:flex;flex-direction:column;transform:{{ repT }};transition:transform .4s cubic-bezier(.3,.8,.2,1);box-shadow:-10px 0 30px rgba(0,0,0,.08)">
+<div style="height:54px;flex:none"></div>
+<div style="height:44px;flex:none;display:flex;align-items:center;padding:0 16px 0 8px">
+<button onClick="{{ closeReport }}" style="border:0;background:none;display:flex;align-items:center;gap:2px;color:var(--accent-text);font:400 17px var(--font);cursor:pointer;padding:6px 4px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>{{ t.project }}</button>
+</div>
+<div style="font:700 30px/36px var(--font);letter-spacing:-.6px;padding:2px 20px 4px">{{ t.pdf }}</div>
+<div style="font:400 14px var(--font);color:var(--ink-2);padding:0 20px 14px">{{ t.format }} · {{ t.p1 }}</div>
+<div style="flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;padding:4px 0 0">
+<div data-theme="light" style="width:318px;height:450px;background:#FFFFFF;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.08),0 14px 34px rgba(0,0,0,.14);padding:20px 20px 14px;box-sizing:border-box;display:flex;flex-direction:column;color:#1A1C1D;font-family:var(--font)">
+<div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:5px"><div style="width:14px;height:14px;border-radius:4px;background:#23272A;display:grid;place-items:center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="#F2F0EB"></path><path d="M8 12h8" stroke="#E5542F"></path></svg></div><span style="font:700 9px var(--font)">iHomeScan</span></div><span style="font:500 7.5px var(--mono);color:#5C605D">{{ t.dateVal }}</span></div>
+<div style="height:2px;background:#D2401C;width:28px;margin:12px 0 7px;border-radius:2px"></div>
+<div style="font:700 14px/17px var(--font);letter-spacing:-.2px">{{ t.reportDoc }}</div>
+<div style="font:500 9.5px var(--font);color:#5C605D;margin-top:3px">{{ t.p1 }}</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
+<div><div style="font:500 6.5px var(--font);color:#8B8E8A;text-transform:uppercase;letter-spacing:.4px">{{ t.address }}</div><div style="font:600 7.5px var(--font);margin-top:1px">{{ t.addressVal }}</div></div>
+<div><div style="font:500 6.5px var(--font);color:#8B8E8A;text-transform:uppercase;letter-spacing:.4px">{{ t.areaL }}</div><div style="font:600 7.5px var(--mono);margin-top:1px">{{ totalArea }}</div></div>
+<div><div style="font:500 6.5px var(--font);color:#8B8E8A;text-transform:uppercase;letter-spacing:.4px">{{ t.ceilingFull }}</div><div style="font:600 7.5px var(--mono);margin-top:1px">{{ ceilVal }}</div></div>
+</div>
+<div style="position:relative;height:158px;margin-top:10px;border:0.5px solid #DDDAD3;border-radius:4px;overflow:hidden">
+<dc-import name="FloorPlan" kind="draft" mode="2d" units="{{ units }}" lang="{{ lang }}" controls="{{ false }}" style="position:absolute;inset:0" hint-size="100%,158px"></dc-import>
+</div>
+<div style="display:grid;grid-template-columns:1.3fr 1.3fr .8fr;font:600 6.5px var(--font);color:#8B8E8A;text-transform:uppercase;letter-spacing:.4px;padding:9px 0 3px;border-bottom:0.5px solid #DDDAD3"><span>{{ t.room }}</span><span>{{ t.size }}</span><span style="text-align:right">{{ t.areaL }}</span></div>
+<sc-for list="{{ roomRows }}" as="r" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:1.3fr 1.3fr .8fr;font:500 7.5px var(--font);padding:3px 0;border-bottom:0.5px solid #EDEBE6"><span>{{ r.name }}</span><span style="font-family:var(--mono)">{{ r.size }}</span><span style="text-align:right;font-family:var(--mono)">{{ r.area }}</span></div>
+</sc-for>
+<div style="display:grid;grid-template-columns:1.3fr 1.3fr .8fr;font:700 7.5px var(--font);padding:4px 0"><span>{{ t.total }}</span><span></span><span style="text-align:right;font-family:var(--mono)">{{ totalArea }}</span></div>
+<div style="font:400 7px/10px var(--font);color:#5C605D;margin-top:4px"><b style="color:#1A1C1D">{{ t.summary }}.</b> {{ summaryText }}</div>
+<div style="flex:1"></div>
+<div style="display:flex;justify-content:space-between;font:500 6px var(--font);color:#8B8E8A"><span>{{ t.sample }}</span><span>1 / 1</span></div>
+</div>
+</div>
+<div style="flex:none;padding:14px 16px 34px">
+<sc-if value="{{ repIdle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ generate }}" style="width:100%;height:54px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7zM14 3v4h4M9 13h6M9 17h4"></path></svg>{{ t.generate }}</button></sc-if>
+<sc-if value="{{ repGen }}" hint-placeholder-val="{{ false }}"><button disabled style="width:100%;height:54px;border:0;border-radius:15px;background:var(--surface-2);color:var(--ink-2);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:10px"><span style="width:18px;height:18px;border-radius:999px;border:2.5px solid var(--line);border-top-color:var(--accent);animation:ihs-spin .8s linear infinite"></span>{{ t.generating }}</button></sc-if>
+<sc-if value="{{ repReady }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;justify-content:center;gap:6px;font:600 14px var(--font);color:var(--success)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>{{ t.ready }} · {{ t.fileSize }}</div><button onClick="{{ openShare }}" style="width:100%;height:54px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"></path></svg>{{ t.share }}</button></div></sc-if>
+</div>
+</div>
+
+<div style="position:absolute;inset:0;z-index:20;background:#0B0C0D;color:#F2F0EB;transform:{{ scanT }};transition:transform .42s cubic-bezier(.3,.8,.2,1);overflow:hidden">
+<div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 40%,#22272A 0%,#0B0C0D 70%)"></div>
+<div style="position:absolute;inset:0;background-image:linear-gradient(rgba(242,240,235,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(242,240,235,.04) 1px,transparent 1px);background-size:28px 28px"></div>
+<div style="position:absolute;top:58px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;z-index:3">
+<button onClick="{{ closeScanner }}" aria-label="{{ t.close }}" style="width:38px;height:38px;border-radius:999px;border:0;background:rgba(242,240,235,.14);color:#F2F0EB;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+<sc-if value="{{ scScanning }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(242,240,235,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font:600 14px var(--font)"><span style="width:8px;height:8px;border-radius:999px;background:#FF6A42"></span>{{ t.scanning }} · {{ pct }}%</div></sc-if>
+<div style="padding:5px 10px;border-radius:999px;border:1px solid rgba(242,240,235,.25);font:600 11px var(--font);color:#A9ADAA">{{ t.demo }}</div>
+</div>
+<sc-if value="{{ scCamera }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:50%;top:{{ frameTop }}px;width:250px;height:250px;margin-left:-125px">
+<svg width="250" height="250" viewBox="0 0 250 250" fill="none" stroke-linecap="round"><path d="M2 40V2h38M210 2h38v38M2 210v38h38M248 210v38h-38" stroke="{{ bracket }}" stroke-width="4"></path></svg>
+<div style="position:absolute;inset:0;display:grid;place-items:center;font:500 12px var(--font);color:rgba(242,240,235,.4)">{{ t.camera }}</div>
+</div>
+</sc-if>
+<sc-if value="{{ scGuide }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:12px;right:12px;bottom:28px;background:#1A1D1F;border-radius:30px;padding:22px 20px 20px">
+<div style="font:700 22px/27px var(--font);letter-spacing:-.4px">{{ t.guideTitle }}</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin:16px 0 20px">
+<div style="display:flex;align-items:center;gap:12px;font:400 15px/20px var(--font);color:#D9D7D2"><span style="width:26px;height:26px;flex:none;border-radius:999px;background:rgba(242,240,235,.1);display:grid;place-items:center;font:600 13px var(--mono)">1</span>{{ t.s1 }}</div>
+<div style="display:flex;align-items:center;gap:12px;font:400 15px/20px var(--font);color:#D9D7D2"><span style="width:26px;height:26px;flex:none;border-radius:999px;background:rgba(242,240,235,.1);display:grid;place-items:center;font:600 13px var(--mono)">2</span>{{ t.s2 }}</div>
+<div style="display:flex;align-items:center;gap:12px;font:400 15px/20px var(--font);color:#D9D7D2"><span style="width:26px;height:26px;flex:none;border-radius:999px;background:rgba(242,240,235,.1);display:grid;place-items:center;font:600 13px var(--mono)">3</span>{{ t.s3 }}</div>
+</div>
+<button onClick="{{ startScan }}" style="width:100%;height:54px;border:0;border-radius:16px;background:#FF6A42;color:#1A0D08;font:650 17px var(--font);cursor:pointer">{{ t.start }}</button>
+</div>
+</sc-if>
+<sc-if value="{{ scScanning }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:12px;right:12px;bottom:28px;background:#1A1D1F;border-radius:30px;padding:18px 20px 20px">
+<div style="font:500 15px/20px var(--font);color:#D9D7D2">{{ t.hint }}</div>
+<div style="height:6px;border-radius:999px;background:rgba(242,240,235,.1);margin:14px 0 14px;overflow:hidden"><div style="height:100%;width:{{ pct }}%;background:#FF6A42;border-radius:999px;transition:width .15s linear"></div></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+<div style="background:rgba(242,240,235,.07);border-radius:14px;padding:9px 12px"><div style="font:500 12px var(--font);color:#A9ADAA">{{ t.walls }}</div><div style="font:600 18px var(--mono);margin-top:2px">{{ cWalls }}</div></div>
+<div style="background:rgba(242,240,235,.07);border-radius:14px;padding:9px 12px"><div style="font:500 12px var(--font);color:#A9ADAA">{{ t.doors }}</div><div style="font:600 18px var(--mono);margin-top:2px">{{ cDoors }}</div></div>
+<div style="background:rgba(242,240,235,.07);border-radius:14px;padding:9px 12px"><div style="font:500 12px var(--font);color:#A9ADAA">{{ t.windows }}</div><div style="font:600 18px var(--mono);margin-top:2px">{{ cWins }}</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px">
+<button onClick="{{ closeScanner }}" style="height:52px;border:0;border-radius:16px;background:rgba(242,240,235,.12);color:#F2F0EB;font:600 16px var(--font);cursor:pointer">{{ t.cancel }}</button>
+<button onClick="{{ finishScan }}" disabled="{{ finishDisabled }}" style="height:52px;border:0;border-radius:16px;background:#FF6A42;color:#1A0D08;font:650 16px var(--font);cursor:pointer;opacity:{{ finishOpacity }}">{{ t.finish }}</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ scDone }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:12px;right:12px;bottom:28px;background:#1A1D1F;border-radius:30px;padding:22px 20px 20px">
+<div style="width:48px;height:48px;border-radius:999px;background:rgba(92,194,138,.16);color:#5CC28A;display:grid;place-items:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></div>
+<div style="font:700 22px var(--font);letter-spacing:-.4px;margin-top:14px">{{ t.doneTitle }}</div>
+<div style="font:500 15px var(--mono);color:#D9D7D2;margin-top:6px">{{ doneSummary }}</div>
+<div style="font:400 13px/18px var(--font);color:#A9ADAA;margin-top:10px;padding:10px 12px;border-radius:12px;border:1px dashed rgba(242,240,235,.2)">{{ t.demoNote }}</div>
+<div style="display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px">
+<button onClick="{{ startScan }}" style="height:52px;border:0;border-radius:16px;background:rgba(242,240,235,.12);color:#F2F0EB;font:600 15px var(--font);cursor:pointer">{{ t.rescan }}</button>
+<button onClick="{{ scanToProject }}" style="height:52px;border:0;border-radius:16px;background:#FF6A42;color:#1A0D08;font:650 16px var(--font);cursor:pointer">{{ t.viewPlan }}</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ scNoLidar }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:120px 24px 28px;display:flex;flex-direction:column">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+<div style="width:64px;height:64px;border-radius:20px;background:rgba(242,240,235,.08);display:grid;place-items:center;color:#A9ADAA"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M4 4l16 16"></path></svg></div>
+<div style="font:700 24px/29px var(--font);letter-spacing:-.4px;margin-top:6px">{{ t.noLidarTitle }}</div>
+<div style="font:400 16px/23px var(--font);color:#C7C5C0">{{ t.noLidarBody }}</div>
+</div>
+<button onClick="{{ scanToProject }}" style="height:54px;border:0;border-radius:16px;background:#FF6A42;color:#1A0D08;font:650 17px var(--font);cursor:pointer">{{ t.openSample }}</button>
+<button onClick="{{ closeScanner }}" style="height:50px;border:0;background:none;color:#F2F0EB;font:600 16px var(--font);cursor:pointer;margin-top:4px">{{ t.close }}</button>
+</div>
+</sc-if>
+<sc-if value="{{ scDenied }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:120px 24px 28px;display:flex;flex-direction:column">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
+<div style="width:64px;height:64px;border-radius:20px;background:rgba(242,240,235,.08);display:grid;place-items:center;color:#A9ADAA"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3l2-3h8l2 3h3v12H3zM3 3l18 18"></path><circle cx="12" cy="13" r="3.5"></circle></svg></div>
+<div style="font:700 24px/29px var(--font);letter-spacing:-.4px;margin-top:6px">{{ t.deniedTitle }}</div>
+<div style="font:400 16px/23px var(--font);color:#C7C5C0">{{ t.deniedBody }}</div>
+</div>
+<button onClick="{{ demoAction }}" style="height:54px;border:0;border-radius:16px;background:#FF6A42;color:#1A0D08;font:650 17px var(--font);cursor:pointer">{{ t.openSettings }}</button>
+<button onClick="{{ closeScanner }}" style="height:50px;border:0;background:none;color:#F2F0EB;font:600 16px var(--font);cursor:pointer;margin-top:4px">{{ t.close }}</button>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{ langMenu }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeLang }}" style="position:absolute;inset:0;z-index:60"></div>
+<div style="position:absolute;top:100px;right:60px;width:200px;z-index:61;background:var(--card);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 14px 40px rgba(0,0,0,.18);padding:6px;animation:ihs-fade .15s ease-out">
+<sc-for list="{{ langItems }}" as="o" hint-placeholder-count="3">
+<button onClick="{{ o.pick }}" style="width:100%;height:46px;border:0;border-radius:11px;background:{{ o.bg }};color:var(--ink);display:flex;align-items:center;gap:10px;padding:0 12px;cursor:pointer;font:500 16px var(--font);text-align:left"><span style="font:700 11px var(--mono);color:var(--ink-3);width:20px">{{ o.code }}</span><span style="flex:1">{{ o.label }}</span><sc-if value="{{ o.on }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></sc-if></button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSheet }}" style="position:absolute;inset:0;z-index:40;background:rgba(0,0,0,.38);animation:ihs-fade .2s ease-out"></div>
+<sc-if value="{{ shMenu }}">
+<div style="position:absolute;left:8px;right:8px;bottom:30px;z-index:41;display:flex;flex-direction:column;gap:8px;animation:ihs-up .3s cubic-bezier(.3,.8,.2,1)">
+<div style="background:var(--card);border-radius:20px;overflow:hidden">
+<button onClick="{{ openReport }}" style="width:100%;height:56px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;gap:12px;padding:0 18px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7zM14 3v4h4"></path></svg>{{ t.pdf }}</button>
+<div style="height:0.5px;background:var(--line)"></div>
+<button onClick="{{ openScanner }}" style="width:100%;height:56px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;gap:12px;padding:0 18px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"></path></svg>{{ t.rescan }}</button>
+<div style="height:0.5px;background:var(--line)"></div>
+<button onClick="{{ demoAction }}" style="width:100%;height:56px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;gap:12px;padding:0 18px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"></path></svg>{{ t.rename }}</button>
+<div style="height:0.5px;background:var(--line)"></div>
+<button onClick="{{ demoAction }}" style="width:100%;height:56px;border:0;background:none;color:var(--error);font:400 17px var(--font);display:flex;align-items:center;gap:12px;padding:0 18px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>{{ t.del }}</button>
+</div>
+<button onClick="{{ closeSheet }}" style="height:56px;border:0;border-radius:20px;background:var(--card);color:var(--accent-text);font:600 17px var(--font);cursor:pointer">{{ t.cancel }}</button>
+</div>
+</sc-if>
+<sc-if value="{{ shRooms }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:var(--card);border-radius:28px 28px 0 0;padding:8px 0 40px;animation:ihs-up .3s cubic-bezier(.3,.8,.2,1)">
+<div style="width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px"></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 20px 8px"><span style="font:700 22px var(--font);letter-spacing:-.4px">{{ t.rooms }}</span><span style="font:600 16px var(--mono);color:var(--accent-text)">{{ totalArea }}</span></div>
+<sc-for list="{{ roomRows }}" as="r" hint-placeholder-count="5">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-top:0.5px solid var(--line)"><div><div style="font:600 16px var(--font)">{{ r.name }}</div><div style="font:500 13px var(--mono);color:var(--ink-2);margin-top:3px">{{ r.size }}</div></div><span style="font:600 15px var(--mono)">{{ r.area }}</span></div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ shShare }}">
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:28px 28px 0 0;padding:8px 16px 40px;animation:ihs-up .3s cubic-bezier(.3,.8,.2,1)">
+<div style="width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 14px"></div>
+<div style="display:flex;align-items:center;gap:12px;padding:4px 4px 16px"><div style="width:44px;height:56px;border-radius:6px;background:#fff;border:0.5px solid var(--line);display:grid;place-items:center;font:700 9px var(--font);color:#D2401C">PDF</div><div><div style="font:600 15px var(--font)">{{ fileName }}</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:2px">{{ t.format }} · {{ t.fileSize }}</div></div></div>
+<div style="background:var(--card);border-radius:16px;overflow:hidden">
+<button onClick="{{ shareDone }}" style="width:100%;height:52px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer">{{ t.sendTo }}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"></path></svg></button>
+<div style="height:0.5px;background:var(--line);margin-left:16px"></div>
+<button onClick="{{ shareDone }}" style="width:100%;height:52px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer">{{ t.saveFiles }}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"></path></svg></button>
+<div style="height:0.5px;background:var(--line);margin-left:16px"></div>
+<button onClick="{{ shareDone }}" style="width:100%;height:52px;border:0;background:none;color:var(--ink);font:400 17px var(--font);display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer">{{ t.print }}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8V3h10v5M7 17H4v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7h-3M7 14h10v7H7z"></path></svg></button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ shProfile }}">
+<div style="position:absolute;left:0;right:0;bottom:0;top:62px;z-index:41;background:var(--bg);border-radius:14px 14px 0 0;display:flex;flex-direction:column;animation:ihs-up .32s cubic-bezier(.3,.8,.2,1)">
+<div style="height:56px;flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px">
+<button onClick="{{ closeSheet }}" style="justify-self:start;border:0;background:none;color:var(--accent-text);font:400 17px var(--font);cursor:pointer;padding:6px 0">{{ t.cancel }}</button>
+<span style="font:600 17px var(--font)">{{ t.profile }}</span>
+<button onClick="{{ saveProfile }}" style="justify-self:end;border:0;background:none;color:var(--accent-text);font:650 17px var(--font);cursor:pointer;padding:6px 0">{{ t.save }}</button>
+</div>
+<div style="flex:1;overflow-y:auto;padding:4px 16px 40px;scrollbar-width:none">
+<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0 22px">
+<div style="width:96px;height:96px;border-radius:999px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-3)">
+<sc-if value="{{ dHasPhoto }}"><div style="width:100%;height:100%;background-position:center;background-size:cover;background-image:{{ dPhotoBg }}"></div></sc-if>
+<sc-if value="{{ dNoPhoto }}"><svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8.5" r="4"></circle><path d="M4 20.5c1.1-3.9 4.2-6 8-6s6.9 2.1 8 6z"></path></svg></sc-if>
+</div>
+<div style="display:flex;gap:16px">
+<label style="font:600 15px var(--font);color:var(--accent-text);cursor:pointer">{{ t.choosePhoto }}<input type="file" accept="image/*" onChange="{{ pickPhoto }}" style="display:none"></label>
+<sc-if value="{{ dHasPhoto }}"><button onClick="{{ removePhoto }}" style="border:0;background:none;padding:0;font:500 15px var(--font);color:var(--ink-2);cursor:pointer">{{ t.removePhoto }}</button></sc-if>
+</div>
+</div>
+<div style="background:var(--card);border-radius:18px;overflow:hidden">
+<sc-for list="{{ fieldsReq }}" as="f" hint-placeholder-count="3">
+<div style="padding:10px 16px 11px;border-bottom:0.5px solid var(--line)">
+<div style="font:500 13px var(--font);color:{{ f.labelColor }}">{{ f.label }} <span style="color:var(--accent-text)">*</span></div>
+<input type="{{ f.type }}" value="{{ f.value }}" placeholder="{{ f.ph }}" onChange="{{ f.set }}" style="width:100%;border:0;background:transparent;padding:4px 0 0;font:400 17px var(--font);color:var(--ink);outline:none">
+<sc-if value="{{ f.hasErr }}"><div style="font:500 12.5px var(--font);color:var(--error);margin-top:4px">{{ f.err }}</div></sc-if>
+</div>
+</sc-for>
+</div>
+<div style="background:var(--card);border-radius:18px;overflow:hidden;margin-top:16px">
+<sc-for list="{{ fieldsOpt }}" as="f" hint-placeholder-count="3">
+<div style="padding:10px 16px 11px;border-bottom:0.5px solid var(--line)">
+<div style="font:500 13px var(--font);color:var(--ink-2)">{{ f.label }} <span style="color:var(--ink-3);font-weight:400">· {{ t.optional }}</span></div>
+<input type="text" value="{{ f.value }}" placeholder="{{ f.ph }}" onChange="{{ f.set }}" style="width:100%;border:0;background:transparent;padding:4px 0 0;font:400 17px var(--font);color:var(--ink);outline:none">
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;align-items:flex-start;font:400 13px/18px var(--font);color:var(--ink-2);padding:14px 6px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>{{ t.localNote }}</div>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:62px;left:50%;transform:translateX(-50%);z-index:90;max-width:340px;padding:11px 16px;border-radius:999px;background:var(--graphite);color:var(--on-graphite);font:500 14px var(--font);box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center;animation:ihs-fade .2s ease-out">{{ toast }}</div>
+</sc-if>
+
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:{{ indicator }};z-index:85;pointer-events:none"></div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scanDevice&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ok&quot;,&quot;nolidar&quot;,&quot;denied&quot;],&quot;default&quot;:&quot;ok&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Skaner holati&quot;},&quot;homeEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Bosh sahifa&quot;}}">
+const S = {
+  tabHome: ['Bosh sahifa', 'Home', 'Главная'], tabProjects: ['Loyihalar', 'Projects', 'Проекты'], tabSettings: ['Sozlamalar', 'Settings', 'Настройки'],
+  cont: ['Davom ettirish', 'Continue', 'Продолжить'], sample: ['Namuna maʼlumot', 'Sample data', 'Пример данных'], other: ['Boshqa loyihalar', 'Other projects', 'Другие проекты'],
+  scan: ['Skanerlash', 'Scan', 'Скан'],
+  emptyTitle: ['Birinchi rejangiz shu yerda boʻladi', 'Your first plan will appear here', 'Здесь появится ваш первый план'],
+  emptyBody: ['Xonani skanerlang — devorlar, eshiklar va oʻlchovlar avtomatik chiziladi.', 'Scan a room — walls, doors and measurements are drawn automatically.', 'Отсканируйте комнату — стены, двери и размеры появятся автоматически.'],
+  p1: ['Chilonzor 9-kv, 2 xonali', 'Chilonzor 9, 2-room flat', 'Чиланзар 9, 2-комн.'], p2: ['Yunusobod 4-kv, 3 xonali', 'Yunusobod 4, 3-room flat', 'Юнусабад 4, 3-комн.'],
+  p3: ['Mirzo Ulugʻbek, ofis', 'Mirzo Ulugbek, office', 'Мирзо-Улугбек, офис'], p4: ['Sergeli, hovli uy', 'Sergeli, house', 'Сергели, частный дом'],
+  today: ['Bugun', 'Today', 'Сегодня'], d28: ['28-okt', 'Oct 28', '28 окт.'], d15: ['15-okt', 'Oct 15', '15 окт.'],
+  notScanned: ['Skanerlanmagan', 'Not scanned', 'Не отсканирован'], search: ['Qidirish', 'Search', 'Поиск'], newProject: ['Yangi loyiha', 'New project', 'Новый проект'],
+  profileCta: ['Profilni toʻldiring', 'Complete your profile', 'Заполните профиль'],
+  profileCtaBody: ['Ism va kontaktlar faqat shu qurilmada saqlanadi.', 'Your name and contacts stay on this device.', 'Имя и контакты хранятся только на устройстве.'],
+  language: ['Til', 'Language', 'Язык'], appearance: ['Koʻrinish', 'Appearance', 'Оформление'], sys: ['Tizim', 'System', 'Система'], light: ['Yorugʻ', 'Light', 'Светлая'], dark: ['Qorongʻi', 'Dark', 'Тёмная'],
+  units: ['Oʻlchov birligi', 'Measurement units', 'Единицы измерения'], mmL: ['Millimetr', 'Millimeters', 'Миллиметры'], mL: ['Metr', 'Meters', 'Метры'],
+  about: ['iHomeScan haqida', 'About iHomeScan', 'О приложении'], version: ['Versiya 1.0 (1)', 'Version 1.0 (1)', 'Версия 1.0 (1)'],
+  aboutBody: ['Xonalarni skanerlash, 2D reja, 3D model va PDF hisobotlar. Barcha maʼlumotlar faqat shu qurilmada saqlanadi.', 'Room scanning, 2D plans, 3D models and PDF reports. All data stays on this device.', 'Сканирование комнат, 2D-планы, 3D-модели и PDF-отчёты. Все данные хранятся только на этом устройстве.'],
+  profile: ['Profil', 'Profile', 'Профиль'], cancel: ['Bekor qilish', 'Cancel', 'Отмена'], save: ['Saqlash', 'Save', 'Сохранить'],
+  choosePhoto: ['Rasm tanlash', 'Choose photo', 'Выбрать фото'], removePhoto: ['Olib tashlash', 'Remove', 'Удалить'],
+  fName: ['Ism familiya', 'Full name', 'Имя и фамилия'], fPhone: ['Telefon', 'Phone', 'Телефон'], fEmail: ['Email', 'Email', 'Эл. почта'],
+  fCompany: ['Kompaniya', 'Company', 'Компания'], fRole: ['Lavozim', 'Role', 'Должность'], fCity: ['Shahar', 'City', 'Город'],
+  optional: ['ixtiyoriy', 'optional', 'необязательно'],
+  phName: ['Masalan, Aziz Karimov', 'e.g. Aziz Karimov', 'Например, Азиз Каримов'], phRole: ['Masalan, inspektor', 'e.g. Inspector', 'Например, инспектор'],
+  phCompany: ['Tashkilot nomi', 'Organization name', 'Название организации'], phCity: ['Toshkent', 'Tashkent', 'Ташкент'],
+  errReq: ['Toʻldirish majburiy', 'Required', 'Обязательное поле'], errEmail: ['Email notoʻgʻri', 'Invalid email', 'Неверный адрес'], errPhone: ['Raqam notoʻgʻri', 'Invalid phone number', 'Неверный номер'],
+  localNote: ['Roʻyxatdan oʻtish shart emas. Maʼlumotlar faqat shu iPhone’da saqlanadi.', 'No sign-up needed. Your details are stored only on this iPhone.', 'Регистрация не нужна. Данные хранятся только на этом iPhone.'],
+  saved: ['Profil saqlandi', 'Profile saved', 'Профиль сохранён'],
+  plan2d: ['2D reja', '2D plan', '2D-план'], model3d: ['3D model', '3D model', '3D-модель'], rooms: ['Xonalar', 'Rooms', 'Комнаты'], pdf: ['PDF hisobot', 'PDF report', 'PDF-отчёт'],
+  rename: ['Nomini oʻzgartirish', 'Rename', 'Переименовать'], rescan: ['Qayta skanerlash', 'Rescan', 'Пересканировать'], del: ['Loyihani oʻchirish', 'Delete project', 'Удалить проект'],
+  total: ['Jami', 'Total', 'Итого'], room: ['Xona', 'Room', 'Комната'], size: ['Oʻlcham', 'Size', 'Размер'], areaL: ['Maydon', 'Area', 'Площадь'],
+  close: ['Yopish', 'Close', 'Закрыть'], guideTitle: ['Skanerlashga tayyorlaning', 'Get ready to scan', 'Подготовка к сканированию'],
+  s1: ['Telefonni koʻkrak balandligida tuting', 'Hold iPhone at chest height', 'Держите iPhone на уровне груди'],
+  s2: ['Devorlar boʻylab sekin yuring', 'Walk slowly along the walls', 'Медленно идите вдоль стен'],
+  s3: ['Eshik va derazalarni ham qamrab oling', 'Capture doors and windows too', 'Захватите двери и окна'],
+  start: ['Skanerlashni boshlash', 'Start scanning', 'Начать сканирование'], scanning: ['Skanerlanmoqda', 'Scanning', 'Сканирование'],
+  hint: ['Sekin harakatlaning — devor kadrda tursin', 'Move slowly — keep the wall in frame', 'Двигайтесь медленно — стена в кадре'],
+  walls: ['Devor', 'Walls', 'Стены'], doors: ['Eshik', 'Doors', 'Двери'], windows: ['Deraza', 'Windows', 'Окна'], finish: ['Tugatish', 'Finish', 'Завершить'],
+  doneTitle: ['Skan yakunlandi', 'Scan complete', 'Сканирование завершено'],
+  demoNote: ['Prototip: namuna natija, haqiqiy RoomPlan skani emas.', 'Prototype: sample result, not a real RoomPlan scan.', 'Прототип: пример результата, а не настоящий скан RoomPlan.'],
+  demo: ['Demo', 'Demo', 'Демо'], viewPlan: ['Rejani koʻrish', 'View plan', 'Открыть план'], camera: ['Kamera koʻrinishi', 'Camera view', 'Изображение камеры'],
+  noLidarTitle: ['Bu qurilmada LiDAR yoʻq', 'LiDAR isn’t available', 'LiDAR недоступен'],
+  noLidarBody: ['Xonani skanerlash LiDAR’li iPhone Pro modellarida ishlaydi. Simulyatorda mavjud emas.', 'Room scanning needs an iPhone Pro with LiDAR. It isn’t available in the Simulator.', 'Для сканирования нужен iPhone Pro с LiDAR. В симуляторе недоступно.'],
+  openSample: ['Namuna rejani ochish', 'Open sample plan', 'Открыть пример плана'],
+  deniedTitle: ['Kameraga ruxsat berilmagan', 'Camera access is off', 'Нет доступа к камере'],
+  deniedBody: ['Skanerlash uchun Sozlamalar → iHomeScan → Kamera’ni yoqing.', 'To scan, turn on Settings → iHomeScan → Camera.', 'Чтобы сканировать, включите Настройки → iHomeScan → Камера.'],
+  openSettings: ['Sozlamalarni ochish', 'Open Settings', 'Открыть настройки'], project: ['Loyiha', 'Project', 'Проект'],
+  reportDoc: ['Uy oʻlchov hisoboti', 'Home measurement report', 'Отчёт об обмерах'], address: ['Manzil', 'Address', 'Адрес'],
+  addressVal: ['Toshkent, Chilonzor 9-kv', 'Tashkent, Chilonzor 9', 'Ташкент, Чиланзар 9'], dateVal: ['5-noyabr, 2026', 'Nov 5, 2026', '5 ноября 2026'],
+  ceilingFull: ['Shift', 'Ceiling', 'Потолок'], summary: ['Xulosa', 'Summary', 'Итог'], format: ['A4 · 1 sahifa', 'A4 · 1 page', 'A4 · 1 стр.'],
+  generate: ['PDF yaratish', 'Generate PDF', 'Создать PDF'], generating: ['Yaratilmoqda…', 'Generating…', 'Создание…'], share: ['Ulashish', 'Share', 'Поделиться'],
+  ready: ['PDF tayyor', 'PDF ready', 'PDF готов'], fileSize: ['184 KB', '184 KB', '184 КБ'],
+  saveFiles: ['Fayllarga saqlash', 'Save to Files', 'Сохранить в «Файлы»'], print: ['Chop etish', 'Print', 'Печать'], sendTo: ['Telegram orqali yuborish', 'Send via Telegram', 'Отправить в Telegram'],
+  onlyChil: ['Prototipda faqat “Chilonzor” loyihasi ochiladi', 'Only “Chilonzor” opens in this prototype', 'В прототипе открывается только «Чиланзар»'],
+  demoAction: ['Prototipda bu amal koʻrsatilmaydi', 'Not shown in this prototype', 'В прототипе не показано'],
+  sent: ['Tayyor', 'Done', 'Готово']
+};
+const ROOMS = [
+  { id: 'living', n: ['Mehmonxona', 'Living room', 'Гостиная'], w: 4200, h: 4800 },
+  { id: 'bed', n: ['Yotoqxona', 'Bedroom', 'Спальня'], w: 3600, h: 4800 },
+  { id: 'kitchen', n: ['Oshxona', 'Kitchen', 'Кухня'], w: 3000, h: 2800 },
+  { id: 'hall', n: ['Koridor', 'Hallway', 'Коридор'], w: 2800, h: 2800 },
+  { id: 'bath', n: ['Hammom', 'Bathroom', 'Санузел'], w: 2000, h: 2800 }
+];
+const KEY = 'ihs-proto-v1';
+const EMPTY = { name: '', phone: '', email: '', company: '', role: '', city: '', photo: null };
+
+class Component extends DCLogic {
+  state = { lang: 'uz', theme: 'system', units: 'mm', tab: 'home', proj: false, scan: false, report: false, sheet: null, langMenu: false,
+    mode: '2d', sc: 'guide', p: 0, rep: 'idle', toast: null, profile: { ...EMPTY }, draft: null, tried: false, scale: 1, sysDark: false };
+
+  componentDidMount() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (s) this.setState({ lang: s.lang || 'uz', theme: s.theme || 'system', units: s.units || 'mm', profile: { ...EMPTY, ...(s.profile || {}) } });
+      else {
+        const nl = (navigator.language || 'en').slice(0, 2);
+        this.setState({ lang: ['uz', 'en', 'ru'].includes(nl) ? nl : 'en' });
+      }
+    } catch (e) {}
+    this.fit = () => this.setState({ scale: Math.min(1, (window.innerHeight - 40) / 898) });
+    this.fit();
+    window.addEventListener('resize', this.fit);
+    this.mq = window.matchMedia('(prefers-color-scheme: dark)');
+    this.onMq = () => this.setState({ sysDark: this.mq.matches });
+    this.onMq();
+    this.mq.addEventListener && this.mq.addEventListener('change', this.onMq);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.fit);
+    this.mq && this.mq.removeEventListener && this.mq.removeEventListener('change', this.onMq);
+    clearInterval(this.timer); clearTimeout(this.tt); clearTimeout(this.gt);
+  }
+  componentDidUpdate(_, prev) {
+    const s = this.state;
+    if (prev.lang !== s.lang || prev.theme !== s.theme || prev.units !== s.units || prev.profile !== s.profile) {
+      try { localStorage.setItem(KEY, JSON.stringify({ lang: s.lang, theme: s.theme, units: s.units, profile: s.profile })); } catch (e) {}
+    }
+  }
+  li() { return { uz: 0, en: 1, ru: 2 }[this.state.lang] ?? 0; }
+  showToast(msg) { clearTimeout(this.tt); this.setState({ toast: msg }); this.tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+  stopScan() { clearInterval(this.timer); this.timer = null; }
+  openScanner = () => {
+    const dev = this.props.scanDevice ?? 'ok';
+    this.stopScan();
+    this.setState({ scan: true, sheet: null, langMenu: false, sc: dev === 'ok' ? 'guide' : dev, p: 0 });
+  };
+  startScan = () => {
+    this.stopScan();
+    this.setState({ sc: 'scanning', p: 0 });
+    this.timer = setInterval(() => {
+      this.setState(s => { const p = Math.min(100, s.p + 1.4); if (p >= 100) this.stopScan(); return { p }; });
+    }, 110);
+  };
+  goTo(name) {
+    const base = { sheet: null, langMenu: false, proj: false, report: false, scan: false };
+    this.stopScan();
+    if (name === 'home' || name === 'projects' || name === 'settings') this.setState({ ...base, tab: name });
+    else if (name === 'project') this.setState({ ...base, proj: true });
+    else if (name === 'report') this.setState({ ...base, proj: true, report: true, rep: 'idle' });
+    else if (name === 'scanner') { this.setState(base); setTimeout(this.openScanner, 0); }
+    else if (name === 'profile') this.setState({ ...base, tab: 'settings', sheet: 'profile', draft: { ...this.state.profile }, tried: false });
+  }
+
+  renderVals() {
+    const s = this.state, i = this.li();
+    const t = {}; for (const k in S) t[k] = S[k][i];
+    const en = i === 1, ru = i === 2;
+    const dec = en ? '.' : ',';
+    const area = v => v.toFixed(1).replace('.', dec) + (ru ? ' м²' : ' m²');
+    const grp = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, en ? ',' : '\u202F');
+    const len = n => s.units === 'm' ? (n / 1000).toFixed(2).replace('.', dec) + (ru ? ' м' : ' m') : grp(n) + (ru ? ' мм' : ' mm');
+    const dims = (w, h) => s.units === 'm' ? `${(w / 1000).toFixed(2).replace('.', dec)} × ${(h / 1000).toFixed(2).replace('.', dec)}` : `${grp(w)} × ${grp(h)}`;
+    const roomsN = n => i === 0 ? `${n} xona` : en ? `${n} rooms` : `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'комната' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'комнаты' : 'комнат'}`;
+    const ceil = (2.7).toFixed(1).replace('.', dec) + (ru ? ' м' : ' m');
+    const total = area(59.28);
+    const themeName = s.theme === 'system' ? (s.sysDark ? 'dark' : 'light') : s.theme;
+    const seg = (on) => ({ bg: on ? 'var(--card)' : 'transparent', fg: on ? 'var(--ink)' : 'var(--ink-2)', sh: on ? '0 1px 3px rgba(0,0,0,.14)' : 'none' });
+    const prof = s.profile;
+    const d = s.draft || EMPTY;
+    const errs = {};
+    if (s.tried) {
+      if (!d.name.trim()) errs.name = t.errReq;
+      const digits = d.phone.replace(/\D/g, '');
+      if (!digits) errs.phone = t.errReq; else if (!(digits.length === 9 || (digits.length === 12 && digits.startsWith('998')))) errs.phone = t.errPhone;
+      if (!d.email.trim()) errs.email = t.errReq; else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim())) errs.email = t.errEmail;
+    }
+    const setF = k => e => { const v = e.target.value; this.setState(st => ({ draft: { ...st.draft, [k]: v } })); };
+    const sc = s.sc;
+    const p = s.p;
+    const tabs = ['home', 'projects', 'settings'].map(k => {
+      const on = s.tab === k;
+      return { isHome: k === 'home', isProjects: k === 'projects', isSettings: k === 'settings', on, label: t['tab' + k[0].toUpperCase() + k.slice(1)],
+        bg: on ? 'rgba(242,240,235,.14)' : 'transparent', c: on ? 'var(--on-graphite)' : 'var(--on-graphite-2)',
+        go: () => this.setState({ tab: k, langMenu: false }) };
+    });
+    const jumpDefs = [['home', 'Bosh sahifa'], ['projects', 'Loyihalar'], ['settings', 'Sozlamalar'], ['profile', 'Profil (sheet)'], ['project', 'Loyiha · 2D/3D reja'], ['scanner', 'Skaner'], ['report', 'PDF hisobot']];
+    const cur = s.scan ? 'scanner' : s.report ? 'report' : s.proj ? 'project' : s.sheet === 'profile' ? 'profile' : s.tab;
+    const hasName = !!prof.name;
+    return {
+      t, lang: s.lang, units: s.units, mode: s.mode, themeName,
+      scale: s.scale, frameW: Math.round(426 * s.scale), frameH: Math.round(898 * s.scale),
+      jumps: jumpDefs.map(([k, l]) => ({ label: l, bg: cur === k ? 'rgba(0,0,0,.08)' : 'transparent', go: () => this.goTo(k) })),
+      statusColor: s.scan ? '#F2F0EB' : 'var(--ink)', indicator: s.scan ? '#F2F0EB' : 'var(--ink)',
+      logoOpacity: s.tab === 'home' ? 1 : 0,
+      langCode: s.lang.toUpperCase(), langMenu: s.langMenu,
+      toggleLang: () => this.setState(st => ({ langMenu: !st.langMenu })), closeLang: () => this.setState({ langMenu: false }),
+      langItems: [['uz', 'Oʻzbekcha'], ['en', 'English'], ['ru', 'Русский']].map(([c, l]) => ({ code: c.toUpperCase(), label: l, on: s.lang === c, bg: s.lang === c ? 'var(--surface-2)' : 'transparent', pick: () => this.setState({ lang: c, langMenu: false }) })),
+      hasPhoto: !!prof.photo, noPhoto: !prof.photo, photoBg: prof.photo ? `url("${prof.photo}")` : 'none',
+      openProfile: () => this.setState({ sheet: 'profile', langMenu: false, draft: { ...this.state.profile }, tried: false }),
+      isHome: s.tab === 'home', isProjects: s.tab === 'projects', isSettings: s.tab === 'settings',
+      homeEmpty: !!this.props.homeEmpty, homeFull: !this.props.homeEmpty,
+      meta1: `${total} · ${roomsN(5)} · ${t.today}`, meta2: `${area(78.6)} · ${roomsN(7)} · ${t.d28}`, meta3: `${area(42)} · ${roomsN(3)} · ${t.d15}`,
+      card1: `${total} · ${t.today}`, card2: `${area(78.6)} · ${t.d28}`, card3: `${area(42)} · ${t.d15}`,
+      openProject: () => this.setState({ proj: true, langMenu: false }), closeProject: () => this.setState({ proj: false }),
+      onlyChil: () => this.showToast(t.onlyChil), demoAction: () => { this.setState({ sheet: null }); this.showToast(t.demoAction); },
+      tabs, scanLabel: s.tab === 'home', scanPad: s.tab === 'home' ? 18 : 0,
+      openScanner: this.openScanner,
+      profTitle: hasName ? prof.name : t.profileCta,
+      profSub: hasName ? ([prof.role, prof.company].filter(Boolean).join(' · ') || prof.email) : t.profileCtaBody,
+      segLang: [['uz', 'Oʻzbekcha'], ['en', 'English'], ['ru', 'Русский']].map(([c, l]) => ({ label: l, ...seg(s.lang === c), pick: () => this.setState({ lang: c }) })),
+      segTheme: [['system', t.sys], ['light', t.light], ['dark', t.dark]].map(([c, l]) => ({ label: l, ...seg(s.theme === c), pick: () => this.setState({ theme: c }) })),
+      segUnits: [['mm', t.mmL], ['m', t.mL]].map(([c, l]) => ({ label: l, ...seg(s.units === c), pick: () => this.setState({ units: c }) })),
+      segMode: [['2d', t.plan2d], ['3d', t.model3d]].map(([c, l]) => ({ label: l, ...seg(s.mode === c), pick: () => this.setState({ mode: c }) })),
+      projT: s.proj ? 'translateX(0)' : 'translateX(105%)', repT: s.report ? 'translateX(0)' : 'translateX(105%)', scanT: s.scan ? 'translateY(0)' : 'translateY(105%)',
+      projMeta: `${total} · ${roomsN(5)} · ${t.ceilingFull.toLowerCase()} ${ceil}`,
+      roomsBtn: `${t.rooms} · 5`,
+      openRooms: () => this.setState({ sheet: 'rooms' }), openMenu: () => this.setState({ sheet: 'menu' }),
+      openReport: () => this.setState({ report: true, proj: true, sheet: null, rep: 'idle' }), closeReport: () => this.setState({ report: false }),
+      totalArea: total, ceilVal: ceil,
+      roomRows: ROOMS.map(r => ({ name: r.n[i], size: dims(r.w, r.h) + (s.units === 'm' ? (ru ? ' м' : ' m') : (ru ? ' мм' : ' mm')), area: area(r.w * r.h / 1e6) })),
+      summaryText: i === 0 ? `${roomsN(5)}, umumiy maydon ${total}, shift balandligi ${ceil}. Oʻlchovlar namuna maʼlumot asosida.` : en ? `${roomsN(5)}, total area ${total}, ceiling height ${ceil}. Measurements are sample data.` : `${roomsN(5)}, общая площадь ${total}, высота потолка ${ceil}. Размеры — пример данных.`,
+      repIdle: s.rep === 'idle', repGen: s.rep === 'gen', repReady: s.rep === 'ready',
+      generate: () => { this.setState({ rep: 'gen' }); clearTimeout(this.gt); this.gt = setTimeout(() => this.setState({ rep: 'ready' }), 1400); },
+      openShare: () => this.setState({ sheet: 'share' }), shareDone: () => { this.setState({ sheet: null }); this.showToast(t.sent); },
+      fileName: en ? 'Chilonzor-9-report.pdf' : ru ? 'Chilanzar-9-otchet.pdf' : 'Chilonzor-9-hisobot.pdf',
+      closeScanner: () => { this.stopScan(); this.setState({ scan: false }); },
+      startScan: this.startScan,
+      finishScan: () => { this.stopScan(); this.setState({ sc: 'done' }); },
+      scanToProject: () => { this.stopScan(); this.setState({ scan: false, proj: true, report: false, tab: 'projects' }); },
+      scGuide: sc === 'guide', scScanning: sc === 'scanning', scDone: sc === 'done', scNoLidar: sc === 'nolidar', scDenied: sc === 'denied',
+      scCamera: sc === 'guide' || sc === 'scanning', frameTop: sc === 'scanning' ? 190 : 150,
+      bracket: sc === 'scanning' ? '#FF6A42' : 'rgba(242,240,235,.85)',
+      pct: Math.round(p), cWalls: Math.min(9, Math.floor(p / 11)), cDoors: p > 70 ? 5 : p > 50 ? 3 : p > 25 ? 1 : 0, cWins: p > 80 ? 4 : p > 40 ? 2 : p > 20 ? 1 : 0,
+      finishDisabled: p < 40, finishOpacity: p < 40 ? 0.4 : 1,
+      doneSummary: `${roomsN(5)} · ${total}`,
+      sheetOpen: !!s.sheet, shMenu: s.sheet === 'menu', shRooms: s.sheet === 'rooms', shShare: s.sheet === 'share', shProfile: s.sheet === 'profile',
+      closeSheet: () => this.setState({ sheet: null }),
+      dHasPhoto: !!d.photo, dNoPhoto: !d.photo, dPhotoBg: d.photo ? `url("${d.photo}")` : 'none',
+      pickPhoto: e => {
+        const f = e.target.files && e.target.files[0]; if (!f) return;
+        const img = new Image(); const url = URL.createObjectURL(f);
+        img.onload = () => {
+          const c = document.createElement('canvas'), sz = 240, m = Math.min(img.width, img.height);
+          c.width = c.height = sz;
+          c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, sz, sz);
+          URL.revokeObjectURL(url);
+          this.setState(st => ({ draft: { ...st.draft, photo: c.toDataURL('image/jpeg', 0.85) } }));
+        };
+        img.src = url;
+      },
+      removePhoto: () => this.setState(st => ({ draft: { ...st.draft, photo: null } })),
+      fieldsReq: [['name', t.fName, 'text', t.phName], ['phone', t.fPhone, 'tel', '+998 90 123 45 67'], ['email', t.fEmail, 'email', 'aziz@example.uz']].map(([k, l, ty, ph]) => ({
+        label: l, type: ty, ph, value: d[k], set: setF(k), hasErr: !!errs[k], err: errs[k] || '', labelColor: errs[k] ? 'var(--error)' : 'var(--ink-2)'
+      })),
+      fieldsOpt: [['company', t.fCompany, t.phCompany], ['role', t.fRole, t.phRole], ['city', t.fCity, t.phCity]].map(([k, l, ph]) => ({ label: l, ph, value: d[k], set: setF(k) })),
+      saveProfile: () => {
+        const dr = this.state.draft; const digits = dr.phone.replace(/\D/g, '');
+        const ok = dr.name.trim() && (digits.length === 9 || (digits.length === 12 && digits.startsWith('998'))) && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(dr.email.trim());
+        if (!ok) { this.setState({ tried: true }); return; }
+        this.setState({ profile: { ...dr, name: dr.name.trim(), email: dr.email.trim() }, sheet: null, tried: false });
+        this.showToast(t.saved);
+      },
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+:root,[data-theme="light"]{--bg:#F4F3F0;--card:#FFFFFF;--surface-2:#E9E7E2;--graphite:#23272A;--on-graphite:#F2F0EB;--on-graphite-2:#A9ADAA;--line:#DDDAD3;--ink:#1A1C1D;--ink-2:#5C605D;--ink-3:#8B8E8A;--accent:#D2401C;--accent-press:#B23516;--accent-text:#B8381A;--accent-tint:#F6E2DA;--on-accent:#FFFFFF;--bar:rgba(244,243,240,.84);--plan-bg:#F7F6F3;--plan-floor:#FFFFFF;--grid:rgba(26,28,29,.055);--wall:#1A1C1D;--wall-side:#CFCBC3;--dim:#5C605D;--shadow:0 1px 2px rgba(26,28,29,.05),0 6px 18px rgba(26,28,29,.06);--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",system-ui,"Helvetica Neue",sans-serif;--mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace}
+[data-theme="dark"]{--bg:#121314;--card:#1E2123;--surface-2:#191B1D;--graphite:#2A2E31;--on-graphite:#EEECE7;--on-graphite-2:#A5A8A4;--line:#2F3336;--ink:#EEECE7;--ink-2:#A5A8A4;--ink-3:#74787A;--accent:#FF6A42;--accent-press:#FF8463;--accent-text:#FF8A66;--accent-tint:#3B2119;--on-accent:#1A0D08;--bar:rgba(18,19,20,.84);--plan-bg:#151719;--plan-floor:#1C1F21;--grid:rgba(238,236,231,.05);--wall:#EEECE7;--wall-side:#3A3F42;--dim:#A5A8A4;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25)}
+body{margin:0;background:#E4E2DC;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#B8381A;text-decoration:none}a:hover{color:#8F2A12}
+button{font-family:inherit}
+.dv-turn{padding:44px 48px 36px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 15px/1.2 -apple-system,system-ui,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:40px 36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.4 -apple-system,system-ui,sans-serif;color:rgba(0,0,0,.6);max-width:420px}
+.dv-opt:target .dv-oid{background:#D2401C;color:#fff}
+.dv-next{margin:28px 0 0;font:13px/1.5 -apple-system,system-ui,sans-serif;color:rgba(0,0,0,.55)}
+</style>
+</helmet>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Asosiy ekranlar uchun variantlar: Home, 2D reja, tab bar</span></div>
+<p style="margin:0 0 28px;font:13px/1.5 -apple-system,system-ui,sans-serif;color:rgba(0,0,0,.55);max-width:760px">Har bir yoʻnalish uchun 2 tadan variant. Light/Dark, “boʻsh holat” va oʻlchov birligi Tweaks panelida. 2D/3D almashtirgich, xona tanlash, zoom va 3D aylantirish ishlaydi. Reja — <b>namuna maʼlumot</b>, haqiqiy skan emas.</p>
+<div data-theme="{{ theme }}" class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Home · Klassik. Skanerlash — katta grafit karta, ostida soʻnggi loyihalar.</div>
+<div data-screen-label="1a Home klassik" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="display:flex;align-items:center;gap:9px;padding:10px 20px 0">
+<div style="width:30px;height:30px;border-radius:9px;background:var(--graphite);display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="#F2F0EB"></path><path d="M8 12h8" stroke="#E5542F"></path></svg></div>
+<span style="font:650 17px var(--font);letter-spacing:-.2px">iHomeScan</span>
+</div>
+<div style="padding:22px 20px 0">
+<div style="font:500 15px var(--font);color:var(--ink-2)">Xayrli kun</div>
+<div style="font:700 31px/36px var(--font);letter-spacing:-.7px;margin-top:4px;text-wrap:pretty">Uyingizni aniq oʻlchang</div>
+</div>
+<div style="margin:22px 16px 0;border-radius:24px;background:var(--graphite);padding:20px;position:relative;overflow:hidden;color:var(--on-graphite)">
+<div style="position:absolute;right:-20px;top:-20px;width:190px;height:170px;background-image:linear-gradient(rgba(242,240,235,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(242,240,235,.07) 1px,transparent 1px);background-size:16px 16px;border-radius:0 0 0 40px"></div>
+<svg width="104" height="88" viewBox="0 0 104 88" fill="none" stroke-linecap="round" style="position:absolute;right:22px;top:20px"><path d="M2 16V2h16M86 2h16v14M2 72v14h16M102 72v14H86" stroke="#F2F0EB" stroke-width="3"></path><path d="M24 30h56v34H24z" stroke="#F2F0EB" stroke-opacity=".5" stroke-width="2"></path><path d="M52 30v34" stroke="#F2F0EB" stroke-opacity=".5" stroke-width="2"></path><path d="M10 47h84" stroke="#FF6A42" stroke-width="2.5"></path></svg>
+<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(242,240,235,.1);font:600 12px var(--font);color:var(--on-graphite-2);position:relative">LiDAR</div>
+<div style="font:650 23px/28px var(--font);letter-spacing:-.4px;margin-top:44px;position:relative">Xonani skanerlash</div>
+<div style="font:400 15px/21px var(--font);color:var(--on-graphite-2);margin-top:6px;max-width:270px;position:relative">Bir necha daqiqada 2D reja, 3D model va aniq oʻlchovlar.</div>
+<button style="margin-top:18px;width:100%;height:52px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;position:relative"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 12h8"></path></svg>Skanerlashni boshlash</button>
+</div>
+<sc-if value="{{ homeFull }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 20px 10px"><span style="font:650 20px var(--font);letter-spacing:-.3px">Soʻnggi loyihalar</span><span style="font:500 15px var(--font);color:var(--accent-text)">Barchasi</span></div>
+<div style="margin:0 16px;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden">
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:52px;height:52px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="38" height="38" viewBox="-400 -400 8600 8400"><rect x="0" y="0" width="7800" height="7600" style="fill:var(--plan-floor)"></rect><path d="M0 0H7800V7600H0Z" style="fill:none;stroke:var(--wall);stroke-width:380"></path><path d="M4200 0V4800M0 4800H7800M3000 4800V7600M5800 4800V7600" style="fill:none;stroke:var(--wall);stroke-width:240"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Chilonzor 9-kv, 2 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">59,3 m² · 5 xona · Bugun</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg>
+</div>
+<div style="height:0.5px;background:var(--line);margin-left:80px"></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:52px;height:52px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="36" height="36" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 8H92V92H8Z" stroke-width="6"></path><path d="M50 8V55M8 55H92M36 55V92M66 55V92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Yunusobod 4-kv, 3 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">78,6 m² · 7 xona · 28-okt</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg>
+</div>
+<div style="height:0.5px;background:var(--line);margin-left:80px"></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:52px;height:52px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="36" height="36" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 18H92V82H8Z" stroke-width="6"></path><path d="M60 18V82M60 50H92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Mirzo Ulugʻbek, ofis</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">42,0 m² · 3 xona · 15-okt</div></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="margin:26px 16px 0;border:1.5px dashed var(--line);border-radius:22px;padding:26px 22px;display:flex;flex-direction:column;align-items:flex-start;gap:8px">
+<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="M3 3h18v18H3zM12 3v9M3 12h13"></path></svg>
+<div style="font:650 18px var(--font);margin-top:6px">Hali loyihalar yoʻq</div>
+<div style="font:400 15px/21px var(--font);color:var(--ink-2)">Birinchi xonani skanerlang — reja va oʻlchovlar shu yerda saqlanadi.</div>
+</div>
+</sc-if>
+<div style="position:absolute;left:0;right:0;bottom:0;height:86px;padding-top:7px;box-sizing:border-box;background:var(--bar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);align-items:start">
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--accent);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"></path></svg>Bosh sahifa</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg>Loyihalar</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H4"></path><circle cx="7" cy="7" r="3"></circle><circle cx="17" cy="17" r="3"></circle></svg>Sozlamalar</div>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Home · Reja birinchi. Oxirgi loyiha rejasi asosiy oʻrinda, skanerlash — suzuvchi tugma.</div>
+<div data-screen-label="1b Home reja" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px 0">
+<div style="display:flex;align-items:center;gap:9px"><div style="width:30px;height:30px;border-radius:9px;background:var(--graphite);display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="#F2F0EB"></path><path d="M8 12h8" stroke="#E5542F"></path></svg></div><span style="font:700 22px var(--font);letter-spacing:-.4px">iHomeScan</span></div>
+</div>
+<div style="font:600 15px var(--font);color:var(--ink-2);padding:22px 20px 10px">Davom ettirish</div>
+<div style="position:relative;margin:0 16px;height:390px;border-radius:26px;overflow:hidden;border:0.5px solid var(--line);flex:none">
+<sc-if value="{{ homeFull }}" hint-placeholder-val="{{ true }}">
+<dc-import name="FloorPlan" kind="plain" controls="{{ false }}" style="position:absolute;inset:0 0 70px 0" hint-size="100%,320px"></dc-import>
+<div style="position:absolute;left:12px;top:12px;padding:5px 10px;border-radius:999px;background:var(--bar);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid var(--line);font:600 11px var(--font);color:var(--ink-2)">Namuna maʼlumot</div>
+<div style="position:absolute;left:10px;right:10px;bottom:10px;padding:14px 14px 14px 16px;border-radius:18px;background:var(--card);box-shadow:var(--shadow);display:flex;align-items:center;gap:12px">
+<div style="flex:1;min-width:0"><div style="font:600 17px var(--font)">Chilonzor 9-kv, 2 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">59,3 m² · 5 xona · Bugun</div></div>
+<div style="width:40px;height:40px;border-radius:999px;background:var(--accent-tint);color:var(--accent-text);display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"></path></svg></div>
+</div>
+</sc-if>
+<sc-if value="{{ homeEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background-color:var(--plan-bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:18px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center">
+<div style="width:150px;height:120px;border:2px dashed var(--ink-3);border-radius:6px"></div>
+<div style="font:650 18px var(--font);margin-top:8px">Birinchi rejangiz shu yerda boʻladi</div>
+<div style="font:400 15px/21px var(--font);color:var(--ink-2);max-width:260px">Xonani skanerlang — devorlar, eshiklar va oʻlchovlar avtomatik chiziladi.</div>
+</div>
+</sc-if>
+</div>
+<sc-if value="{{ homeFull }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:2px;padding:18px 20px 0">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0"><div><div style="font:600 15px var(--font)">Yunusobod 4-kv, 3 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:2px">78,6 m² · 28-okt</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-3)"><path d="m9 6 6 6-6 6"></path></svg></div>
+</div>
+</sc-if>
+<button style="position:absolute;left:50%;transform:translateX(-50%);bottom:104px;height:56px;padding:0 26px 0 22px;border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;gap:10px;box-shadow:0 10px 26px rgba(210,64,28,.35);cursor:pointer;white-space:nowrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 12h8"></path></svg>Xonani skanerlash</button>
+<div style="position:absolute;left:0;right:0;bottom:0;height:86px;padding-top:7px;box-sizing:border-box;background:var(--bar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);align-items:start">
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--accent);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"></path></svg>Bosh sahifa</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg>Loyihalar</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-3);font:500 10.5px var(--font)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H4"></path><circle cx="7" cy="7" r="3"></circle><circle cx="17" cy="17" r="3"></circle></svg>Sozlamalar</div>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>2D reja · Chizma. Barcha oʻlcham zanjirlari va maydonlar koʻrinadi — muhandis uslubi.</div>
+<div data-screen-label="1c Reja chizma" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px 0 10px">
+<div style="display:flex;align-items:center;gap:2px;color:var(--accent-text);font:400 17px var(--font)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg>Loyihalar</div>
+<div style="width:34px;height:34px;border-radius:999px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink)"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></div>
+</div>
+<div style="padding:4px 20px 14px">
+<div style="font:700 25px/30px var(--font);letter-spacing:-.5px">Chilonzor 9-kv, 2 xonali</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap"><span style="font:400 14px var(--font);color:var(--ink-2)">59,3 m² · 5 xona · shift 2,7 m</span><span style="padding:3px 8px;border-radius:999px;background:var(--surface-2);font:600 11px var(--font);color:var(--ink-2)">Namuna maʼlumot</span></div>
+</div>
+<div style="margin:0 20px 12px;display:grid;grid-template-columns:1fr 1fr;padding:2px;border-radius:10px;background:var(--surface-2)">
+<button onClick="{{ m1to2d }}" style="height:32px;border:0;border-radius:8px;font:600 14px var(--font);cursor:pointer;background:{{ m1a.bg }};color:{{ m1a.fg }};box-shadow:{{ m1a.sh }}">2D reja</button>
+<button onClick="{{ m1to3d }}" style="height:32px;border:0;border-radius:8px;font:600 14px var(--font);cursor:pointer;background:{{ m1b.bg }};color:{{ m1b.fg }};box-shadow:{{ m1b.sh }}">3D model</button>
+</div>
+<div style="flex:1;margin:0 12px;border-radius:22px;overflow:hidden;border:0.5px solid var(--line);position:relative;min-height:0">
+<dc-import name="FloorPlan" kind="draft" mode="{{ m1 }}" units="{{ units }}" controls="{{ true }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+</div>
+<div style="flex:none;display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px 16px 34px">
+<button style="height:52px;padding:0 18px;border:0;border-radius:15px;background:var(--surface-2);color:var(--ink);font:600 16px var(--font);cursor:pointer">Xonalar · 5</button>
+<button style="height:52px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font:600 17px var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7zM14 3v4h4M9 13h6M9 17h4"></path></svg>PDF hisobot</button>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>2D reja · Fokus. Reja toza; oʻlcham faqat tanlangan xonada. Rejaga yoki chipga bosing.</div>
+<div data-screen-label="1d Reja fokus" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="height:50px;flex:none;display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:0 14px">
+<div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></div>
+<div style="text-align:center"><div style="font:600 17px var(--font)">Chilonzor 9-kv</div><div style="font:400 12px var(--font);color:var(--ink-2)">59,3 m² · namuna</div></div>
+<div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink);justify-self:end"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></div>
+</div>
+<div style="flex:1;position:relative;min-height:0;margin-top:6px">
+<dc-import name="FloorPlan" kind="focus" mode="{{ m2 }}" units="{{ units }}" controls="{{ true }}" selected="{{ sel }}" on-select="{{ onSel }}" style="position:absolute;inset:0" hint-size="100%,100%"></dc-import>
+<div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);display:flex;padding:3px;border-radius:999px;background:var(--bar);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:0.5px solid var(--line);box-shadow:var(--shadow)">
+<button onClick="{{ m2to2d }}" style="height:32px;padding:0 16px;border:0;border-radius:999px;font:600 14px var(--font);cursor:pointer;background:{{ m2a.bg }};color:{{ m2a.fg }};box-shadow:{{ m2a.sh }}">2D</button>
+<button onClick="{{ m2to3d }}" style="height:32px;padding:0 16px;border:0;border-radius:999px;font:600 14px var(--font);cursor:pointer;background:{{ m2b.bg }};color:{{ m2b.fg }};box-shadow:{{ m2b.sh }}">3D</button>
+</div>
+</div>
+<div style="flex:none;position:relative;background:var(--card);border-radius:28px 28px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.08);padding:8px 0 34px">
+<div style="width:36px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px"></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 20px"><span style="font:700 22px var(--font);letter-spacing:-.4px">{{ selRoom.name }}</span><span style="font:600 20px var(--mono);color:var(--accent-text)">{{ selRoom.a }} m²</span></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 20px 0">
+<div style="background:var(--surface-2);border-radius:14px;padding:10px 12px"><div style="font:500 12px var(--font);color:var(--ink-2)">Eni</div><div style="font:600 15px var(--mono);margin-top:3px">{{ selW }}</div></div>
+<div style="background:var(--surface-2);border-radius:14px;padding:10px 12px"><div style="font:500 12px var(--font);color:var(--ink-2)">Boʻyi</div><div style="font:600 15px var(--mono);margin-top:3px">{{ selH }}</div></div>
+<div style="background:var(--surface-2);border-radius:14px;padding:10px 12px"><div style="font:500 12px var(--font);color:var(--ink-2)">Shift</div><div style="font:600 15px var(--mono);margin-top:3px">{{ selC }}</div></div>
+</div>
+<div style="display:flex;gap:8px;overflow-x:auto;padding:14px 20px 0;scrollbar-width:none">
+<sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+<button onClick="{{ c.pick }}" style="flex:none;height:36px;padding:0 14px;border-radius:999px;font:600 14px var(--font);cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.bd }}">{{ c.name }}</button>
+</sc-for>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Tab bar · Standart iOS. 3 boʻlim, tanish va kutilgan. Tablarni bosib koʻring.</div>
+<div data-screen-label="1e Loyihalar standart tab" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="height:44px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px"><div style="width:36px;height:36px;border-radius:999px;background:var(--accent-tint);color:var(--accent-text);display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div></div>
+<div style="font:700 34px/40px var(--font);letter-spacing:-.8px;padding:0 20px">Loyihalar</div>
+<div style="margin:12px 16px 16px;height:38px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--ink-3);font:400 17px var(--font)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Qidirish</div>
+<div style="margin:0 16px;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden">
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:56px;height:56px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="40" height="40" viewBox="-400 -400 8600 8400"><rect x="0" y="0" width="7800" height="7600" style="fill:var(--plan-floor)"></rect><path d="M0 0H7800V7600H0Z" style="fill:none;stroke:var(--wall);stroke-width:380"></path><path d="M4200 0V4800M0 4800H7800M3000 4800V7600M5800 4800V7600" style="fill:none;stroke:var(--wall);stroke-width:240"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Chilonzor 9-kv, 2 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">59,3 m² · 5 xona</div></div>
+<span style="font:400 13px var(--font);color:var(--ink-3)">Bugun</span>
+</div>
+<div style="height:0.5px;background:var(--line);margin-left:84px"></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:56px;height:56px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="38" height="38" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 8H92V92H8Z" stroke-width="6"></path><path d="M50 8V55M8 55H92M36 55V92M66 55V92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Yunusobod 4-kv, 3 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">78,6 m² · 7 xona</div></div>
+<span style="font:400 13px var(--font);color:var(--ink-3)">28-okt</span>
+</div>
+<div style="height:0.5px;background:var(--line);margin-left:84px"></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:56px;height:56px;flex:none;border-radius:12px;background:var(--plan-bg);border:0.5px solid var(--line);display:grid;place-items:center"><svg width="38" height="38" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 18H92V82H8Z" stroke-width="6"></path><path d="M60 18V82M60 50H92" stroke-width="4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Mirzo Ulugʻbek, ofis</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:3px">42,0 m² · 3 xona</div></div>
+<span style="font:400 13px var(--font);color:var(--ink-3)">15-okt</span>
+</div>
+<div style="height:0.5px;background:var(--line);margin-left:84px"></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 14px">
+<div style="width:56px;height:56px;flex:none;border-radius:12px;border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--ink-3)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"></path></svg></div>
+<div style="flex:1;min-width:0"><div style="font:600 16px var(--font)">Sergeli, hovli uy</div><div style="font:500 13px var(--font);color:var(--accent-text);margin-top:3px">Skanerlanmagan</div></div>
+<span style="font:400 13px var(--font);color:var(--ink-3)">2-okt</span>
+</div>
+</div>
+<div style="position:absolute;left:0;right:0;bottom:0;height:86px;padding-top:7px;box-sizing:border-box;background:var(--bar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:0.5px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);align-items:start">
+<button onClick="{{ ta.home.go }}" style="border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ ta.home.c }};font:500 10.5px var(--font);cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"></path></svg>Bosh sahifa</button>
+<button onClick="{{ ta.projects.go }}" style="border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ ta.projects.c }};font:500 10.5px var(--font);cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg>Loyihalar</button>
+<button onClick="{{ ta.settings.go }}" style="border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:{{ ta.settings.c }};font:500 10.5px var(--font);cursor:pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H4"></path><circle cx="7" cy="7" r="3"></circle><circle cx="17" cy="17" r="3"></circle></svg>Sozlamalar</button>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Tab bar · Suzuvchi kapsula. Skanerlash tugmasi har bir boʻlimdan bir bosishda.</div>
+<div data-screen-label="1f Loyihalar kapsula tab" style="position:relative;width:402px;height:874px;border-radius:58px;background:var(--bg);box-shadow:0 0 0 11px #0d0e0f,0 0 0 12.5px #3a3c3e,0 30px 60px rgba(0,0,0,.22);overflow:hidden;color:var(--ink);font-family:var(--font);margin:12px;display:flex;flex-direction:column">
+<div style="height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:4px 30px 0 46px;font:600 17px var(--font);position:relative"><span>9:41</span><div style="position:absolute;left:50%;top:11px;width:124px;height:36px;margin-left:-62px;border-radius:20px;background:#000"></div><svg width="72" height="13" viewBox="0 0 72 13" fill="currentColor"><rect x="0" y="8" width="3" height="5" rx="1"></rect><rect x="5" y="5.5" width="3" height="7.5" rx="1"></rect><rect x="10" y="3" width="3" height="10" rx="1"></rect><rect x="15" y="0" width="3" height="13" rx="1"></rect><path d="M30 4.6a11 11 0 0 1 14 0M32.6 7.6a6.6 6.6 0 0 1 8.8 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><circle cx="37" cy="11" r="1.6"></circle><rect x="48" y="0.8" width="21" height="11.4" rx="3.4" fill="none" stroke="currentColor" stroke-opacity=".4"></rect><rect x="50" y="2.8" width="17" height="7.4" rx="1.8"></rect><rect x="70" y="4.5" width="1.6" height="4" rx=".8" fill-opacity=".4"></rect></svg></div>
+<div style="height:44px;display:flex;align-items:center;justify-content:flex-end;padding:0 16px"><div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);color:var(--ink);display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div></div>
+<div style="font:700 34px/40px var(--font);letter-spacing:-.8px;padding:0 20px">Loyihalar</div>
+<div style="margin:12px 16px 16px;height:38px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;gap:8px;padding:0 10px;color:var(--ink-3);font:400 17px var(--font)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Qidirish</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px">
+<div style="background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="86" height="86" viewBox="-400 -400 8600 8400"><rect x="0" y="0" width="7800" height="7600" style="fill:var(--plan-floor)"></rect><path d="M0 0H7800V7600H0Z" style="fill:none;stroke:var(--wall);stroke-width:240"></path><path d="M4200 0V4800M0 4800H7800M3000 4800V7600M5800 4800V7600" style="fill:none;stroke:var(--wall);stroke-width:150"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">Chilonzor 9-kv, 2 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">59,3 m² · Bugun</div></div></div>
+<div style="background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="80" height="80" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 8H92V92H8Z" stroke-width="3"></path><path d="M50 8V55M8 55H92M36 55V92M66 55V92" stroke-width="2"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">Yunusobod 4-kv, 3 xonali</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">78,6 m² · 28-okt</div></div></div>
+<div style="background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden"><div style="height:118px;background:var(--plan-bg);display:grid;place-items:center;border-bottom:0.5px solid var(--line)"><svg width="80" height="80" viewBox="0 0 100 100" style="fill:none;stroke:var(--wall)"><path d="M8 18H92V82H8Z" stroke-width="3"></path><path d="M60 18V82M60 50H92" stroke-width="2"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">Mirzo Ulugʻbek, ofis</div><div style="font:400 13px var(--font);color:var(--ink-2);margin-top:4px">42,0 m² · 15-okt</div></div></div>
+<div style="border-radius:20px;border:1.5px dashed var(--line);overflow:hidden"><div style="height:118px;display:grid;place-items:center;color:var(--ink-3)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"></path></svg></div><div style="padding:10px 12px 12px"><div style="font:600 15px/19px var(--font)">Sergeli, hovli uy</div><div style="font:500 13px var(--font);color:var(--accent-text);margin-top:4px">Skanerlanmagan</div></div></div>
+</div>
+<div style="position:absolute;left:16px;right:16px;bottom:28px;height:64px;border-radius:999px;background:var(--graphite);box-shadow:0 12px 30px rgba(0,0,0,.25);display:flex;align-items:center;padding:0 6px 0 8px;gap:4px">
+<button onClick="{{ tb.home.go }}" style="height:48px;border:0;border-radius:999px;padding:0 14px;display:flex;align-items:center;gap:7px;cursor:pointer;background:{{ tb.home.bg }};color:{{ tb.home.c }};font:600 14px var(--font)"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 3.5l8.5 7V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"></path></svg><span style="display:{{ tb.home.d }}">Bosh sahifa</span></button>
+<button onClick="{{ tb.projects.go }}" style="height:48px;border:0;border-radius:999px;padding:0 14px;display:flex;align-items:center;gap:7px;cursor:pointer;background:{{ tb.projects.bg }};color:{{ tb.projects.c }};font:600 14px var(--font)"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"></path></svg><span style="display:{{ tb.projects.d }}">Loyihalar</span></button>
+<button onClick="{{ tb.settings.go }}" style="height:48px;border:0;border-radius:999px;padding:0 14px;display:flex;align-items:center;gap:7px;cursor:pointer;background:{{ tb.settings.bg }};color:{{ tb.settings.c }};font:600 14px var(--font)"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H4"></path><circle cx="7" cy="7" r="3"></circle><circle cx="17" cy="17" r="3"></circle></svg><span style="display:{{ tb.settings.d }}">Sozlamalar</span></button>
+<div style="flex:1"></div>
+<button style="width:52px;height:52px;border:0;border-radius:999px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;cursor:pointer;flex:none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 12h8"></path></svg></button>
+</div>
+<div style="position:absolute;bottom:8px;left:50%;width:140px;margin-left:-70px;height:5px;border-radius:3px;background:var(--ink)"></div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Keyingi qadam: masalan, “Home — <a class="dv-oid" href="#1a">1a</a>, reja — <a class="dv-oid" href="#1d">1d</a> + <a class="dv-oid" href="#1c">1c</a> dagi oʻlcham zanjirlari, tab — <a class="dv-oid" href="#1e">1e</a>” deb yozing. Shu asosda barcha 7 ekranli toʻliq interaktiv prototipni yigʻaman.</p>
+</section>
+
+<section class="dv-turn" id="brand" style="padding-bottom:64px">
+<div class="dv-thd"><a class="dv-tid" href="#brand">B</a><span class="dv-tname">Brend yoʻnalishi: “Redline”</span></div>
+<p style="margin:0 0 28px;font:15px/1.55 -apple-system,system-ui,sans-serif;color:#3c3e3d;max-width:720px;text-wrap:pretty">Arxitektorning <b>kalka qogʻozi</b> (vellum), <b>grafit qalam</b> va tekshiruvchining <b>qizil chizigʻi</b> (redline). Fon — iliq qogʻoz, struktura — grafit, urgʻu — faqat harakat va tanlov uchun ishlatiladigan qizil-terrakota. JAEMM’ning moviy-yashil rangidan va odatiy SaaS koʻk/binafshadan ataylab uzoq.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:28px;max-width:1380px">
+
+<div style="background:#fff;border-radius:22px;padding:26px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+<div style="font:650 17px -apple-system,system-ui,sans-serif;color:#1A1C1D;margin-bottom:16px">60 – 30 – 10</div>
+<div style="display:flex;height:120px;border-radius:16px;overflow:hidden;border:1px solid #DDDAD3">
+<div style="flex:60;background:#F4F3F0;padding:14px;display:flex;flex-direction:column;justify-content:flex-end"><div style="font:700 22px -apple-system,system-ui,sans-serif;color:#1A1C1D">60%</div><div style="font:500 13px -apple-system,system-ui,sans-serif;color:#5C605D">Vellum · #F4F3F0</div></div>
+<div style="flex:18;background:#E9E7E2;padding:14px;display:flex;flex-direction:column;justify-content:flex-end;border-left:1px solid #DDDAD3"><div style="font:700 22px -apple-system,system-ui,sans-serif;color:#1A1C1D">30%</div><div style="font:500 12px -apple-system,system-ui,sans-serif;color:#5C605D">Mineral</div></div>
+<div style="flex:12;background:#23272A;padding:14px;display:flex;flex-direction:column;justify-content:flex-end"><div style="font:500 12px -apple-system,system-ui,sans-serif;color:#A9ADAA">Graphite</div></div>
+<div style="flex:10;background:#D2401C;padding:14px 10px;display:flex;flex-direction:column;justify-content:flex-end"><div style="font:700 22px -apple-system,system-ui,sans-serif;color:#fff">10%</div><div style="font:500 12px -apple-system,system-ui,sans-serif;color:#fff">Redline</div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;font:13px/1.45 -apple-system,system-ui,sans-serif;color:#5C605D">
+<div><b style="color:#1A1C1D">60 · Vellum</b><br>Ekran foni, keng boʻsh joylar, reja qogʻozi.</div>
+<div><b style="color:#1A1C1D">30 · Mineral + Graphite</b><br>Kartalar, segment, tab bar, skanerlash kartasi, devorlar.</div>
+<div><b style="color:#1A1C1D">10 · Redline</b><br>Asosiy CTA, faol tab, tanlangan xona, oʻlcham urgʻusi.</div>
+</div>
+</div>
+
+<div style="background:#fff;border-radius:22px;padding:26px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+<div style="font:650 17px -apple-system,system-ui,sans-serif;color:#1A1C1D;margin-bottom:16px">Tipografiya · SF Pro + SF Mono</div>
+<div style="display:flex;flex-direction:column;gap:12px;color:#1A1C1D;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif">
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Large Title 34</span><span style="font-size:34px;font-weight:700;letter-spacing:-.8px">Loyihalar</span></div>
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Title 22</span><span style="font-size:22px;font-weight:650;letter-spacing:-.4px">Yotoqxona</span></div>
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Headline 17</span><span style="font-size:17px;font-weight:600">Skanerlashni boshlash</span></div>
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Body 17</span><span style="font-size:17px">Telefonni sekin aylantiring.</span></div>
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Caption 13</span><span style="font-size:13px;color:#5C605D">59,3 m² · 5 xona · Bugun</span></div>
+<div style="display:flex;align-items:baseline;gap:16px"><span style="width:120px;flex:none;font:500 12px ui-monospace,Menlo,monospace;color:#8B8E8A">Measure Mono</span><span style="font:600 15px 'SF Mono',ui-monospace,Menlo,monospace;color:#B8381A">3 600 × 4 800 mm</span></div>
+</div>
+<div style="font:13px/1.5 -apple-system,system-ui,sans-serif;color:#5C605D;margin-top:16px">Dynamic Type bilan masshtablanadi. Oʻlchovlar har doim mono, raqamlar tabular.</div>
+</div>
+
+<div style="background:#F4F3F0;border-radius:22px;padding:26px;border:1px solid #DDDAD3">
+<div style="font:650 17px -apple-system,system-ui,sans-serif;color:#1A1C1D;margin-bottom:14px">Light tokenlar</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+<sc-for list="{{ tokLight }}" as="t" hint-placeholder-count="12">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;flex:none;border-radius:10px;border:1px solid rgba(0,0,0,.1);background:{{ t.hex }}"></div><div style="min-width:0"><div style="font:600 12.5px -apple-system,system-ui,sans-serif;color:#1A1C1D">{{ t.name }}</div><div style="font:500 11.5px ui-monospace,Menlo,monospace;color:#5C605D">{{ t.hex }}</div><div style="font:400 11px -apple-system,system-ui,sans-serif;color:#5C605D">{{ t.role }}</div></div></div>
+</sc-for>
+</div>
+</div>
+
+<div style="background:#121314;border-radius:22px;padding:26px">
+<div style="font:650 17px -apple-system,system-ui,sans-serif;color:#EEECE7;margin-bottom:14px">Dark tokenlar</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+<sc-for list="{{ tokDark }}" as="t" hint-placeholder-count="12">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;flex:none;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:{{ t.hex }}"></div><div style="min-width:0"><div style="font:600 12.5px -apple-system,system-ui,sans-serif;color:#EEECE7">{{ t.name }}</div><div style="font:500 11.5px ui-monospace,Menlo,monospace;color:#A5A8A4">{{ t.hex }}</div><div style="font:400 11px -apple-system,system-ui,sans-serif;color:#A5A8A4">{{ t.role }}</div></div></div>
+</sc-for>
+</div>
+<div style="font:13px/1.5 -apple-system,system-ui,sans-serif;color:#A5A8A4;margin-top:16px">Dark — inversiya emas: chuqurlik sirt yorugʻligi bilan (bg → card → graphite), urgʻu yorqinroq #FF6A42, ustidagi matn toʻq.</div>
+</div>
+
+<div style="background:#fff;border-radius:22px;padding:26px;box-shadow:0 1px 3px rgba(0,0,0,.06);grid-column:1/-1">
+<div style="font:650 17px -apple-system,system-ui,sans-serif;color:#1A1C1D;margin-bottom:16px">JAEMM tahlili (8 ta skrinshot)</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px;font:14px/1.55 -apple-system,system-ui,sans-serif;color:#3c3e3d">
+<div><div style="font:600 13px -apple-system,system-ui,sans-serif;color:#2E7D4F;margin-bottom:8px">Saqlaymiz</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div>Toʻr fonli texnik reja va zanjirli oʻlchamlar (mm) — ishonchli, professional koʻrinish.</div>
+<div>Reja ↔ 3D bitta segment orqali; “Toʻliq / Joyida koʻrish” gʻoyasi keyingi bosqich uchun.</div>
+<div>Xona nomi + maydon reja ichida.</div>
+<div>Eksport oldidan PDF sahifa koʻrinishi.</div>
+<div>Bottom sheet — ikkilamchi amallar uchun.</div>
+</div></div>
+<div><div style="font:600 13px -apple-system,system-ui,sans-serif;color:#B3261E;margin-bottom:8px">Olib tashlaymiz</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div>10 ta asbobli pastki CAD panel → zoom +/− va moslash, xolos.</div>
+<div>Tepada 3 qator tugma (Login, Menyu, qavat, skan, eskiz, qurilma) → bitta “…” menyusi.</div>
+<div>Kirish (login), xarita, konditsioner/ventilyator joylash — 1-bosqichdan tashqari.</div>
+<div>10+ bandli menyu sahifasi → kontekstli 3–4 amal.</div>
+<div>Oʻlchov chizgʻichlari (rulers) → faqat kerakli oʻlcham zanjiri.</div>
+</div></div>
+</div>
+</div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Koʻrinish&quot;},&quot;homeEmpty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Koʻrinish&quot;},&quot;units&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mm&quot;,&quot;m&quot;],&quot;default&quot;:&quot;mm&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Oʻlchov&quot;}}">
+class Component extends DCLogic {
+  state = { tabA: 'projects', tabB: 'projects', m1: '2d', m2: '2d', sel: 'bed' };
+  rooms = [
+    { id: 'living', name: 'Mehmonxona', w: 4200, h: 4800, a: '20,2' },
+    { id: 'bed', name: 'Yotoqxona', w: 3600, h: 4800, a: '17,3' },
+    { id: 'kitchen', name: 'Oshxona', w: 3000, h: 2800, a: '8,4' },
+    { id: 'hall', name: 'Koridor', w: 2800, h: 2800, a: '7,8' },
+    { id: 'bath', name: 'Hammom', w: 2000, h: 2800, a: '5,6' }
+  ];
+  renderVals() {
+    const s = this.state;
+    const units = this.props.units ?? 'mm';
+    const empty = !!this.props.homeEmpty;
+    const fmt = mm => units === 'm' ? (mm / 1000).toFixed(2).replace('.', ',') + ' m' : String(mm).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202F') + ' mm';
+    const seg = on => ({ bg: on ? 'var(--card)' : 'transparent', fg: on ? 'var(--ink)' : 'var(--ink-2)', sh: on ? '0 1px 3px rgba(0,0,0,.14)' : 'none' });
+    const r = this.rooms.find(x => x.id === s.sel);
+    const tabA = k => ({ c: s.tabA === k ? 'var(--accent)' : 'var(--ink-3)', go: () => this.setState({ tabA: k }) });
+    const tabB = k => {
+      const on = s.tabB === k;
+      return { bg: on ? 'rgba(242,240,235,.14)' : 'transparent', c: on ? 'var(--on-graphite)' : 'var(--on-graphite-2)', d: on ? 'inline' : 'none', go: () => this.setState({ tabB: k }) };
+    };
+    const tok = (n, hex, role) => ({ name: n, hex, role });
+    return {
+      theme: this.props.theme ?? 'light',
+      homeEmpty: empty, homeFull: !empty, units,
+      m1: s.m1, m2: s.m2,
+      m1a: seg(s.m1 === '2d'), m1b: seg(s.m1 === '3d'), m2a: seg(s.m2 === '2d'), m2b: seg(s.m2 === '3d'),
+      m1to2d: () => this.setState({ m1: '2d' }), m1to3d: () => this.setState({ m1: '3d' }),
+      m2to2d: () => this.setState({ m2: '2d' }), m2to3d: () => this.setState({ m2: '3d' }),
+      sel: s.sel, onSel: id => this.setState({ sel: id }),
+      selRoom: r, selW: fmt(r.w), selH: fmt(r.h), selC: fmt(2700),
+      chips: this.rooms.map(x => {
+        const on = x.id === s.sel;
+        return { name: x.name, bg: on ? 'var(--accent-tint)' : 'var(--card)', fg: on ? 'var(--accent-text)' : 'var(--ink)', bd: on ? 'var(--accent)' : 'var(--line)', pick: () => this.setState({ sel: x.id }) };
+      }),
+      ta: { home: tabA('home'), projects: tabA('projects'), settings: tabA('settings') },
+      tb: { home: tabB('home'), projects: tabB('projects'), settings: tabB('settings') },
+      tokLight: [
+        tok('Vellum · bg', '#F4F3F0', '60% · ekran foni'), tok('Card', '#FFFFFF', 'kartalar'), tok('Mineral', '#E9E7E2', '30% · ikkilamchi sirt'),
+        tok('Graphite', '#23272A', '30% · urgʻuli sirt'), tok('Line', '#DDDAD3', 'chegaralar'), tok('Ink', '#1A1C1D', 'matn, devorlar · 16:1'),
+        tok('Ink 2', '#5C605D', 'ikkilamchi · 5.9:1'), tok('Ink 3', '#8B8E8A', 'izoh, nofaol'), tok('Redline', '#D2401C', '10% · CTA · oq matn 6.3:1'),
+        tok('Redline tint', '#F6E2DA', 'tanlangan fon'), tok('Success', '#2E7D4F', 'muvaffaqiyat'), tok('Warning', '#A86A12', 'ogohlantirish'), tok('Error', '#B3261E', 'xato')
+      ],
+      tokDark: [
+        tok('Bg', '#121314', '60% · ekran foni'), tok('Card', '#1E2123', 'kartalar'), tok('Surface 2', '#191B1D', '30% · ikkilamchi'),
+        tok('Graphite', '#2A2E31', '30% · koʻtarilgan'), tok('Line', '#2F3336', 'chegaralar'), tok('Ink', '#EEECE7', 'matn · 16:1'),
+        tok('Ink 2', '#A5A8A4', 'ikkilamchi · 7.6:1'), tok('Ink 3', '#74787A', 'izoh, nofaol'), tok('Redline', '#FF6A42', '10% · toʻq matn bilan'),
+        tok('Redline tint', '#3B2119', 'tanlangan fon'), tok('Success', '#5CC28A', 'muvaffaqiyat'), tok('Warning', '#E0A43A', 'ogohlantirish'), tok('Error', '#FF6B60', 'xato')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

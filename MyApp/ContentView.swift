@@ -1,17 +1,92 @@
 import SwiftUI
-import Playgrounds
+import SwiftData
 
+/// Root shell: header, the selected tab's content, the floating tab bar,
+/// and a single navigation stack that pushes project details over everything.
 struct ContentView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(AppSettings.self) private var settings
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        @Bindable var model = model
+
+        NavigationStack(path: $model.path) {
+            VStack(spacing: 0) {
+                AppHeader()
+                tabContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .background(Palette.background.ignoresSafeArea())
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                FloatingTabBar(selection: $model.selectedTab) {
+                    model.showToast("toast.scanLater")
+                }
+            }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
+            .navigationTitle(settings.t(model.selectedTab.titleKey))
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .project(let id): ProjectDetailScreen(projectID: id)
+                case .reports(let id): ReportsScreen(projectID: id)
+                }
+            }
+        }
+        .tint(Palette.accentText)
+        .sheet(isPresented: $model.isCreatingProject) {
+            NewProjectSheet()
+                .toastOverlay(model, settings: settings)
+        }
+        .toastOverlay(model, settings: settings)
+    }
+
+    @ViewBuilder
+    private var tabContent: some View {
+        switch model.selectedTab {
+        case .home: HomeView()
+        case .projects: ProjectsView()
+        case .settings: SettingsView()
+        }
     }
 }
 
-#Preview {
-    ContentView()
+#Preview("Light") {
+    PreviewContainer { ContentView() }
 }
 
-#Playground {
-    _ = 1 + 2
+#Preview("Dark · Russian") {
+    PreviewContainer(language: .russian) { ContentView() }
+        .preferredColorScheme(.dark)
+}
+
+/// In-memory database with the sample project and temporary file storage, for previews only.
+struct PreviewContainer<Content: View>: View {
+    private let model = AppModel()
+    private let settings: AppSettings
+    private let files: LocalFileStorageService
+    private let container: ModelContainer?
+    private let content: Content
+
+    init(language: AppLanguage = .english, @ViewBuilder content: () -> Content) {
+        let defaults = UserDefaults(suiteName: "preview.\(UUID().uuidString)") ?? .standard
+        settings = AppSettings(defaults: defaults)
+        settings.language = language
+        files = LocalFileStorageService(rootURL: .temporaryDirectory.appending(path: "preview-\(UUID().uuidString)"))
+        container = try? Persistence.makeContainer(storeURL: nil)
+        if let container {
+            _ = try? SampleProjectSeeder.seedIfNeeded(context: container.mainContext, files: files,
+                                                  settings: settings, defaults: defaults)
+        }
+        self.content = content()
+    }
+
+    var body: some View {
+        if let container {
+            content
+                .modelContainer(container)
+                .environment(model)
+                .environment(settings)
+                .environment(\.fileStorage, files)
+        }
+    }
 }
