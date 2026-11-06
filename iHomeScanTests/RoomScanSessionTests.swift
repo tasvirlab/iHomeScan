@@ -76,6 +76,15 @@ struct RoomScanSessionTests {
                 objects: objects,
                 floors: 0
             ),
+            floorPlan: FloorPlan(
+                bounds: CGRect(x: 0, y: 0, width: 1, height: 1),
+                rooms: [],
+                outerWalls: [],
+                innerWalls: [],
+                doors: [],
+                windows: [],
+                dimensions: []
+            ),
             capturedAt: .now,
             capturedRoom: nil
         )

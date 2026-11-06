@@ -7,7 +7,7 @@ import CoreGraphics
 /// top-left outer wall corner, y axis pointing down. Stage 2 will produce this from RoomPlan.
 struct FloorPlan: Codable, Hashable {
     /// Bumped when the JSON layout changes so older files can still be decoded.
-    static let currentFormatVersion = 1
+    static let currentFormatVersion = 2
 
     /// A room outline. `id` is matched against `Room.geometryIdentifier` in the database.
     struct PlanRoom: Codable, Hashable, Identifiable {
@@ -51,6 +51,8 @@ struct FloorPlan: Codable, Hashable {
     let doors: [Door]
     let windows: [CGRect]
     let dimensions: [Dimension]
+    /// Loss-aware source geometry for real RoomPlan scans. Nil identifies legacy or sample plans.
+    var roomPlanMetadata: RoomPlanGeometryMetadata? = nil
 
     /// Returns a copy with every coordinate multiplied by `factor` (e.g. 1000 for millimeters).
     func scaled(by factor: CGFloat) -> FloorPlan {
@@ -70,7 +72,8 @@ struct FloorPlan: Codable, Hashable {
             dimensions: dimensions.map {
                 Dimension(start: p($0.start), end: p($0.end), value: $0.value,
                           labelPosition: p($0.labelPosition), labelRotation: $0.labelRotation)
-            }
+            },
+            roomPlanMetadata: roomPlanMetadata
         )
     }
 

@@ -113,6 +113,8 @@ struct RoomScanSummary: Equatable {
 /// The in-memory result of a finished scan. Not persisted in Stage 2.2.
 struct RoomScanOutput {
     let summary: RoomScanSummary
+    /// Versioned iHomeScan geometry converted directly from this capture.
+    let floorPlan: FloorPlan
     let capturedAt: Date
     #if canImport(RoomPlan)
     /// The real RoomPlan result, kept for geometry processing in Stage 2.3.

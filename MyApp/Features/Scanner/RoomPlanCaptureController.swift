@@ -85,11 +85,19 @@ extension RoomPlanCaptureController: RoomCaptureViewDelegate {
             onEvent?(.failed(RoomScanFailure(roomPlanError: error, duringProcessing: true)))
             return
         }
-        onEvent?(.completed(RoomScanOutput(
-            summary: RoomScanSummary(processedResult),
-            capturedAt: .now,
-            capturedRoom: processedResult
-        )))
+        do {
+            let floorPlan = try RoomGeometryProcessor().process(
+                RoomGeometrySource(capturedRoom: processedResult)
+            )
+            onEvent?(.completed(RoomScanOutput(
+                summary: RoomScanSummary(processedResult),
+                floorPlan: floorPlan,
+                capturedAt: .now,
+                capturedRoom: processedResult
+            )))
+        } catch {
+            onEvent?(.failed(.processingFailed))
+        }
     }
 }
 #endif
