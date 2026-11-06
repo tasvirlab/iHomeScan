@@ -24,6 +24,8 @@ struct FloorPlanCanvas: View {
     var showsGrid = true
     var zoom: CGFloat = 1
     var offset: CGSize = .zero
+    /// Presentation-only auto-alignment in radians. Persisted coordinates remain unchanged.
+    var rotation: CGFloat = 0
     /// Space reserved for overlaid controls; the plan is fitted into the remaining area.
     var contentInsets = EdgeInsets()
 
@@ -41,29 +43,42 @@ struct FloorPlanCanvas: View {
     /// Maps plan coordinates in **meters** to view coordinates.
     static func transform(
         for plan: FloorPlan, in size: CGSize, insets: EdgeInsets = EdgeInsets(),
-        zoom: CGFloat, offset: CGSize, style: Style = .draft
+        zoom: CGFloat, offset: CGSize, rotation: CGFloat = 0, style: Style = .draft
     ) -> CGAffineTransform {
         millimeterTransform(for: plan.scaled(by: millimetersPerMeter), in: size, insets: insets,
-                            zoom: zoom, offset: offset, style: style)
+                            zoom: zoom, offset: offset, rotation: rotation, style: style)
             .scaledBy(x: millimetersPerMeter, y: millimetersPerMeter)
     }
 
     /// Maps plan coordinates in millimeters to view coordinates.
     private static func millimeterTransform(
-        for plan: FloorPlan, in size: CGSize, insets: EdgeInsets, zoom: CGFloat, offset: CGSize, style: Style
+        for plan: FloorPlan, in size: CGSize, insets: EdgeInsets, zoom: CGFloat, offset: CGSize,
+        rotation: CGFloat, style: Style
     ) -> CGAffineTransform {
         let box = viewBox(forMillimeterPlan: plan, style: style)
+        let rotatedBox = rotatedBounds(of: box, by: rotation)
         let available = CGRect(
             x: insets.leading, y: insets.top,
             width: max(size.width - insets.leading - insets.trailing, 1),
             height: max(size.height - insets.top - insets.bottom, 1)
         )
-        let fit = min(available.width / box.width, available.height / box.height)
+        let fit = min(available.width / rotatedBox.width, available.height / rotatedBox.height)
         let scale = fit * zoom
         return CGAffineTransform.identity
             .translatedBy(x: available.midX + offset.width, y: available.midY + offset.height)
             .scaledBy(x: scale, y: scale)
+            .rotated(by: rotation)
             .translatedBy(x: -box.midX, y: -box.midY)
+    }
+
+    private static func rotatedBounds(of rect: CGRect, by angle: CGFloat) -> CGRect {
+        let transform = CGAffineTransform(translationX: rect.midX, y: rect.midY)
+            .rotated(by: angle)
+            .translatedBy(x: -rect.midX, y: -rect.midY)
+        return [CGPoint(x: rect.minX, y: rect.minY), CGPoint(x: rect.maxX, y: rect.minY),
+                CGPoint(x: rect.maxX, y: rect.maxY), CGPoint(x: rect.minX, y: rect.maxY)]
+            .map { $0.applying(transform) }
+            .reduce(CGRect.null) { $0.union(CGRect(origin: $1, size: .zero)) }
     }
 
     var body: some View {
@@ -74,15 +89,15 @@ struct FloorPlanCanvas: View {
             }
 
             let transform = Self.millimeterTransform(for: plan, in: size, insets: contentInsets,
-                                                     zoom: zoom, offset: offset, style: style)
-            let scale = transform.a
+                                                     zoom: zoom, offset: offset, rotation: rotation, style: style)
+            let scale = hypot(transform.a, transform.c)
 
             var planContext = context
             planContext.concatenate(transform)
             drawGeometry(plan, in: &planContext)
 
             if style != .thumbnail {
-                drawLabels(plan, in: &context, transform: transform, scale: scale)
+                drawLabels(plan, in: &context, size: size, transform: transform, scale: scale)
             }
         }
         .background(Palette.planBackground)
@@ -109,8 +124,7 @@ struct FloorPlanCanvas: View {
     }
 
     private func drawGeometry(_ plan: FloorPlan, in context: inout GraphicsContext) {
-        // Floor
-        context.fill(Path(plan.bounds), with: .color(Palette.planFloor))
+        drawFloor(plan, in: &context)
 
         // Selected room highlight
         if let room = plan.rooms.first(where: { $0.id == selectedRoomID }) {
@@ -167,8 +181,21 @@ struct FloorPlanCanvas: View {
             }
         }
 
-        if style == .draft {
-            drawDimensionLines(plan, in: &context)
+    }
+
+    private func drawFloor(_ plan: FloorPlan, in context: inout GraphicsContext) {
+        if let metadata = plan.roomPlanMetadata {
+            for surface in metadata.surfaces where surface.kind == .floor && surface.projectedPolygon.count >= 3 {
+                var polygon = Path()
+                polygon.addLines(surface.projectedPolygon.map {
+                    CGPoint(x: $0.x * Self.millimetersPerMeter, y: $0.y * Self.millimetersPerMeter)
+                })
+                polygon.closeSubpath()
+                context.fill(polygon, with: .color(Palette.planFloor.opacity(0.72)))
+            }
+        } else {
+            // Legacy/sample plans intentionally use their rectangular authored bounds.
+            context.fill(Path(plan.bounds), with: .color(Palette.planFloor))
         }
     }
 
@@ -196,46 +223,34 @@ struct FloorPlanCanvas: View {
         }
     }
 
-    private func drawDimensionLines(_ plan: FloorPlan, in context: inout GraphicsContext) {
+    private func drawDimensionLines(_ annotations: [FloorPlanDimensionLayoutEngine.Annotation],
+                                    in context: inout GraphicsContext) {
         var lines = Path()
         var ticks = Path()
-        for dimension in plan.dimensions {
-            lines.move(to: dimension.start)
-            lines.addLine(to: dimension.end)
-
-            // Extension lines perpendicular to the dimension, reaching toward the wall.
-            let isHorizontal = dimension.start.y == dimension.end.y
-            for point in [dimension.start, dimension.end] {
-                let toward = extensionRange(for: point, horizontal: isHorizontal, bounds: plan.bounds)
-                if isHorizontal {
-                    lines.move(to: CGPoint(x: point.x, y: toward.lowerBound))
-                    lines.addLine(to: CGPoint(x: point.x, y: toward.upperBound))
-                } else {
-                    lines.move(to: CGPoint(x: toward.lowerBound, y: point.y))
-                    lines.addLine(to: CGPoint(x: toward.upperBound, y: point.y))
-                }
-                ticks.move(to: CGPoint(x: point.x - 90, y: point.y + 90))
-                ticks.addLine(to: CGPoint(x: point.x + 90, y: point.y - 90))
+        for annotation in annotations {
+            lines.move(to: annotation.lineStart)
+            lines.addLine(to: annotation.lineEnd)
+            lines.move(to: annotation.wallStart)
+            lines.addLine(to: annotation.lineStart)
+            lines.move(to: annotation.wallEnd)
+            lines.addLine(to: annotation.lineEnd)
+            let dx = annotation.lineEnd.x - annotation.lineStart.x
+            let dy = annotation.lineEnd.y - annotation.lineStart.y
+            let length = max(hypot(dx, dy), 1)
+            let tangent = CGVector(dx: dx / length, dy: dy / length)
+            for point in [annotation.lineStart, annotation.lineEnd] {
+                ticks.move(to: CGPoint(x: point.x - tangent.dx * 4 - tangent.dy * 4,
+                                       y: point.y - tangent.dy * 4 + tangent.dx * 4))
+                ticks.addLine(to: CGPoint(x: point.x + tangent.dx * 4 + tangent.dy * 4,
+                                          y: point.y + tangent.dy * 4 - tangent.dx * 4))
             }
         }
-        context.stroke(lines, with: .color(Palette.inkSecondary), lineWidth: 16)
-        context.stroke(ticks, with: .color(Palette.inkSecondary), lineWidth: 40)
+        context.stroke(lines, with: .color(Palette.inkSecondary.opacity(0.7)), lineWidth: 0.8)
+        context.stroke(ticks, with: .color(Palette.inkSecondary.opacity(0.8)), lineWidth: 1.2)
     }
 
-    /// Extension line extent for a dimension point: from 150 mm beyond the line to 500 mm toward the plan.
-    private func extensionRange(for point: CGPoint, horizontal: Bool, bounds: CGRect) -> ClosedRange<CGFloat> {
-        if horizontal {
-            let towardPlan: CGFloat = point.y < bounds.midY ? 500 : -500
-            return ordered(point.y - towardPlan * 0.3, point.y + towardPlan)
-        } else {
-            let towardPlan: CGFloat = point.x < bounds.midX ? 500 : -500
-            return ordered(point.x - towardPlan * 0.3, point.x + towardPlan)
-        }
-    }
-
-    private func ordered(_ a: CGFloat, _ b: CGFloat) -> ClosedRange<CGFloat> { min(a, b)...max(a, b) }
-
-    private func drawLabels(_ plan: FloorPlan, in context: inout GraphicsContext, transform: CGAffineTransform, scale: CGFloat) {
+    private func drawLabels(_ plan: FloorPlan, in context: inout GraphicsContext, size: CGSize,
+                            transform: CGAffineTransform, scale: CGFloat) {
         // Font sizes are specified in plan millimeters, converted to points.
         let nameSize = 290 * scale
         let detailSize = 220 * scale
@@ -262,16 +277,21 @@ struct FloorPlanCanvas: View {
         }
 
         guard style == .draft else { return }
-        for dimension in plan.dimensions {
-            let point = dimension.labelPosition.applying(transform)
-            var layer = context
-            layer.translateBy(x: point.x, y: point.y)
-            layer.rotate(by: .degrees(dimension.labelRotation))
-            layer.draw(
-                Text(settings.lengthValue(dimension.value))
-                    .font(.system(size: detailSize, weight: .medium, design: .monospaced))
+        let annotations = FloorPlanDimensionLayoutEngine.layout(
+            dimensions: plan.dimensions, transform: transform,
+            canvasBounds: CGRect(origin: .zero, size: size),
+            planCenter: CGPoint(x: plan.bounds.midX, y: plan.bounds.midY),
+            textForValue: settings.lengthValue
+        )
+        drawDimensionLines(annotations, in: &context)
+        for annotation in annotations {
+            context.fill(Path(roundedRect: annotation.labelBounds, cornerRadius: 5),
+                         with: .color(Palette.planBackground.opacity(0.92)))
+            context.draw(
+                Text(settings.lengthValue(annotation.value))
+                    .font(.system(size: max(detailSize, 11), weight: .medium, design: .monospaced))
                     .foregroundStyle(Palette.inkSecondary),
-                at: .zero, anchor: .bottom
+                at: annotation.labelCenter, anchor: .center
             )
         }
     }

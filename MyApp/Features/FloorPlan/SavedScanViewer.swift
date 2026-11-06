@@ -210,24 +210,58 @@ private struct SavedScanLoadErrorView: View {
 private struct SavedUSDZViewer: View {
     let url: URL
     @Environment(AppSettings.self) private var settings
+    @State private var loadState: ArchitecturalModelLoadState = .loading
+    @State private var resetID = 0
 
     var body: some View {
+        ZStack(alignment: .bottomTrailing) {
+            if loadState == .failed {
+                quickLookFallback
+            } else {
+                RealityKitArchitecturalViewer(url: url, resetID: resetID, loadState: $loadState)
+                if loadState == .loading {
+                    ProgressView(settings.t("scan.viewer.loading"))
+                        .padding(14)
+                        .background(.regularMaterial, in: .rect(cornerRadius: Radius.medium))
+                }
+            }
+            if loadState == .ready {
+                Button {
+                    resetID += 1
+                } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Palette.ink)
+                        .frame(width: 44, height: 44)
+                        .background(.ultraThinMaterial, in: .circle)
+                        .overlay(Circle().strokeBorder(Palette.line, lineWidth: 0.5))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(settings.t("plan.reset"))
+                .padding(12)
+            }
+        }
+        .background(Palette.planBackground)
+    }
+
+    @ViewBuilder
+    private var quickLookFallback: some View {
         #if canImport(QuickLook) && canImport(UIKit)
         if QLPreviewController.canPreview(url as NSURL) {
             EmbeddedQuickLookPreview(url: url)
-                .background(Palette.planBackground)
         } else {
-            ContentUnavailableView(
-                settings.t("scan.viewer.error.model"),
-                systemImage: "cube.transparent"
-            )
+            modelUnavailable
         }
         #else
+        modelUnavailable
+        #endif
+    }
+
+    private var modelUnavailable: some View {
         ContentUnavailableView(
             settings.t("scan.viewer.3d.unavailable"),
             systemImage: "cube.transparent"
         )
-        #endif
     }
 }
 

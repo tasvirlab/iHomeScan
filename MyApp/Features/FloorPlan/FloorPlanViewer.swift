@@ -22,6 +22,9 @@ struct FloorPlanViewer: View {
     private var effectiveOffset: CGSize {
         CGSize(width: offset.width + drag.width, height: offset.height + drag.height)
     }
+    private var alignmentRotation: CGFloat {
+        FloorPlanAlignmentEngine.alignment(for: plan).rotation
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -32,6 +35,7 @@ struct FloorPlanViewer: View {
                 selectedRoomID: selectedRoomID,
                 zoom: effectiveZoom,
                 offset: effectiveOffset,
+                rotation: alignmentRotation,
                 contentInsets: planInsets
             )
             .contentShape(.rect)
@@ -68,7 +72,9 @@ struct FloorPlanViewer: View {
     }
 
     private func selectRoom(at location: CGPoint, in size: CGSize) {
-        let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets, zoom: effectiveZoom, offset: effectiveOffset)
+        let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets,
+                                                  zoom: effectiveZoom, offset: effectiveOffset,
+                                                  rotation: alignmentRotation)
         let point = location.applying(transform.inverted())
         let room = plan.rooms.first { $0.rect.contains(point) }
         withAnimation(.easeOut(duration: 0.2)) {
