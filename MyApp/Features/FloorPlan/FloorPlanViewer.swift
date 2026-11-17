@@ -93,7 +93,7 @@ struct FloorPlanViewer: View {
             let transform = FloorPlanCanvas.transform(
                 for: plan, in: size, insets: planInsets,
                 zoom: effectiveZoom, offset: effectiveOffset,
-                rotation: alignmentRotation
+                rotation: alignmentRotation, precisionPlan: precisionPlan
             )
             let targets = PrecisionOpeningHitTesting.targets(for: precisionPlan, transform: transform)
             ForEach(Array(targets.enumerated()), id: \.element.openingID) { index, target in
@@ -122,12 +122,12 @@ struct FloorPlanViewer: View {
 
     private func openingAccessibilityLabel(id: UUID, index: Int) -> String {
         guard let opening = precisionPlan?.openings.first(where: { $0.id == id }) else {
-            return settings.t("opening.title.generic", index + 1)
+            return settings.t("precision.opening.genericTitle", String(index + 1))
         }
         switch opening.kind {
-        case .door: return settings.t("opening.title.door", index + 1)
-        case .window: return settings.t("opening.title.window", index + 1)
-        case .opening: return settings.t("opening.title.generic", index + 1)
+        case .door: return settings.t("precision.opening.doorTitle", String(index + 1))
+        case .window: return settings.t("precision.opening.windowTitle", String(index + 1))
+        case .opening: return settings.t("precision.opening.genericTitle", String(index + 1))
         }
     }
 
@@ -155,7 +155,7 @@ struct FloorPlanViewer: View {
     private func selectRoom(at location: CGPoint, in size: CGSize) {
         let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets,
                                                   zoom: effectiveZoom, offset: effectiveOffset,
-                                                  rotation: alignmentRotation)
+                                                  rotation: alignmentRotation, precisionPlan: precisionPlan)
         if let openingID = precisionOpening(at: location, transform: transform) {
             selectedPrecisionWallID = nil
             selectedPrecisionOpeningID = openingID
@@ -192,7 +192,10 @@ struct FloorPlanViewer: View {
             dimensions: dimensions, transform: transform,
             canvasBounds: CGRect(origin: .zero, size: size),
             planCenter: CGPoint(x: plan.bounds.midX, y: plan.bounds.midY),
-            textForValue: settings.lengthValue
+            textForValue: settings.lengthValue,
+            avoiding: FloorPlanCanvas.dimensionAvoidanceRects(
+                plan: plan, precisionPlan: precisionPlan, labels: labels, transform: transform
+            )
         )
         if let annotation = annotations.first(where: { $0.labelBounds.insetBy(dx: -8, dy: -8).contains(location) }),
            annotation.sourceIndex < precisionPlan.walls.count {
@@ -254,7 +257,7 @@ struct FloorPlanViewer: View {
             Image(systemName: systemImage)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundStyle(Palette.ink)
-                .frame(width: 40, height: 40)
+                .frame(width: 44, height: 44)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)

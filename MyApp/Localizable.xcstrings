@@ -2212,6 +2212,30 @@
         }
       }
     },
+    "precision.opening.endOffset" : {
+      "comment" : "Read-only distance from corner B",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "From corner B"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От угла B"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "B burchakdan"
+          }
+        }
+      }
+    },
     "precision.opening.genericTitle" : {
       "comment" : "Title of the selected generic wall opening measurement sheet; placeholder is its ordinal number",
       "extractionState" : "extracted_with_value",
@@ -2256,6 +2280,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Kiritilgan o‘lchamlarni tekshiring."
+          }
+        }
+      }
+    },
+    "precision.opening.noChanges" : {
+      "comment" : "Explains a disabled opening confirmation button",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change a measurement to enable confirmation."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Измените размер, чтобы подтвердить."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tasdiqlash uchun o‘lchamni o‘zgartiring."
           }
         }
       }
@@ -2332,6 +2380,30 @@
         }
       }
     },
+    "precision.opening.referenceRequired" : {
+      "comment" : "Explains why an edited corner offset needs a reference",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Choose corner A or B for this distance."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Выберите угол A или B для этого расстояния."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bu masofa uchun A yoki B burchakni tanlang."
+          }
+        }
+      }
+    },
     "precision.opening.sill" : {
       "comment" : "Window sill elevation above floor",
       "extractionState" : "extracted_with_value",
@@ -2352,6 +2424,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Poldan deraza ostigacha"
+          }
+        }
+      }
+    },
+    "precision.opening.startOffset" : {
+      "comment" : "Read-only distance from corner A",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "From corner A"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От угла A"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "A burchakdan"
           }
         }
       }
@@ -2404,50 +2500,74 @@
         }
       }
     },
-    "precision.opening.wallEnd" : {
-      "comment" : "Wall topology end endpoint",
+    "precision.opening.unknown" : {
+      "comment" : "Value shown for an optional unknown opening measurement",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "End corner"
+            "value" : "Not measured"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "machine_translated",
-            "value" : "Конечный угол"
+            "value" : "Не измерено"
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "machine_translated",
-            "value" : "Tugash burchagi"
+            "value" : "O‘lchanmagan"
+          }
+        }
+      }
+    },
+    "precision.opening.wallEnd" : {
+      "comment" : "Second visually marked endpoint of the host wall",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Corner B"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Угол B"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "B burchak"
           }
         }
       }
     },
     "precision.opening.wallStart" : {
-      "comment" : "Wall topology start endpoint",
+      "comment" : "First visually marked endpoint of the host wall",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Start corner"
+            "value" : "Corner A"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "machine_translated",
-            "value" : "Начальный угол"
+            "value" : "Угол A"
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "machine_translated",
-            "value" : "Boshlanish burchagi"
+            "value" : "A burchak"
           }
         }
       }

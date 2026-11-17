@@ -26,6 +26,7 @@ struct ProjectDetailView: View {
     @Environment(AppModel.self) private var model
     @Environment(AppSettings.self) private var settings
     @Environment(\.fileStorage) private var files
+    @Environment(\.modelContext) private var context
 
     private enum Mode: Hashable { case plan2D, model3D }
 
@@ -74,12 +75,23 @@ struct ProjectDetailView: View {
 
     private var metaText: String {
         var parts: [String] = []
-        if let area = project.totalArea { parts.append(settings.area(area)) }
+        if let area = authoritativeProjectArea { parts.append(settings.area(area)) }
         parts.append(settings.roomCount(project.allRooms.count))
         if let height = project.ceilingHeight {
             parts.append(settings.t("project.ceiling", settings.ceilingHeight(height)))
         }
         return parts.joined(separator: " · ")
+    }
+
+    private var authoritativeProjectArea: Double? {
+        PrecisionAreaPolicy.projectTotal(
+            rooms: project.allRooms,
+            replacingRoomID: selectedScan?.roomID,
+            with: PrecisionAreaPolicy.authoritativeArea(
+                precisionPlan: precisionSession?.displayedPlan,
+                storedArea: selectedFloor?.rooms.first(where: { $0.id == selectedScan?.roomID })?.effectiveArea
+            )
+        )
     }
 
     var body: some View {
@@ -163,7 +175,7 @@ struct ProjectDetailView: View {
                     onConfirm: confirmMeasurement,
                     onClose: closeMeasurementPanel
                 )
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.height(460), .large])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
                 .interactiveDismissDisabled(isSavingMeasurement)
@@ -181,7 +193,6 @@ struct ProjectDetailView: View {
                     onConfirm: confirmOpeningMeasurement,
                     onClose: closeOpeningPanel
                 )
-                .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(isSavingMeasurement)
             }
@@ -311,6 +322,7 @@ struct ProjectDetailView: View {
             let document = try ParametricPlanRepository(files: files)
                 .loadPrecisionDocument(scan: selectedScan, floorPlan: plan)
             precisionSession = GeometryRevisionSession(document: document)
+            synchronizeStoredArea(document.currentPlan, scan: selectedScan)
             precisionLoadError = false
         } catch {
             precisionSession = nil
@@ -370,6 +382,7 @@ struct ProjectDetailView: View {
         document.currentPlan = preview.candidatePlan
         do {
             try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
+            synchronizeStoredArea(document.currentPlan, scan: selectedScan)
             precisionSession = GeometryRevisionSession(document: document)
             isSavingMeasurement = false
             closeOpeningPanel()
@@ -471,6 +484,7 @@ struct ProjectDetailView: View {
         do {
             try ParametricPlanRepository(files: files)
                 .savePrecisionDocument(candidate.document, scan: selectedScan)
+            synchronizeStoredArea(candidate.document.currentPlan, scan: selectedScan)
             precisionSession = candidate
             isSavingMeasurement = false
             closeMeasurementPanel()
@@ -483,6 +497,15 @@ struct ProjectDetailView: View {
             isSavingMeasurement = false
             precisionSaveError = true
         }
+    }
+
+    private func synchronizeStoredArea(_ plan: ParametricFloorPlan, scan: SavedScan) {
+        guard let area = plan.derivedFloorArea,
+              let room = project.allRooms.first(where: { $0.id == scan.roomID }),
+              room.area != area else { return }
+        room.area = area
+        room.updatedAt = .now
+        try? context.save()
     }
 
     private var moreMenu: some View {

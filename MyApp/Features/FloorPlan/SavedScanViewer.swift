@@ -143,7 +143,7 @@ struct SavedScanViewerScreen: View {
                     onConfirm: confirmMeasurement,
                     onClose: closeMeasurementPanel
                 )
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.height(460), .large])
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
                 .interactiveDismissDisabled(isSavingMeasurement)
@@ -161,7 +161,6 @@ struct SavedScanViewerScreen: View {
                     onConfirm: confirmOpeningMeasurement,
                     onClose: closeOpeningPanel
                 )
-                .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
                 .interactiveDismissDisabled(isSavingMeasurement)
             }
@@ -276,6 +275,7 @@ struct SavedScanViewerScreen: View {
         do {
             let document = try ParametricPlanRepository(files: files).loadPrecisionDocument(scan: scan, floorPlan: floorPlan)
             precisionSession = GeometryRevisionSession(document: document)
+            synchronizeStoredArea(document.currentPlan, scan: scan)
             precisionLoadError = false
         } catch {
             precisionSession = nil
@@ -334,6 +334,7 @@ struct SavedScanViewerScreen: View {
         document.currentPlan = preview.candidatePlan
         do {
             try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
+            synchronizeStoredArea(document.currentPlan, scan: selectedScan)
             precisionSession = GeometryRevisionSession(document: document)
             isSavingMeasurement = false
             closeOpeningPanel()
@@ -433,6 +434,7 @@ struct SavedScanViewerScreen: View {
         isSavingMeasurement = true
         do {
             try ParametricPlanRepository(files: files).savePrecisionDocument(candidate.document, scan: selectedScan)
+            synchronizeStoredArea(candidate.document.currentPlan, scan: selectedScan)
             precisionSession = candidate
             isSavingMeasurement = false
             closeMeasurementPanel()
@@ -454,6 +456,7 @@ struct SavedScanViewerScreen: View {
         isSavingMeasurement = true
         do {
             try ParametricPlanRepository(files: files).savePrecisionDocument(candidate.document, scan: selectedScan)
+            synchronizeStoredArea(candidate.document.currentPlan, scan: selectedScan)
             precisionSession = candidate
             isSavingMeasurement = false
             closeMeasurementPanel()
@@ -461,6 +464,15 @@ struct SavedScanViewerScreen: View {
             isSavingMeasurement = false
             precisionSaveError = true
         }
+    }
+
+    private func synchronizeStoredArea(_ plan: ParametricFloorPlan, scan: SavedScan) {
+        guard let area = plan.derivedFloorArea,
+              let room = rooms.first(where: { $0.id == scan.roomID }),
+              room.area != area else { return }
+        room.area = area
+        room.updatedAt = .now
+        try? context.save()
     }
 }
 

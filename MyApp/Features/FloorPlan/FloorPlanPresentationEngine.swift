@@ -93,6 +93,7 @@ enum FloorPlanDimensionLayoutEngine {
         canvasBounds: CGRect,
         planCenter: CGPoint,
         textForValue: (Double) -> String,
+        avoiding avoidanceRects: [CGRect] = [],
         configuration: Configuration = Configuration()
     ) -> [Annotation] {
         let safeBounds = canvasBounds.insetBy(dx: configuration.edgeInset, dy: configuration.edgeInset)
@@ -141,6 +142,7 @@ enum FloorPlanDimensionLayoutEngine {
                     let padded = bounds.insetBy(dx: -configuration.collisionPadding,
                                                 dy: -configuration.collisionPadding)
                     guard !accepted.contains(where: { $0.labelBounds.intersects(padded) }) else { continue }
+                    guard !avoidanceRects.contains(where: { $0.intersects(padded) }) else { continue }
                     chosen = Annotation(sourceIndex: index, lineStart: lineStart, lineEnd: lineEnd,
                                         wallStart: wallStart, wallEnd: wallEnd, labelCenter: center,
                                         labelBounds: bounds, value: dimension.value)

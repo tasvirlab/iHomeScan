@@ -144,8 +144,10 @@ private struct InlineMeasurementHeader: View {
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .frame(width: 44, height: 44)
+                    .frame(width: 46, height: 46)
             }
+            .frame(minWidth: 46, minHeight: 46)
+            .contentShape(.rect)
             .buttonStyle(.plain)
             .accessibilityLabel(settings.t("common.close"))
             .accessibilityIdentifier("precision.inline.close")

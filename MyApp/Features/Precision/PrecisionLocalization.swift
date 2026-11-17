@@ -113,8 +113,8 @@ enum PrecisionLocalization {
     static let openingGenericTitle = LocalizedStringResource("precision.opening.genericTitle", defaultValue: "Opening %@", comment: "Title of the selected generic wall opening measurement sheet; placeholder is its ordinal number")
     static let openingOther = LocalizedStringResource("precision.opening.other", defaultValue: "Other measurements", comment: "Disclosure for optional opening measurements")
     static let openingWhichCorner = LocalizedStringResource("precision.opening.whichCorner", defaultValue: "Which corner did you measure from?", comment: "Asks the surveyor to choose a wall endpoint reference")
-    static let openingWallStart = LocalizedStringResource("precision.opening.wallStart", defaultValue: "Start corner", comment: "Wall topology start endpoint")
-    static let openingWallEnd = LocalizedStringResource("precision.opening.wallEnd", defaultValue: "End corner", comment: "Wall topology end endpoint")
+    static let openingWallStart = LocalizedStringResource("precision.opening.wallStart", defaultValue: "Corner A", comment: "First visually marked endpoint of the host wall")
+    static let openingWallEnd = LocalizedStringResource("precision.opening.wallEnd", defaultValue: "Corner B", comment: "Second visually marked endpoint of the host wall")
     static let openingDoorOffset = LocalizedStringResource("precision.opening.doorOffset", defaultValue: "Corner to door", comment: "Distance from selected corner to the near door edge")
     static let openingWindowOffset = LocalizedStringResource("precision.opening.windowOffset", defaultValue: "Corner to window", comment: "Distance from selected corner to the near window edge")
     static let openingDoorWidth = LocalizedStringResource("precision.opening.doorWidth", defaultValue: "Door width", comment: "Door opening width")
@@ -128,6 +128,11 @@ enum PrecisionLocalization {
     static let openingInvalid = LocalizedStringResource("precision.opening.invalid", defaultValue: "Check the entered measurements.", comment: "Fallback opening validation error")
     static let openingOverlap = LocalizedStringResource("precision.opening.overlap", defaultValue: "This opening would overlap another opening.", comment: "Opening overlap validation error")
     static let openingProtectedConflict = LocalizedStringResource("precision.opening.protectedConflict", defaultValue: "This value conflicts with a verified measurement.", comment: "Protected opening measurement conflict")
+    static let openingReferenceRequired = LocalizedStringResource("precision.opening.referenceRequired", defaultValue: "Choose corner A or B for this distance.", comment: "Explains why an edited corner offset needs a reference")
+    static let openingNoChanges = LocalizedStringResource("precision.opening.noChanges", defaultValue: "Change a measurement to enable confirmation.", comment: "Explains a disabled opening confirmation button")
+    static let openingUnknown = LocalizedStringResource("precision.opening.unknown", defaultValue: "Not measured", comment: "Value shown for an optional unknown opening measurement")
+    static let openingStartOffset = LocalizedStringResource("precision.opening.startOffset", defaultValue: "From corner A", comment: "Read-only distance from corner A")
+    static let openingEndOffset = LocalizedStringResource("precision.opening.endOffset", defaultValue: "From corner B", comment: "Read-only distance from corner B")
 
     static func englishFallback(for key: String) -> String? {
         let values = [
@@ -147,15 +152,19 @@ enum PrecisionLocalization {
             "precision.inline.unavailable.body": "The scan is still safe, but its editable wall model could not be prepared. Try again."
             , "precision.opening.doorTitle": "Door %@", "precision.opening.windowTitle": "Window %@",
             "precision.opening.genericTitle": "Opening %@", "precision.opening.other": "Other measurements",
-            "precision.opening.whichCorner": "Which corner did you measure from?", "precision.opening.wallStart": "Start corner",
-            "precision.opening.wallEnd": "End corner", "precision.opening.doorOffset": "Corner to door",
+            "precision.opening.whichCorner": "Which corner did you measure from?", "precision.opening.wallStart": "Corner A",
+            "precision.opening.wallEnd": "Corner B", "precision.opening.doorOffset": "Corner to door",
             "precision.opening.windowOffset": "Corner to window", "precision.opening.doorWidth": "Door width",
             "precision.opening.windowWidth": "Window width", "precision.opening.doorHeight": "Door height",
             "precision.opening.windowHeight": "Window height", "precision.opening.sill": "Floor to window sill",
             "precision.opening.threshold": "Threshold elevation", "precision.opening.top": "Top elevation",
             "precision.opening.confirm": "Confirm measurements", "precision.opening.invalid": "Check the entered measurements.",
             "precision.opening.overlap": "This opening would overlap another opening.",
-            "precision.opening.protectedConflict": "This value conflicts with a verified measurement."
+            "precision.opening.protectedConflict": "This value conflicts with a verified measurement.",
+            "precision.opening.referenceRequired": "Choose corner A or B for this distance.",
+            "precision.opening.noChanges": "Change a measurement to enable confirmation.",
+            "precision.opening.unknown": "Not measured", "precision.opening.startOffset": "From corner A",
+            "precision.opening.endOffset": "From corner B"
         ]
         return values[key]
     }

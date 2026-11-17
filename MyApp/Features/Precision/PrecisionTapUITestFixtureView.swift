@@ -58,7 +58,6 @@ struct PrecisionTapUITestFixtureView: View {
                     onConfirm: confirmOpening,
                     onClose: closeOpeningPanel
                 )
-                .presentationDetents([.medium, .large])
             }
         }
         .background(Palette.background)
@@ -76,7 +75,7 @@ struct PrecisionTapUITestFixtureView: View {
                     onConfirm: confirm,
                     onClose: closeMeasurementPanel
                 )
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.height(460), .large])
                 .presentationDragIndicator(.visible)
         }
     }

@@ -79,11 +79,12 @@ struct InlineOpeningEditingTests {
         #expect(preview?.resolution.conflicts.contains { $0.code == .overlappingOpenings } == true)
     }
 
-    @Test("Laser toggle creates user-declared verified provenance")
+    @Test("Laser toggle applies only to the modified measurement")
     func laserProvenance() {
         let plan = fixturePlan()
         var draft = OpeningMeasurementDraft.make(opening: plan.openings[0], plan: plan)
         draft.referenceEndpoint = .wallStart
+        draft.widthMillimeters = "950"
         draft.laserVerified = true
         let preview = OpeningEditEngine.preview(draft: draft, in: plan)
         let width = preview?.candidatePlan.openings[0].architecturalMetadata?.measurements.first {
@@ -91,6 +92,50 @@ struct InlineOpeningEditingTests {
         }
         #expect(width?.value.provenance.source == .laserVerified)
         #expect(width?.value.provenance.verificationStatus == .verified)
+        #expect(preview?.candidatePlan.openings[0].height?.provenance.source == .lidarEstimated)
+    }
+
+    @Test("Width-only correction does not require an unresolved corner or optional elevation")
+    func widthOnlyWithUnresolvedReference() {
+        var plan = fixturePlan()
+        var metadata = plan.openings[0].architecturalMetadata!
+        metadata.measurements = metadata.measurements.map { measurement in
+            guard measurement.kind == .offsetFromStart else { return measurement }
+            return OpeningMeasurement(
+                id: measurement.id,
+                openingID: measurement.openingID,
+                kind: measurement.kind,
+                value: measurement.value,
+                reference: nil,
+                relatedConstraintIDs: measurement.relatedConstraintIDs
+            )
+        }
+        plan.openings[0].architecturalMetadata = metadata
+
+        var draft = OpeningMeasurementDraft.make(opening: plan.openings[0], plan: plan)
+        draft.referenceEndpoint = nil
+        draft.widthMillimeters = "975"
+        draft.lowerElevationMillimeters = ""
+
+        let preview = OpeningEditEngine.preview(draft: draft, in: plan)
+        #expect(draft.requiresReferenceForChanges == false)
+        #expect(preview?.isValid == true)
+        #expect(abs((preview?.candidatePlan.openings[0].width?.value ?? 0) - 0.975) < 0.0001)
+    }
+
+    @Test("Authoritative precision area wins and opening edits preserve it")
+    func authoritativeAreaPolicy() {
+        var plan = fixturePlan()
+        plan.floorBoundary = [[
+            .init(x: 0, y: 0), .init(x: 2.6, y: 0),
+            .init(x: 2.6, y: 3.5), .init(x: 0, y: 3.5)
+        ]]
+        var draft = OpeningMeasurementDraft.make(opening: plan.openings[0], plan: plan)
+        draft.widthMillimeters = "1000"
+        let preview = OpeningEditEngine.preview(draft: draft, in: plan)
+
+        #expect(abs((PrecisionAreaPolicy.authoritativeArea(precisionPlan: plan, storedArea: 9.5) ?? 0) - 9.1) < 0.0001)
+        #expect(preview?.candidatePlan.derivedFloorArea == plan.derivedFloorArea)
     }
 
     @Test("Invalid input never mutates committed plan")

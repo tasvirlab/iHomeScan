@@ -73,4 +73,23 @@ final class iHomeScanUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 3))
         XCTAssertEqual(app.textFields["precision.opening.offset"].value as? String, "700")
     }
+
+    func testDoorWidthOnlyConfirmsWithoutEditingOptionalHeight() throws {
+        let canvas = app.otherElements["precision.floorPlanCanvas"]
+        XCTAssertTrue(canvas.waitForExistence(timeout: 3))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.34, dy: 0.39)).tap()
+        XCTAssertTrue(app.descendants(matching: .any)["precision.opening.title"].waitForExistence(timeout: 3))
+
+        let width = app.textFields["precision.opening.width"]
+        XCTAssertTrue(width.waitForExistence(timeout: 2))
+        width.tap()
+        width.press(forDuration: 1.0)
+        app.menuItems["Select All"].tap()
+        width.typeText("950")
+
+        let confirm = app.buttons["precision.opening.confirm"]
+        XCTAssertTrue(confirm.isEnabled, "Unchanged optional dimensions must not block width-only confirmation")
+        confirm.tap()
+        XCTAssertFalse(app.descendants(matching: .any)["precision.opening.title"].waitForExistence(timeout: 3))
+    }
 }

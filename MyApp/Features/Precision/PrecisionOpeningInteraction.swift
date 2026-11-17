@@ -68,7 +68,18 @@ enum PrecisionOpeningHitTesting {
 }
 
 struct OpeningMeasurementDraft: Equatable, Sendable {
+    struct Values: Equatable, Sendable {
+        var referenceEndpoint: OpeningReferenceEndpoint?
+        var startOffsetMillimeters: String
+        var endOffsetMillimeters: String
+        var widthMillimeters: String
+        var heightMillimeters: String
+        var lowerElevationMillimeters: String
+        var topElevationMillimeters: String
+    }
+
     let openingID: UUID
+    let original: Values
     var referenceEndpoint: OpeningReferenceEndpoint?
     var startOffsetMillimeters: String
     var endOffsetMillimeters: String
@@ -77,6 +88,28 @@ struct OpeningMeasurementDraft: Equatable, Sendable {
     var lowerElevationMillimeters: String
     var topElevationMillimeters: String
     var laserVerified: Bool
+
+    var current: Values {
+        Values(
+            referenceEndpoint: referenceEndpoint,
+            startOffsetMillimeters: startOffsetMillimeters,
+            endOffsetMillimeters: endOffsetMillimeters,
+            widthMillimeters: widthMillimeters,
+            heightMillimeters: heightMillimeters,
+            lowerElevationMillimeters: lowerElevationMillimeters,
+            topElevationMillimeters: topElevationMillimeters
+        )
+    }
+
+    var hasChanges: Bool { current != original }
+
+    var offsetChanged: Bool {
+        referenceEndpoint != original.referenceEndpoint
+            || startOffsetMillimeters != original.startOffsetMillimeters
+            || endOffsetMillimeters != original.endOffsetMillimeters
+    }
+
+    var requiresReferenceForChanges: Bool { offsetChanged && referenceEndpoint == nil }
 
     static func make(opening: WallOpening, plan: ParametricFloorPlan) -> OpeningMeasurementDraft {
         let measurements = opening.architecturalMetadata?.measurements ?? []
@@ -90,8 +123,7 @@ struct OpeningMeasurementDraft: Equatable, Sendable {
         let reference = measurements.first(where: {
             ($0.kind == .offsetFromStart || $0.kind == .offsetFromEnd) && $0.reference?.reliability == .verified
         })?.reference?.endpoint
-        return OpeningMeasurementDraft(
-            openingID: opening.id,
+        let initial = Values(
             referenceEndpoint: reference,
             startOffsetMillimeters: value(.offsetFromStart, fallback: placement?.startOffset),
             endOffsetMillimeters: value(.offsetFromEnd, fallback: placement?.endOffset),
@@ -101,7 +133,18 @@ struct OpeningMeasurementDraft: Equatable, Sendable {
                 opening.kind == .window ? .sillElevation : .thresholdElevation,
                 fallback: placement?.lowerElevation ?? opening.verticalOffset?.value
             ),
-            topElevationMillimeters: value(.topElevation, fallback: nil),
+            topElevationMillimeters: value(.topElevation, fallback: nil)
+        )
+        return OpeningMeasurementDraft(
+            openingID: opening.id,
+            original: initial,
+            referenceEndpoint: initial.referenceEndpoint,
+            startOffsetMillimeters: initial.startOffsetMillimeters,
+            endOffsetMillimeters: initial.endOffsetMillimeters,
+            widthMillimeters: initial.widthMillimeters,
+            heightMillimeters: initial.heightMillimeters,
+            lowerElevationMillimeters: initial.lowerElevationMillimeters,
+            topElevationMillimeters: initial.topElevationMillimeters,
             laserVerified: false
         )
     }
@@ -125,8 +168,14 @@ enum OpeningEditEngine {
         let status: GeometryVerificationStatus = draft.laserVerified ? .verified : .unverified
         let provenance = MeasurementProvenance(source: source, verificationStatus: status, timestamp: Date(), uncertainty: nil)
 
-        func replace(_ kind: OpeningMeasurementKind, millimeters: String, endpoint: OpeningReferenceEndpoint? = nil) -> Bool {
-            guard !millimeters.isEmpty else { return true }
+        func replace(
+            _ kind: OpeningMeasurementKind,
+            millimeters: String,
+            original: String,
+            endpoint: OpeningReferenceEndpoint? = nil
+        ) -> Bool {
+            guard millimeters != original else { return true }
+            guard !millimeters.isEmpty else { return false }
             guard let meters = PrecisionMeasurementInput.meters(fromMillimeters: millimeters) else { return false }
             measurements.removeAll { $0.kind == kind && $0.value.provenance.source != .derived }
             let reference = endpoint.map {
@@ -144,19 +193,27 @@ enum OpeningEditEngine {
             return true
         }
 
-        guard replace(.width, millimeters: draft.widthMillimeters),
-              replace(.height, millimeters: draft.heightMillimeters),
+        guard replace(.width, millimeters: draft.widthMillimeters, original: draft.original.widthMillimeters),
+              replace(.height, millimeters: draft.heightMillimeters, original: draft.original.heightMillimeters),
               replace(opening.kind == .window ? .sillElevation : .thresholdElevation,
-                      millimeters: draft.lowerElevationMillimeters),
-              replace(.topElevation, millimeters: draft.topElevationMillimeters) else { return nil }
-        if draft.referenceEndpoint == .wallEnd {
+                      millimeters: draft.lowerElevationMillimeters,
+                      original: draft.original.lowerElevationMillimeters),
+              replace(.topElevation, millimeters: draft.topElevationMillimeters,
+                      original: draft.original.topElevationMillimeters) else { return nil }
+        if draft.offsetChanged && draft.referenceEndpoint == .wallEnd {
             measurements.removeAll { $0.kind == .offsetFromStart && $0.value.provenance.source != .derived }
-            guard replace(.offsetFromEnd, millimeters: draft.endOffsetMillimeters, endpoint: .wallEnd) else { return nil }
-        } else if draft.referenceEndpoint == .wallStart {
+            guard replace(.offsetFromEnd, millimeters: draft.endOffsetMillimeters,
+                          original: draft.referenceEndpoint == draft.original.referenceEndpoint
+                              ? draft.original.endOffsetMillimeters : "",
+                          endpoint: .wallEnd) else { return nil }
+        } else if draft.offsetChanged && draft.referenceEndpoint == .wallStart {
             measurements.removeAll { $0.kind == .offsetFromEnd && $0.value.provenance.source != .derived }
-            guard replace(.offsetFromStart, millimeters: draft.startOffsetMillimeters, endpoint: .wallStart) else { return nil }
-        } else {
-            measurements.removeAll { ($0.kind == .offsetFromStart || $0.kind == .offsetFromEnd) && $0.value.provenance.source != .derived }
+            guard replace(.offsetFromStart, millimeters: draft.startOffsetMillimeters,
+                          original: draft.referenceEndpoint == draft.original.referenceEndpoint
+                              ? draft.original.startOffsetMillimeters : "",
+                          endpoint: .wallStart) else { return nil }
+        } else if draft.requiresReferenceForChanges {
+            return nil
         }
         candidate.openings[index] = WallOpening(
             id: opening.id, hostWallID: opening.hostWallID, kind: opening.kind,
