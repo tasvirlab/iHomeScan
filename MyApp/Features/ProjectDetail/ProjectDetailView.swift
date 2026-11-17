@@ -317,7 +317,9 @@ struct ProjectDetailView: View {
                                   timestamp: Date(), uncertainty: nil),
                 createdAt: Date()
             )
-            if case .solved = candidate.propose(command) { return candidate }
+            if case .solved = candidate.propose(command, allowsReplacingVerifiedMeasurement: true) {
+                return candidate
+            }
             return nil
         }
         if let selectedAnchor {

@@ -24,7 +24,8 @@ struct GeometryConstraintSolver: Sendable {
     func preview(
         command: SetWallLengthCommand,
         plan: ParametricFloorPlan,
-        constraints: [GeometryConstraint]
+        constraints: [GeometryConstraint],
+        allowsReplacingVerifiedMeasurement: Bool = false
     ) -> ConstraintSolveResult {
         guard command.targetLength.isFinite, command.targetLength >= configuration.minimumLength else {
             return .conflict([conflict(.invalidTarget, geometry: [command.wallID])])
@@ -55,7 +56,7 @@ struct GeometryConstraintSolver: Sendable {
                   wallID == command.wallID else { return false }
             return abs(meters - command.targetLength) > configuration.distanceTolerance
         }
-        if !protectedLengths.isEmpty {
+        if !protectedLengths.isEmpty && !allowsReplacingVerifiedMeasurement {
             return .conflict([conflict(
                 .verifiedMeasurement,
                 constraints: protectedLengths.map(\.id),

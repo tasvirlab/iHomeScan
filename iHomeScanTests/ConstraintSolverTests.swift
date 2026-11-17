@@ -189,6 +189,30 @@ struct ConstraintSolverTests {
         #expect(conflicts.contains { $0.code == .verifiedMeasurement })
     }
 
+    @Test("11b. Explicit remeasurement replaces the same wall's verified value")
+    func replacesVerifiedLengthWhenExplicitlyAllowed() {
+        let original = plan(points: [.init(x: 0, y: 0), .init(x: 2, y: 0)], edges: [(0, 1)])
+        let wallID = original.walls[0].id
+        let verified = constraint(1, .wallLength(wallID: wallID, meters: 2), status: .verified)
+        let result = GeometryConstraintSolver().preview(
+            command: command(wallID: wallID, target: 2.991),
+            plan: original,
+            constraints: [verified],
+            allowsReplacingVerifiedMeasurement: true
+        )
+        guard case .solved(let transaction, _) = result else {
+            Issue.record("Expected replacement measurement to solve")
+            return
+        }
+        #expect(abs((transaction.candidatePlan.wall(id: wallID)?.length(in: transaction.candidatePlan) ?? 0) - 2.991) < 0.001)
+        #expect(transaction.constraints.filter {
+            if case .wallLength(let constrainedWallID, _) = $0.kind {
+                return constrainedWallID == wallID
+            }
+            return false
+        }.count == 1)
+    }
+
     @Test("12. Overconstrained fixed rectangle is rejected")
     func overconstrainedRectangle() {
         let original = rectangle()

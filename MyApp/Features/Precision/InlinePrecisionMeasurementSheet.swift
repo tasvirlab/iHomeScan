@@ -64,7 +64,7 @@ struct InlinePrecisionMeasurementSheet: View {
 
                 Picker(settings.t("precision.inline.input"), selection: wheelSelection) {
                     ForEach(wheelValues, id: \.self) { value in
-                        Text(verbatim: "\\(value) mm")
+                        Text(verbatim: "\(value) mm")
                             .font(.system(.title3, design: .monospaced, weight: .semibold))
                             .tag(value)
                     }

@@ -14,12 +14,14 @@ struct GeometryRevisionSession: Sendable {
 
     mutating func propose(
         _ command: SetWallLengthCommand,
-        solver: GeometryConstraintSolver = GeometryConstraintSolver()
+        solver: GeometryConstraintSolver = GeometryConstraintSolver(),
+        allowsReplacingVerifiedMeasurement: Bool = false
     ) -> ConstraintSolveResult {
         let result = solver.preview(
             command: command,
             plan: document.currentPlan,
-            constraints: document.constraints
+            constraints: document.constraints,
+            allowsReplacingVerifiedMeasurement: allowsReplacingVerifiedMeasurement
         )
         switch result {
         case .solved(let transaction, _):
