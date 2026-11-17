@@ -108,6 +108,26 @@ enum PrecisionLocalization {
     static let inlineSaved = LocalizedStringResource("precision.inline.saved", defaultValue: "Saved", comment: "Brief confirmation after a durable precision save")
     static let inlineUnavailableTitle = LocalizedStringResource("precision.inline.unavailable.title", defaultValue: "Measurement editing unavailable", comment: "Title when editable parametric geometry cannot be loaded")
     static let inlineUnavailableBody = LocalizedStringResource("precision.inline.unavailable.body", defaultValue: "The scan is still safe, but its editable wall model could not be prepared. Try again.", comment: "Explains safe recovery when precision geometry loading fails")
+    static let openingDoorTitle = LocalizedStringResource("precision.opening.doorTitle", defaultValue: "Door %@", comment: "Title of the selected door measurement sheet; placeholder is its ordinal number")
+    static let openingWindowTitle = LocalizedStringResource("precision.opening.windowTitle", defaultValue: "Window %@", comment: "Title of the selected window measurement sheet; placeholder is its ordinal number")
+    static let openingGenericTitle = LocalizedStringResource("precision.opening.genericTitle", defaultValue: "Opening %@", comment: "Title of the selected generic wall opening measurement sheet; placeholder is its ordinal number")
+    static let openingOther = LocalizedStringResource("precision.opening.other", defaultValue: "Other measurements", comment: "Disclosure for optional opening measurements")
+    static let openingWhichCorner = LocalizedStringResource("precision.opening.whichCorner", defaultValue: "Which corner did you measure from?", comment: "Asks the surveyor to choose a wall endpoint reference")
+    static let openingWallStart = LocalizedStringResource("precision.opening.wallStart", defaultValue: "Start corner", comment: "Wall topology start endpoint")
+    static let openingWallEnd = LocalizedStringResource("precision.opening.wallEnd", defaultValue: "End corner", comment: "Wall topology end endpoint")
+    static let openingDoorOffset = LocalizedStringResource("precision.opening.doorOffset", defaultValue: "Corner to door", comment: "Distance from selected corner to the near door edge")
+    static let openingWindowOffset = LocalizedStringResource("precision.opening.windowOffset", defaultValue: "Corner to window", comment: "Distance from selected corner to the near window edge")
+    static let openingDoorWidth = LocalizedStringResource("precision.opening.doorWidth", defaultValue: "Door width", comment: "Door opening width")
+    static let openingWindowWidth = LocalizedStringResource("precision.opening.windowWidth", defaultValue: "Window width", comment: "Window opening width")
+    static let openingDoorHeight = LocalizedStringResource("precision.opening.doorHeight", defaultValue: "Door height", comment: "Door opening height")
+    static let openingWindowHeight = LocalizedStringResource("precision.opening.windowHeight", defaultValue: "Window height", comment: "Window opening height")
+    static let openingSill = LocalizedStringResource("precision.opening.sill", defaultValue: "Floor to window sill", comment: "Window sill elevation above floor")
+    static let openingThreshold = LocalizedStringResource("precision.opening.threshold", defaultValue: "Threshold elevation", comment: "Door threshold elevation")
+    static let openingTop = LocalizedStringResource("precision.opening.top", defaultValue: "Top elevation", comment: "Opening top elevation")
+    static let openingConfirm = LocalizedStringResource("precision.opening.confirm", defaultValue: "Confirm measurements", comment: "Validates and automatically saves opening measurements")
+    static let openingInvalid = LocalizedStringResource("precision.opening.invalid", defaultValue: "Check the entered measurements.", comment: "Fallback opening validation error")
+    static let openingOverlap = LocalizedStringResource("precision.opening.overlap", defaultValue: "This opening would overlap another opening.", comment: "Opening overlap validation error")
+    static let openingProtectedConflict = LocalizedStringResource("precision.opening.protectedConflict", defaultValue: "This value conflicts with a verified measurement.", comment: "Protected opening measurement conflict")
 
     static func englishFallback(for key: String) -> String? {
         let values = [
@@ -125,6 +145,17 @@ enum PrecisionLocalization {
             "precision.inline.lidarCurrent": "LiDAR: %@ mm", "precision.inline.laserCurrent": "Laser verified: %@ mm",
             "precision.inline.unavailable.title": "Measurement editing unavailable",
             "precision.inline.unavailable.body": "The scan is still safe, but its editable wall model could not be prepared. Try again."
+            , "precision.opening.doorTitle": "Door %@", "precision.opening.windowTitle": "Window %@",
+            "precision.opening.genericTitle": "Opening %@", "precision.opening.other": "Other measurements",
+            "precision.opening.whichCorner": "Which corner did you measure from?", "precision.opening.wallStart": "Start corner",
+            "precision.opening.wallEnd": "End corner", "precision.opening.doorOffset": "Corner to door",
+            "precision.opening.windowOffset": "Corner to window", "precision.opening.doorWidth": "Door width",
+            "precision.opening.windowWidth": "Window width", "precision.opening.doorHeight": "Door height",
+            "precision.opening.windowHeight": "Window height", "precision.opening.sill": "Floor to window sill",
+            "precision.opening.threshold": "Threshold elevation", "precision.opening.top": "Top elevation",
+            "precision.opening.confirm": "Confirm measurements", "precision.opening.invalid": "Check the entered measurements.",
+            "precision.opening.overlap": "This opening would overlap another opening.",
+            "precision.opening.protectedConflict": "This value conflicts with a verified measurement."
         ]
         return values[key]
     }

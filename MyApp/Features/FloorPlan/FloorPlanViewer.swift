@@ -8,7 +8,9 @@ struct FloorPlanViewer: View {
     @Binding var selectedRoomID: String?
     var precisionPlan: ParametricFloorPlan?
     @Binding var selectedPrecisionWallID: UUID?
+    @Binding var selectedPrecisionOpeningID: UUID?
     var onPrecisionWallSelected: ((UUID) -> Void)?
+    var onPrecisionOpeningSelected: ((UUID) -> Void)?
 
     init(
         plan: FloorPlan,
@@ -16,14 +18,18 @@ struct FloorPlanViewer: View {
         selectedRoomID: Binding<String?>,
         precisionPlan: ParametricFloorPlan? = nil,
         selectedPrecisionWallID: Binding<UUID?> = .constant(nil),
-        onPrecisionWallSelected: ((UUID) -> Void)? = nil
+        selectedPrecisionOpeningID: Binding<UUID?> = .constant(nil),
+        onPrecisionWallSelected: ((UUID) -> Void)? = nil,
+        onPrecisionOpeningSelected: ((UUID) -> Void)? = nil
     ) {
         self.plan = plan
         self.labels = labels
         _selectedRoomID = selectedRoomID
         self.precisionPlan = precisionPlan
         _selectedPrecisionWallID = selectedPrecisionWallID
+        _selectedPrecisionOpeningID = selectedPrecisionOpeningID
         self.onPrecisionWallSelected = onPrecisionWallSelected
+        self.onPrecisionOpeningSelected = onPrecisionOpeningSelected
     }
 
     @Environment(AppSettings.self) private var settings
@@ -50,30 +56,79 @@ struct FloorPlanViewer: View {
 
     var body: some View {
         GeometryReader { proxy in
-            FloorPlanCanvas(
-                plan: plan,
-                style: .draft,
-                labels: labels,
-                selectedRoomID: selectedRoomID,
-                zoom: effectiveZoom,
-                offset: effectiveOffset,
-                rotation: alignmentRotation,
-                precisionPlan: precisionPlan,
-                selectedPrecisionWallID: selectedPrecisionWallID,
-                contentInsets: planInsets
-            )
-            .contentShape(.rect)
-            .highPriorityGesture(
-                SpatialTapGesture(coordinateSpace: .local)
-                    .onEnded { selectRoom(at: $0.location, in: proxy.size) }
-            )
-            .simultaneousGesture(panGesture.simultaneously(with: zoomGesture))
+            ZStack {
+                FloorPlanCanvas(
+                    plan: plan,
+                    style: .draft,
+                    labels: labels,
+                    selectedRoomID: selectedRoomID,
+                    zoom: effectiveZoom,
+                    offset: effectiveOffset,
+                    rotation: alignmentRotation,
+                    precisionPlan: precisionPlan,
+                    selectedPrecisionWallID: selectedPrecisionWallID,
+                    selectedPrecisionOpeningID: selectedPrecisionOpeningID,
+                    contentInsets: planInsets
+                )
+                .contentShape(.rect)
+                .highPriorityGesture(
+                    SpatialTapGesture(coordinateSpace: .local)
+                        .onEnded { selectRoom(at: $0.location, in: proxy.size) }
+                )
+                .simultaneousGesture(panGesture.simultaneously(with: zoomGesture))
+
+                openingAccessibilityTargets(in: proxy.size)
+            }
         }
         .overlay(alignment: .bottomLeading) { unitBadge }
         .overlay(alignment: .bottomTrailing) { zoomControls }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(settings.t("plan.accessibility"))
         .accessibilityIdentifier("precision.floorPlanCanvas")
+    }
+
+    @ViewBuilder
+    private func openingAccessibilityTargets(in size: CGSize) -> some View {
+        if let precisionPlan {
+            let transform = FloorPlanCanvas.transform(
+                for: plan, in: size, insets: planInsets,
+                zoom: effectiveZoom, offset: effectiveOffset,
+                rotation: alignmentRotation
+            )
+            let targets = PrecisionOpeningHitTesting.targets(for: precisionPlan, transform: transform)
+            ForEach(Array(targets.enumerated()), id: \.element.openingID) { index, target in
+                let midpoint = CGPoint(
+                    x: (target.start.x + target.end.x) / 2,
+                    y: (target.start.y + target.end.y) / 2
+                )
+                let width = max(hypot(target.end.x - target.start.x, target.end.y - target.start.y), 44)
+                Button {
+                    selectedPrecisionWallID = nil
+                    selectedPrecisionOpeningID = target.openingID
+                    onPrecisionOpeningSelected?(target.openingID)
+                } label: {
+                    Color.clear
+                        .frame(width: width, height: 44)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .rotationEffect(.radians(atan2(target.end.y - target.start.y, target.end.x - target.start.x)))
+                .position(midpoint)
+                .accessibilityLabel(openingAccessibilityLabel(id: target.openingID, index: index))
+                .accessibilityIdentifier("precision.opening.\(target.openingID.uuidString)")
+            }
+        }
+    }
+
+    private func openingAccessibilityLabel(id: UUID, index: Int) -> String {
+        guard let opening = precisionPlan?.openings.first(where: { $0.id == id }) else {
+            return settings.t("opening.title.generic", index + 1)
+        }
+        switch opening.kind {
+        case .door: return settings.t("opening.title.door", index + 1)
+        case .window: return settings.t("opening.title.window", index + 1)
+        case .opening: return settings.t("opening.title.generic", index + 1)
+        }
     }
 
     // MARK: - Gestures
@@ -101,7 +156,14 @@ struct FloorPlanViewer: View {
         let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets,
                                                   zoom: effectiveZoom, offset: effectiveOffset,
                                                   rotation: alignmentRotation)
+        if let openingID = precisionOpening(at: location, transform: transform) {
+            selectedPrecisionWallID = nil
+            selectedPrecisionOpeningID = openingID
+            onPrecisionOpeningSelected?(openingID)
+            return
+        }
         if let wallID = precisionWall(at: location, transform: transform, size: size) {
+            selectedPrecisionOpeningID = nil
             selectedPrecisionWallID = wallID
             onPrecisionWallSelected?(wallID)
             return
@@ -111,6 +173,16 @@ struct FloorPlanViewer: View {
         withAnimation(.easeOut(duration: 0.2)) {
             selectedRoomID = room?.id == selectedRoomID ? nil : room?.id
         }
+    }
+
+    private func precisionOpening(at location: CGPoint, transform: CGAffineTransform) -> UUID? {
+        guard let precisionPlan else { return nil }
+        let targets = PrecisionOpeningHitTesting.targets(
+            for: precisionPlan,
+            transform: transform,
+            selectedOpeningID: selectedPrecisionOpeningID
+        )
+        return PrecisionOpeningHitTesting.selectedOpening(at: location, targets: targets)
     }
 
     private func precisionWall(at location: CGPoint, transform: CGAffineTransform, size: CGSize) -> UUID? {

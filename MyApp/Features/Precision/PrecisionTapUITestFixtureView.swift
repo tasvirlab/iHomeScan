@@ -4,18 +4,25 @@ import SwiftUI
 /// Deterministic UI-test-only floor plan. It is never presented without the explicit launch argument.
 struct PrecisionTapUITestFixtureView: View {
     private static let persistedMetersKey = "precision.uiTest.persistedMeters"
+    private static let persistedDoorOffsetKey = "precision.uiTest.persistedDoorOffset"
     private static let wallID = UUID(uuidString: "A1000000-0000-0000-0000-000000000001")!
+    private static let doorID = UUID(uuidString: "A1000000-0000-0000-0000-000000000002")!
     @State private var selectedRoomID: String?
     @State private var selectedWallID: UUID?
+    @State private var selectedOpeningID: UUID?
     @State private var showsMeasurementPanel = false
     @State private var input = ""
     @State private var laserVerified = false
     @State private var anchor: WallLengthAnchorStrategy?
     @State private var plan: ParametricFloorPlan
+    @State private var openingDraft: OpeningMeasurementDraft?
+    @State private var openingPreview: OpeningEditPreview?
+    @State private var showsOpeningPanel = false
 
     init() {
         if ProcessInfo.processInfo.arguments.contains("--reset-precision-ui-test") {
             UserDefaults.standard.removeObject(forKey: Self.persistedMetersKey)
+            UserDefaults.standard.removeObject(forKey: Self.persistedDoorOffsetKey)
         }
         _plan = State(initialValue: Self.fixtureParametricPlan())
     }
@@ -30,10 +37,29 @@ struct PrecisionTapUITestFixtureView: View {
                 plan: Self.fixtureFloorPlan,
                 labels: ["fixture-room": .init(name: "Fixture room", area: 12)],
                 selectedRoomID: $selectedRoomID,
-                precisionPlan: plan,
+                precisionPlan: openingPreview?.candidatePlan ?? plan,
                 selectedPrecisionWallID: $selectedWallID,
-                onPrecisionWallSelected: selectWall
+                selectedPrecisionOpeningID: $selectedOpeningID,
+                onPrecisionWallSelected: selectWall,
+                onPrecisionOpeningSelected: selectOpening
             )
+        }
+        .sheet(isPresented: $showsOpeningPanel, onDismiss: closeOpeningPanel) {
+            if let draft = openingDraft {
+                InlineOpeningMeasurementSheet(
+                    openingKind: .door,
+                    ordinal: 1,
+                    draft: Binding(get: { openingDraft ?? draft }, set: {
+                        openingDraft = $0
+                        openingPreview = OpeningEditEngine.preview(draft: $0, in: plan)
+                    }),
+                    preview: openingPreview,
+                    isSaving: false,
+                    onConfirm: confirmOpening,
+                    onClose: closeOpeningPanel
+                )
+                .presentationDetents([.medium, .large])
+            }
         }
         .background(Palette.background)
         .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
@@ -56,6 +82,7 @@ struct PrecisionTapUITestFixtureView: View {
     }
 
     private func selectWall(_ id: UUID) {
+        closeOpeningPanel()
         selectedWallID = id
         input = PrecisionMeasurementInput.millimeters(fromMeters: plan.wall(id: id)?.length(in: plan))
         Task { @MainActor in
@@ -63,6 +90,30 @@ struct PrecisionTapUITestFixtureView: View {
             guard selectedWallID == id else { return }
             showsMeasurementPanel = true
         }
+    }
+
+    private func selectOpening(_ id: UUID) {
+        guard let opening = plan.openings.first(where: { $0.id == id }) else { return }
+        selectedWallID = nil
+        selectedOpeningID = id
+        openingDraft = OpeningMeasurementDraft.make(opening: opening, plan: plan)
+        openingPreview = openingDraft.flatMap { OpeningEditEngine.preview(draft: $0, in: plan) }
+        showsOpeningPanel = true
+    }
+
+    private func closeOpeningPanel() {
+        showsOpeningPanel = false
+        selectedOpeningID = nil
+        openingDraft = nil
+        openingPreview = nil
+    }
+
+    private func confirmOpening() {
+        guard let preview = openingPreview, preview.isValid,
+              let placement = preview.resolution.placements.first(where: { $0.openingID == Self.doorID }) else { return }
+        plan = preview.candidatePlan
+        UserDefaults.standard.set(placement.startOffset, forKey: Self.persistedDoorOffsetKey)
+        closeOpeningPanel()
     }
 
     private func closeMeasurementPanel() {
@@ -101,6 +152,23 @@ struct PrecisionTapUITestFixtureView: View {
         let endID = UUID(uuidString: "A2000000-0000-0000-0000-000000000002")!
         let persisted = UserDefaults.standard.double(forKey: persistedMetersKey)
         let length = persisted > 0 ? persisted : 4
+        let persistedDoorOffset = UserDefaults.standard.double(forKey: persistedDoorOffsetKey)
+        let doorOffset = persistedDoorOffset > 0 ? persistedDoorOffset : 0.65
+        let provenance = MeasurementProvenance(source: .manualEntered, verificationStatus: .unverified, timestamp: nil, uncertainty: nil)
+        let opening = WallOpening(
+            id: doorID, hostWallID: wallID, kind: .door,
+            width: .init(value: 0.9, provenance: provenance),
+            height: .init(value: 2.1, provenance: provenance), verticalOffset: nil,
+            horizontalAnchor: .distanceFromStart(.init(value: doorOffset + 0.45, provenance: provenance)),
+            source: source,
+            architecturalMetadata: .init(measurements: [
+                .init(id: UUID(uuidString: "A4000000-0000-0000-0000-000000000001")!, openingID: doorID,
+                      kind: .offsetFromStart, value: .init(value: doorOffset, provenance: provenance),
+                      reference: .init(endpoint: .wallStart, vertexID: startID, reliability: .verified), relatedConstraintIDs: []),
+                .init(id: UUID(uuidString: "A4000000-0000-0000-0000-000000000002")!, openingID: doorID,
+                      kind: .width, value: .init(value: 0.9, provenance: provenance), reference: nil, relatedConstraintIDs: [])
+            ], completeness: .partial, doorSwing: nil)
+        )
         return ParametricFloorPlan(
             id: UUID(uuidString: "A3000000-0000-0000-0000-000000000001")!,
             projectID: UUID(), roomID: UUID(), sourceScanID: UUID(),
@@ -110,7 +178,7 @@ struct PrecisionTapUITestFixtureView: View {
                 .init(id: endID, position: .init(x: length, y: 0), source: source, mergedEndpointKeys: [])
             ],
             walls: [.init(id: wallID, startVertexID: startID, endVertexID: endID, height: nil, thickness: nil, source: source)],
-            openings: [], columns: [], beams: [], floorBoundary: nil, endpointMerges: [],
+            openings: [opening], columns: [], beams: [], floorBoundary: nil, endpointMerges: [],
             revision: .init(number: 1, createdAt: .init(timeIntervalSince1970: 0), source: .manualEntered)
         )
     }

@@ -46,4 +46,31 @@ final class iHomeScanUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: 3))
         XCTAssertTrue(app.descendants(matching: .any)["precision.inline.current"].label.contains("4250"))
     }
+
+    func testDoorTapEditsRealOpeningAndPersists() throws {
+        let canvas = app.otherElements["precision.floorPlanCanvas"]
+        XCTAssertTrue(canvas.waitForExistence(timeout: 3))
+
+        // Door occupies the left portion of the deterministic top host wall.
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.34, dy: 0.39)).tap()
+        let title = app.descendants(matching: .any)["precision.opening.title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 3), "Door tap must open the opening measurement panel")
+
+        let offset = app.textFields["precision.opening.offset"]
+        XCTAssertTrue(offset.waitForExistence(timeout: 2))
+        offset.tap()
+        offset.press(forDuration: 1.0)
+        app.menuItems["Select All"].tap()
+        offset.typeText("700")
+        app.buttons["precision.opening.confirm"].tap()
+        XCTAssertFalse(title.waitForExistence(timeout: 3))
+
+        app.terminate()
+        app.launchArguments = ["--precision-tap-ui-test"]
+        app.launch()
+        XCTAssertTrue(canvas.waitForExistence(timeout: 5))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.35, dy: 0.39)).tap()
+        XCTAssertTrue(title.waitForExistence(timeout: 3))
+        XCTAssertEqual(app.textFields["precision.opening.offset"].value as? String, "700")
+    }
 }

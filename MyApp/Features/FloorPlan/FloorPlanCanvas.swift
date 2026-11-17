@@ -29,6 +29,7 @@ struct FloorPlanCanvas: View {
     /// Latest parametric geometry. When present, it is the authoritative editable wall layer.
     var precisionPlan: ParametricFloorPlan?
     var selectedPrecisionWallID: UUID?
+    var selectedPrecisionOpeningID: UUID?
     /// Space reserved for overlaid controls; the plan is fitted into the remaining area.
     var contentInsets = EdgeInsets()
 
@@ -278,10 +279,27 @@ struct FloorPlanCanvas: View {
             path.move(to: a)
             path.addLine(to: b)
             context.stroke(path, with: .color(Palette.planFloor), style: .init(lineWidth: 245, lineCap: .butt))
-            let color = opening.kind == .window ? Palette.accentText : Palette.inkTertiary
+            let selected = opening.id == selectedPrecisionOpeningID
+            let color = selected ? Palette.accent : (opening.kind == .window ? Palette.accentText : Palette.inkTertiary)
             context.stroke(path, with: .color(color), style: .init(lineWidth: opening.kind == .opening ? 14 : 28,
                                                                     lineCap: .butt,
                                                                     dash: opening.kind == .opening ? [70, 55] : []))
+            if selected {
+                let center = CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
+                context.fill(Path(ellipseIn: CGRect(x: center.x - 70, y: center.y - 70, width: 140, height: 140)),
+                             with: .color(Palette.accent.opacity(0.18)))
+                let referenceEndpoint = opening.architecturalMetadata?.measurements.first {
+                    ($0.kind == .offsetFromStart || $0.kind == .offsetFromEnd)
+                        && $0.reference?.reliability == .verified
+                }?.reference?.endpoint
+                if let referenceEndpoint {
+                    let corner = referenceEndpoint == .wallStart
+                        ? CGPoint(x: start.x * Self.millimetersPerMeter, y: start.y * Self.millimetersPerMeter)
+                        : CGPoint(x: end.x * Self.millimetersPerMeter, y: end.y * Self.millimetersPerMeter)
+                    context.fill(Path(ellipseIn: CGRect(x: corner.x - 65, y: corner.y - 65, width: 130, height: 130)),
+                                 with: .color(Palette.accent.opacity(0.85)))
+                }
+            }
         }
     }
 
@@ -374,6 +392,27 @@ struct FloorPlanCanvas: View {
                 at: annotation.labelCenter, anchor: .center
             )
         }
+        drawSelectedOpeningDimensions(precisionPlan, in: &context, transform: transform, detailSize: detailSize)
+    }
+
+    private func drawSelectedOpeningDimensions(
+        _ plan: ParametricFloorPlan?,
+        in context: inout GraphicsContext,
+        transform: CGAffineTransform,
+        detailSize: CGFloat
+    ) {
+        guard let plan, let selectedPrecisionOpeningID,
+              let opening = plan.openings.first(where: { $0.id == selectedPrecisionOpeningID }) else { return }
+        let targets = PrecisionOpeningHitTesting.targets(for: plan, transform: transform, selectedOpeningID: selectedPrecisionOpeningID)
+        guard let target = targets.first(where: { $0.openingID == selectedPrecisionOpeningID }),
+              let bounds = target.labelBounds else { return }
+        context.fill(Path(roundedRect: bounds, cornerRadius: 5), with: .color(Palette.planBackground.opacity(0.96)))
+        context.draw(
+            Text(settings.lengthValue(opening.width?.value ?? 0))
+                .font(.system(size: max(detailSize, 11), weight: .semibold, design: .monospaced))
+                .foregroundStyle(Palette.accentText),
+            at: CGPoint(x: bounds.midX, y: bounds.midY), anchor: .center
+        )
     }
 
     private func precisionLabelCenter(

@@ -39,6 +39,10 @@ struct ProjectDetailView: View {
     @State private var deleting: Project?
     @State private var precisionSession: GeometryRevisionSession?
     @State private var selectedWallID: UUID?
+    @State private var selectedOpeningID: UUID?
+    @State private var openingDraft: OpeningMeasurementDraft?
+    @State private var openingPreview: OpeningEditPreview?
+    @State private var showsOpeningPanel = false
     @State private var showsMeasurementPanel = false
     @State private var measurementInput = ""
     @State private var laserVerified = false
@@ -120,6 +124,7 @@ struct ProjectDetailView: View {
         .onChange(of: selectedFloorID) {
             selectedRoomID = nil
             closeMeasurementPanel()
+            closeOpeningPanel()
             precisionSession = nil
             mode = .plan2D
         }
@@ -134,6 +139,15 @@ struct ProjectDetailView: View {
             try? await Task.sleep(for: .milliseconds(180))
             guard !Task.isCancelled else { return }
             updatePrecisionPreview()
+        }
+        .task(id: openingDraft) {
+            guard let openingDraft, let plan = precisionSession?.document.currentPlan else {
+                openingPreview = nil
+                return
+            }
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
+            openingPreview = OpeningEditEngine.preview(draft: openingDraft, in: plan)
         }
         .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
             InlinePrecisionMeasurementSheet(
@@ -153,6 +167,24 @@ struct ProjectDetailView: View {
                 .presentationDragIndicator(.visible)
                 .presentationContentInteraction(.scrolls)
                 .interactiveDismissDisabled(isSavingMeasurement)
+        }
+        .sheet(isPresented: $showsOpeningPanel, onDismiss: closeOpeningPanel) {
+            if let selectedOpeningID,
+               let opening = precisionSession?.document.currentPlan.openings.first(where: { $0.id == selectedOpeningID }),
+               let draft = openingDraft {
+                InlineOpeningMeasurementSheet(
+                    openingKind: opening.kind,
+                    ordinal: openingOrdinal(opening),
+                    draft: Binding(get: { openingDraft ?? draft }, set: { openingDraft = $0 }),
+                    preview: openingPreview,
+                    isSaving: isSavingMeasurement,
+                    onConfirm: confirmOpeningMeasurement,
+                    onClose: closeOpeningPanel
+                )
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled(isSavingMeasurement)
+            }
         }
         .alert(settings.t("precision.editor.saveError.title"), isPresented: $precisionSaveError) {
             Button(settings.t("scanner.retry"), action: confirmMeasurement)
@@ -223,9 +255,11 @@ struct ProjectDetailView: View {
                     plan: plan,
                     labels: currentPlanLabels(for: floor),
                     selectedRoomID: $selectedRoomID,
-                    precisionPlan: precisionSession?.displayedPlan,
+                    precisionPlan: openingPreview?.candidatePlan ?? precisionSession?.displayedPlan,
                     selectedPrecisionWallID: $selectedWallID,
-                    onPrecisionWallSelected: beginMeasurement
+                    selectedPrecisionOpeningID: $selectedOpeningID,
+                    onPrecisionWallSelected: beginMeasurement,
+                    onPrecisionOpeningSelected: beginOpeningMeasurement
                 )
             case .model3D:
                 PlanPlaceholder(systemImage: "cube.transparent",
@@ -288,6 +322,7 @@ struct ProjectDetailView: View {
         guard let plan = precisionSession?.document.currentPlan,
               let wall = plan.wall(id: wallID) else { return }
         precisionSession?.cancelPreview()
+        closeOpeningPanel()
         selectedWallID = wallID
         measurementInput = PrecisionMeasurementInput.millimeters(fromMeters: wall.length(in: plan))
         selectedAnchor = nil
@@ -298,6 +333,54 @@ struct ProjectDetailView: View {
             await Task.yield()
             guard selectedWallID == wallID else { return }
             showsMeasurementPanel = true
+        }
+    }
+
+    private func beginOpeningMeasurement(_ openingID: UUID) {
+        guard let plan = precisionSession?.document.currentPlan,
+              let opening = plan.openings.first(where: { $0.id == openingID }) else { return }
+        precisionSession?.cancelPreview()
+        selectedWallID = nil
+        selectedOpeningID = openingID
+        openingDraft = OpeningMeasurementDraft.make(opening: opening, plan: plan)
+        openingPreview = OpeningEditEngine.preview(draft: openingDraft!, in: plan)
+        Task { @MainActor in
+            await Task.yield()
+            guard selectedOpeningID == openingID else { return }
+            showsOpeningPanel = true
+        }
+    }
+
+    private func closeOpeningPanel() {
+        showsOpeningPanel = false
+        selectedOpeningID = nil
+        openingDraft = nil
+        openingPreview = nil
+    }
+
+    private func openingOrdinal(_ opening: WallOpening) -> Int {
+        let matching = precisionSession?.document.currentPlan.openings.filter { $0.kind == opening.kind } ?? []
+        return (matching.firstIndex(where: { $0.id == opening.id }) ?? 0) + 1
+    }
+
+    private func confirmOpeningMeasurement() {
+        guard !isSavingMeasurement, let preview = openingPreview, preview.isValid,
+              var document = precisionSession?.document, let selectedScan else { return }
+        isSavingMeasurement = true
+        document.currentPlan = preview.candidatePlan
+        do {
+            try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
+            precisionSession = GeometryRevisionSession(document: document)
+            isSavingMeasurement = false
+            closeOpeningPanel()
+            withAnimation { showsSavedConfirmation = true }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.5))
+                withAnimation { showsSavedConfirmation = false }
+            }
+        } catch {
+            isSavingMeasurement = false
+            precisionSaveError = true
         }
     }
 

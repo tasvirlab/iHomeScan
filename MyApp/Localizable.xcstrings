@@ -2092,6 +2092,486 @@
         }
       }
     },
+    "precision.opening.confirm" : {
+      "comment" : "Validates and automatically saves opening measurements",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Confirm measurements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Подтвердить размеры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamlarni tasdiqlash"
+          }
+        }
+      }
+    },
+    "precision.opening.doorHeight" : {
+      "comment" : "Door opening height",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Door height"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота двери"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Eshik balandligi"
+          }
+        }
+      }
+    },
+    "precision.opening.doorOffset" : {
+      "comment" : "Distance from selected corner to the near door edge",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Corner to door"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От угла до двери"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Burchakdan eshikkacha"
+          }
+        }
+      }
+    },
+    "precision.opening.doorTitle" : {
+      "comment" : "Title of the selected door measurement sheet; placeholder is its ordinal number",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Door %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Дверь %@"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Eshik %@"
+          }
+        }
+      }
+    },
+    "precision.opening.doorWidth" : {
+      "comment" : "Door opening width",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Door width"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ширина двери"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Eshik kengligi"
+          }
+        }
+      }
+    },
+    "precision.opening.genericTitle" : {
+      "comment" : "Title of the selected generic wall opening measurement sheet; placeholder is its ordinal number",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Opening %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Проём %@"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ochiq joy %@"
+          }
+        }
+      }
+    },
+    "precision.opening.invalid" : {
+      "comment" : "Fallback opening validation error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Check the entered measurements."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Проверьте введённые размеры."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Kiritilgan o‘lchamlarni tekshiring."
+          }
+        }
+      }
+    },
+    "precision.opening.other" : {
+      "comment" : "Disclosure for optional opening measurements",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other measurements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Другие размеры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshqa o‘lchamlar"
+          }
+        }
+      }
+    },
+    "precision.opening.overlap" : {
+      "comment" : "Opening overlap validation error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This opening would overlap another opening."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Этот проём перекрывает другой проём."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bu ochiq joy boshqa ochiq joy bilan ustma-ust tushadi."
+          }
+        }
+      }
+    },
+    "precision.opening.protectedConflict" : {
+      "comment" : "Protected opening measurement conflict",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This value conflicts with a verified measurement."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Это значение противоречит подтверждённому размеру."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bu qiymat tasdiqlangan o‘lchamga zid."
+          }
+        }
+      }
+    },
+    "precision.opening.sill" : {
+      "comment" : "Window sill elevation above floor",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Floor to window sill"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От пола до подоконника"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Poldan deraza ostigacha"
+          }
+        }
+      }
+    },
+    "precision.opening.threshold" : {
+      "comment" : "Door threshold elevation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Threshold elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота порога"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ostona balandligi"
+          }
+        }
+      }
+    },
+    "precision.opening.top" : {
+      "comment" : "Opening top elevation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Top elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота верхнего края"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Yuqori qism balandligi"
+          }
+        }
+      }
+    },
+    "precision.opening.wallEnd" : {
+      "comment" : "Wall topology end endpoint",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "End corner"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Конечный угол"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tugash burchagi"
+          }
+        }
+      }
+    },
+    "precision.opening.wallStart" : {
+      "comment" : "Wall topology start endpoint",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start corner"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Начальный угол"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshlanish burchagi"
+          }
+        }
+      }
+    },
+    "precision.opening.whichCorner" : {
+      "comment" : "Asks the surveyor to choose a wall endpoint reference",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Which corner did you measure from?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От какого угла выполнено измерение?"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qaysi burchakdan o‘lchadingiz?"
+          }
+        }
+      }
+    },
+    "precision.opening.windowHeight" : {
+      "comment" : "Window opening height",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Window height"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота окна"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Deraza balandligi"
+          }
+        }
+      }
+    },
+    "precision.opening.windowOffset" : {
+      "comment" : "Distance from selected corner to the near window edge",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Corner to window"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "От угла до окна"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Burchakdan derazagacha"
+          }
+        }
+      }
+    },
+    "precision.opening.windowTitle" : {
+      "comment" : "Title of the selected window measurement sheet; placeholder is its ordinal number",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Window %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Окно %@"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Deraza %@"
+          }
+        }
+      }
+    },
+    "precision.opening.windowWidth" : {
+      "comment" : "Window opening width",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Window width"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ширина окна"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Deraza kengligi"
+          }
+        }
+      }
+    },
     "precision.source.laserVerified" : {
       "comment" : "Explicitly marks a manually entered laser measurement as verified",
       "extractionState" : "extracted_with_value",
