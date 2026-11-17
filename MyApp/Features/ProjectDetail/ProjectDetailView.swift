@@ -317,7 +317,11 @@ struct ProjectDetailView: View {
                                   timestamp: Date(), uncertainty: nil),
                 createdAt: Date()
             )
-            if case .solved = candidate.propose(command, allowsReplacingVerifiedMeasurement: true) {
+            if case .solved = candidate.propose(
+                command,
+                allowsReplacingVerifiedMeasurement: true,
+                allowsRectangularPropagation: true
+            ) {
                 return candidate
             }
             return nil

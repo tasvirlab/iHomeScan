@@ -126,6 +126,35 @@ struct ConstraintSolverTests {
         #expect(abs((transaction.candidatePlan.walls[0].length(in: transaction.candidatePlan) ?? 0) - 4.25) < 0.000_1)
     }
 
+    @Test("4b. Inline edit restores a near-rectangular four-wall room without affecting irregular rooms")
+    func nearRectanglePropagation() throws {
+        let original = plan(
+            points: [
+                .init(x: 0, y: 0),
+                .init(x: 2.5, y: -0.12),
+                .init(x: 2.62, y: 2.88),
+                .init(x: 0.12, y: 3.0)
+            ],
+            edges: [(0, 1), (1, 2), (2, 3), (3, 0)]
+        )
+        let result = GeometryConstraintSolver().preview(
+            command: command(wallID: original.walls[0].id, target: 2.5),
+            plan: original,
+            constraints: [],
+            allowsRectangularPropagation: true
+        )
+        guard case .solved(let transaction, _) = result else {
+            Issue.record("Expected near-rectangle solution")
+            return
+        }
+        let points = transaction.candidatePlan.vertices.map(\.position)
+        let first = PlanPoint2D(x: points[1].x - points[0].x, y: points[1].y - points[0].y)
+        let second = PlanPoint2D(x: points[2].x - points[1].x, y: points[2].y - points[1].y)
+        #expect(abs(first.x * second.x + first.y * second.y) < 0.000_1)
+        #expect(abs(points[0].distance(to: points[1]) - points[2].distance(to: points[3])) < 0.000_1)
+        #expect(abs(points[1].distance(to: points[2]) - points[3].distance(to: points[0])) < 0.000_1)
+    }
+
     @Test("5. Rectangle height adjustment uses documented start anchor")
     func rectangleHeight() throws {
         let original = rectangle()

@@ -25,7 +25,8 @@ struct GeometryConstraintSolver: Sendable {
         command: SetWallLengthCommand,
         plan: ParametricFloorPlan,
         constraints: [GeometryConstraint],
-        allowsReplacingVerifiedMeasurement: Bool = false
+        allowsReplacingVerifiedMeasurement: Bool = false,
+        allowsRectangularPropagation: Bool = false
     ) -> ConstraintSolveResult {
         guard command.targetLength.isFinite, command.targetLength >= configuration.minimumLength else {
             return .conflict([conflict(.invalidTarget, geometry: [command.wallID])])
@@ -94,6 +95,10 @@ struct GeometryConstraintSolver: Sendable {
             if maximumCorrection <= configuration.distanceTolerance { break }
         }
 
+        if allowsRectangularPropagation {
+            propagateRectangleIfApplicable(targetWallID: command.wallID, original: plan, candidate: &candidate)
+        }
+
         let residualConflicts = hardConstraintConflicts(active, plan: candidate)
         if !residualConflicts.isEmpty { return .conflict(residualConflicts) }
         let openingConflicts = validateOpenings(in: candidate, constraints: active)
@@ -118,6 +123,83 @@ struct GeometryConstraintSolver: Sendable {
             validation: validation
         )
         return .solved(transaction, warnings: [])
+    }
+
+    private func propagateRectangleIfApplicable(
+        targetWallID: UUID,
+        original: ParametricFloorPlan,
+        candidate: inout ParametricFloorPlan
+    ) {
+        guard original.walls.count == 4, original.vertices.count == 4,
+              let target = original.wall(id: targetWallID),
+              let cycle = rectangleCycle(startingWith: target, in: original) else { return }
+
+        let originalPoints = cycle.compactMap { original.vertex(id: $0)?.position }
+        guard originalPoints.count == 4, isNearRectangle(originalPoints) else { return }
+
+        let candidatePoints = cycle.compactMap { candidate.vertex(id: $0)?.position }
+        guard candidatePoints.count == 4 else { return }
+        let a = candidatePoints[0]
+        let b = candidatePoints[1]
+        let width = a.distance(to: b)
+        guard width >= configuration.minimumLength else { return }
+
+        let ux = (b.x - a.x) / width
+        let uy = (b.y - a.y) / width
+        let leftHeight = originalPoints[0].distance(to: originalPoints[3])
+        let rightHeight = originalPoints[1].distance(to: originalPoints[2])
+        let height = (leftHeight + rightHeight) / 2
+        guard height >= configuration.minimumLength else { return }
+
+        let cross = ux * (originalPoints[2].y - originalPoints[1].y)
+            - uy * (originalPoints[2].x - originalPoints[1].x)
+        let sign = cross >= 0 ? 1.0 : -1.0
+        let nx = -uy * sign
+        let ny = ux * sign
+        setPosition(.init(x: b.x + nx * height, y: b.y + ny * height), for: cycle[2], in: &candidate)
+        setPosition(.init(x: a.x + nx * height, y: a.y + ny * height), for: cycle[3], in: &candidate)
+    }
+
+    private func rectangleCycle(startingWith target: ParametricWall, in plan: ParametricFloorPlan) -> [UUID]? {
+        var result = [target.startVertexID, target.endVertexID]
+        var previousWallID = target.id
+        var currentVertexID = target.endVertexID
+        while result.count < 4 {
+            let next = plan.walls.first { wall in
+                wall.id != previousWallID
+                    && (wall.startVertexID == currentVertexID || wall.endVertexID == currentVertexID)
+            }
+            guard let next else { return nil }
+            let nextVertexID = next.startVertexID == currentVertexID ? next.endVertexID : next.startVertexID
+            guard !result.contains(nextVertexID) else { return nil }
+            result.append(nextVertexID)
+            previousWallID = next.id
+            currentVertexID = nextVertexID
+        }
+        guard plan.walls.contains(where: { wall in
+            (wall.startVertexID == result[3] && wall.endVertexID == result[0])
+                || (wall.endVertexID == result[3] && wall.startVertexID == result[0])
+        }) else { return nil }
+        return result
+    }
+
+    private func isNearRectangle(_ points: [PlanPoint2D]) -> Bool {
+        guard points.count == 4 else { return false }
+        let lengths = points.indices.map { points[$0].distance(to: points[($0 + 1) % 4]) }
+        guard lengths.allSatisfy({ $0 >= configuration.minimumLength }),
+              abs(lengths[0] - lengths[2]) / max(lengths[0], lengths[2]) < 0.1,
+              abs(lengths[1] - lengths[3]) / max(lengths[1], lengths[3]) < 0.1 else { return false }
+        return points.indices.allSatisfy { index in
+            let previous = points[(index + 3) % 4]
+            let center = points[index]
+            let next = points[(index + 1) % 4]
+            let ax = previous.x - center.x
+            let ay = previous.y - center.y
+            let bx = next.x - center.x
+            let by = next.y - center.y
+            let cosine = (ax * bx + ay * by) / max(hypot(ax, ay) * hypot(bx, by), 0.000_001)
+            return abs(cosine) < 0.26
+        }
     }
 
     private func setInitialTarget(
