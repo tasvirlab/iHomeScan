@@ -1225,6 +1225,30 @@
         }
       }
     },
+    "precision.editor.deselect" : {
+      "comment" : "Accessibility label for deselecting a wall",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Clear wall selection"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Снять выбор стены"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Devor tanlovini olib tashlash"
+          }
+        }
+      }
+    },
     "precision.editor.dimension" : {
       "comment" : "Field for entering a revised wall length",
       "extractionState" : "extracted_with_value",
@@ -1341,6 +1365,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Geometriya to‘liq emas"
+          }
+        }
+      }
+    },
+    "precision.editor.invalidMeasurement" : {
+      "comment" : "Validation message for invalid wall length input",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter a positive measurement using the displayed unit."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Введите положительный размер в указанной единице."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ko‘rsatilgan birlikda musbat o‘lcham kiriting."
           }
         }
       }
@@ -1533,6 +1581,126 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Bekor qilish"
+          }
+        }
+      }
+    },
+    "precision.editor.unsaved.body" : {
+      "comment" : "Message before leaving the precision editor",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save your accepted floor plan changes before closing?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранить принятые изменения плана перед закрытием?"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qabul qilingan reja o‘zgarishlarini yopishdan oldin saqlaysizmi?"
+          }
+        }
+      }
+    },
+    "precision.editor.unsaved.discard" : {
+      "comment" : "Discards unsaved precision edits",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Discard Changes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Отменить изменения"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘zgarishlarni bekor qilish"
+          }
+        }
+      }
+    },
+    "precision.editor.unsaved.save" : {
+      "comment" : "Saves precision edits and closes the editor",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save and Close"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранить и закрыть"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlash va yopish"
+          }
+        }
+      }
+    },
+    "precision.editor.unsaved.status" : {
+      "comment" : "Compact status for accepted edits not yet written to disk",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unsaved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Не сохранено"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlanmagan"
+          }
+        }
+      }
+    },
+    "precision.editor.unsaved.title" : {
+      "comment" : "Title before leaving the precision editor with unsaved edits",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unsaved changes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Несохранённые изменения"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlanmagan o‘zgarishlar"
           }
         }
       }

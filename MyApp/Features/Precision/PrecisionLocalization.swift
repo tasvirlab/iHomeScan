@@ -86,4 +86,11 @@ enum PrecisionLocalization {
     static let original3D = LocalizedStringResource("precision.editor.original3D", defaultValue: "3D remains original scan", comment: "Clarifies that USDZ does not reflect precision edits")
     static let saveErrorTitle = LocalizedStringResource("precision.editor.saveError.title", defaultValue: "Could not save changes", comment: "Precision geometry persistence error title")
     static let saveErrorBody = LocalizedStringResource("precision.editor.saveError.body", defaultValue: "The previous saved geometry is unchanged. Try again.", comment: "Precision geometry persistence recovery message")
+    static let unsavedTitle = LocalizedStringResource("precision.editor.unsaved.title", defaultValue: "Unsaved changes", comment: "Title before leaving the precision editor with unsaved edits")
+    static let unsavedBody = LocalizedStringResource("precision.editor.unsaved.body", defaultValue: "Save your accepted floor plan changes before closing?", comment: "Message before leaving the precision editor")
+    static let unsavedSave = LocalizedStringResource("precision.editor.unsaved.save", defaultValue: "Save and Close", comment: "Saves precision edits and closes the editor")
+    static let unsavedDiscard = LocalizedStringResource("precision.editor.unsaved.discard", defaultValue: "Discard Changes", comment: "Discards unsaved precision edits")
+    static let unsavedStatus = LocalizedStringResource("precision.editor.unsaved.status", defaultValue: "Unsaved", comment: "Compact status for accepted edits not yet written to disk")
+    static let deselect = LocalizedStringResource("precision.editor.deselect", defaultValue: "Clear wall selection", comment: "Accessibility label for deselecting a wall")
+    static let invalidMeasurement = LocalizedStringResource("precision.editor.invalidMeasurement", defaultValue: "Enter a positive measurement using the displayed unit.", comment: "Validation message for invalid wall length input")
 }

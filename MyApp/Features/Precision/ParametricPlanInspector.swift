@@ -14,6 +14,8 @@ struct ParametricPlanInspectorScreen: View {
     @State private var source: GeometrySourceKind = .manualEntered
     @State private var loadFailed = false
     @State private var saveError = false
+    @State private var hasUnsavedChanges = false
+    @State private var showsDiscardConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -28,7 +30,8 @@ struct ParametricPlanInspectorScreen: View {
                         onApply: applyPreview,
                         onCancel: cancelPreview,
                         onUndo: undo,
-                        onRedo: redo
+                        onRedo: redo,
+                        hasUnsavedChanges: hasUnsavedChanges
                     )
                 } else if loadFailed {
                     ContentUnavailableView(
@@ -45,8 +48,12 @@ struct ParametricPlanInspectorScreen: View {
             .navigationTitle(settings.t("precision.editor.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(settings.t("common.done")) { dismiss() }
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    Button(settings.t("common.save")) { save() }
+                        .disabled(!hasUnsavedChanges)
+                        .accessibilityIdentifier("precision.save")
+                    Button(settings.t("common.done")) { requestDismiss() }
+                        .accessibilityIdentifier("precision.done")
                 }
             }
         }
@@ -63,6 +70,14 @@ struct ParametricPlanInspectorScreen: View {
         } message: {
             Text(settings.t("precision.editor.saveError.body"))
         }
+        .confirmationDialog(settings.t("precision.editor.unsaved.title"), isPresented: $showsDiscardConfirmation) {
+            Button(settings.t("precision.editor.unsaved.save")) { saveAndDismiss() }
+            Button(settings.t("precision.editor.unsaved.discard"), role: .destructive) { dismiss() }
+            Button(settings.t("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(settings.t("precision.editor.unsaved.body"))
+        }
+        .interactiveDismissDisabled(hasUnsavedChanges)
     }
 
     private var repository: ParametricPlanRepository { ParametricPlanRepository(files: files) }
@@ -71,7 +86,7 @@ struct ParametricPlanInspectorScreen: View {
         do {
             let document = try repository.loadPrecisionDocument(scan: scan, floorPlan: floorPlan)
             session = GeometryRevisionSession(document: document)
-            selectedWallID = document.currentPlan.walls.first?.id
+            selectedWallID = nil
             resetInput()
         } catch {
             loadFailed = true
@@ -110,7 +125,9 @@ struct ParametricPlanInspectorScreen: View {
 
     private func applyPreview() {
         guard var candidate = session, candidate.applyPreview() != nil else { return }
-        persist(candidate)
+        session = candidate
+        hasUnsavedChanges = true
+        resetInput()
     }
 
     private func cancelPreview() {
@@ -120,18 +137,41 @@ struct ParametricPlanInspectorScreen: View {
 
     private func undo() {
         guard var candidate = session, candidate.undo() else { return }
-        persist(candidate)
+        session = candidate
+        hasUnsavedChanges = true
+        resetInput()
     }
 
     private func redo() {
         guard var candidate = session, candidate.redo() else { return }
-        persist(candidate)
+        session = candidate
+        hasUnsavedChanges = true
+        resetInput()
+    }
+
+    private func save() {
+        guard let session else { return }
+        persist(session)
+    }
+
+    private func requestDismiss() {
+        if hasUnsavedChanges { showsDiscardConfirmation = true } else { dismiss() }
+    }
+
+    private func saveAndDismiss() {
+        guard let session else { return }
+        do {
+            try repository.savePrecisionDocument(session.document, scan: scan)
+            hasUnsavedChanges = false
+            dismiss()
+        } catch { saveError = true }
     }
 
     private func persist(_ candidate: GeometryRevisionSession) {
         do {
             try repository.savePrecisionDocument(candidate.document, scan: scan)
             session = candidate
+            hasUnsavedChanges = false
             resetInput()
         } catch {
             saveError = true
@@ -156,6 +196,7 @@ private struct PrecisionEditorContent: View {
     let onCancel: () -> Void
     let onUndo: () -> Void
     let onRedo: () -> Void
+    let hasUnsavedChanges: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -168,12 +209,14 @@ private struct PrecisionEditorContent: View {
                 canUndo: session.canUndo,
                 canRedo: session.canRedo,
                 onUndo: onUndo,
-                onRedo: onRedo
+                onRedo: onRedo,
+                hasUnsavedChanges: hasUnsavedChanges
             )
             ParametricWallCanvas(
                 plan: session.displayedPlan,
                 committedPlan: session.document.currentPlan,
-                selectedWallID: $selectedWallID
+                selectedWallID: $selectedWallID,
+                anchor: anchor
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Palette.planBackground)
@@ -191,7 +234,8 @@ private struct PrecisionEditorContent: View {
                     conflicts: session.conflicts,
                     hasPreview: session.preview != nil,
                     onApply: onApply,
-                    onCancel: onCancel
+                    onCancel: onCancel,
+                    onDeselect: { selectedWallID = nil }
                 )
                 .padding(12)
             } else {
@@ -228,6 +272,7 @@ private struct RevisionToolbar: View {
     let canRedo: Bool
     let onUndo: () -> Void
     let onRedo: () -> Void
+    let hasUnsavedChanges: Bool
     @Environment(AppSettings.self) private var settings
 
     var body: some View {
@@ -241,6 +286,12 @@ private struct RevisionToolbar: View {
             }
             .disabled(!canRedo)
             Spacer()
+            if hasUnsavedChanges {
+                Label(settings.t("precision.editor.unsaved.status"), systemImage: "circle.fill")
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(Palette.accentText)
+                    .accessibilityIdentifier("precision.unsavedStatus")
+            }
             Text(settings.t("precision.editor.original3D"))
                 .font(Typography.meta)
                 .foregroundStyle(Palette.inkSecondary)
@@ -261,7 +312,17 @@ private struct WallDimensionInspector: View {
     let hasPreview: Bool
     let onApply: () -> Void
     let onCancel: () -> Void
+    let onDeselect: () -> Void
     @Environment(AppSettings.self) private var settings
+
+    private var currentLength: Double? {
+        plan.wall(id: wall.id)?.length(in: plan)
+    }
+
+    private var inputIsValid: Bool {
+        if case .success(let value) = settings.parseLength(input) { return value != nil }
+        return false
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -269,7 +330,13 @@ private struct WallDimensionInspector: View {
                 Text(settings.t("precision.editor.wallDetails"))
                     .font(Typography.cardTitle)
                 Spacer()
-                Text(wall.length(in: plan).map(settings.length) ?? "—")
+                Button(action: onDeselect) {
+                    Image(systemName: "xmark.circle.fill")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(settings.t("precision.editor.deselect"))
+                .accessibilityIdentifier("precision.deselect")
+                Text(currentLength.map(settings.length) ?? "—")
                     .font(Typography.control.monospacedDigit())
                     .foregroundStyle(Palette.accentText)
             }
@@ -277,9 +344,15 @@ private struct WallDimensionInspector: View {
                 TextField(settings.t("precision.editor.dimension"), text: $input)
                     .keyboardType(.decimalPad)
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("precision.dimensionInput")
                 Text(settings.lengthUnitSymbol)
                     .font(Typography.control)
                     .foregroundStyle(Palette.inkSecondary)
+            }
+            if !input.isEmpty && !inputIsValid {
+                Label(settings.t("precision.editor.invalidMeasurement"), systemImage: "exclamationmark.triangle.fill")
+                    .font(Typography.meta)
+                    .foregroundStyle(Palette.error)
             }
             Picker(settings.t("precision.editor.anchor"), selection: $anchor) {
                 Text(settings.t("precision.anchor.start")).tag(WallLengthAnchorStrategy.keepStart)
@@ -294,7 +367,7 @@ private struct WallDimensionInspector: View {
             if !conflicts.isEmpty {
                 Label(settings.t("precision.editor.conflict"), systemImage: "exclamationmark.octagon.fill")
                     .font(Typography.meta)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Palette.error)
             }
             ViewThatFits {
                 HStack { actionButtons }
@@ -314,6 +387,7 @@ private struct WallDimensionInspector: View {
                 .buttonStyle(.borderedProminent)
                 .tint(Palette.accent)
                 .disabled(!hasPreview || !conflicts.isEmpty)
+                .accessibilityIdentifier("precision.apply")
         }
         .frame(maxWidth: .infinity)
     }
@@ -334,6 +408,7 @@ private struct ParametricWallCanvas: View {
     let plan: ParametricFloorPlan
     let committedPlan: ParametricFloorPlan
     @Binding var selectedWallID: UUID?
+    let anchor: WallLengthAnchorStrategy
     @Environment(AppSettings.self) private var settings
     @State private var zoom = 1.0
     @State private var lastZoom = 1.0
@@ -357,6 +432,18 @@ private struct ParametricWallCanvas: View {
         GeometryReader { proxy in
             Canvas { context, size in
                 let transform = drawingTransform(in: size)
+                drawGrid(context: &context, size: size)
+                if plan != committedPlan {
+                    let committedVertices = Dictionary(uniqueKeysWithValues: committedPlan.vertices.map { ($0.id, $0) })
+                    for wall in committedPlan.walls {
+                        guard let start = committedVertices[wall.startVertexID]?.position,
+                              let end = committedVertices[wall.endVertexID]?.position else { continue }
+                        var original = Path()
+                        original.move(to: CGPoint(x: start.x, y: start.y).applying(transform))
+                        original.addLine(to: CGPoint(x: end.x, y: end.y).applying(transform))
+                        context.stroke(original, with: .color(Palette.inkTertiary.opacity(0.45)), style: .init(lineWidth: 2, dash: [5, 4]))
+                    }
+                }
                 for wall in plan.walls {
                     guard let segment = segment(for: wall, transform: transform) else { continue }
                     var path = Path()
@@ -366,9 +453,16 @@ private struct ParametricWallCanvas: View {
                     let affected = affectedWallIDs.contains(wall.id)
                     context.stroke(
                         path,
-                        with: .color(selected ? Palette.accent : (affected ? .orange : Palette.wall)),
+                        with: .color(selected ? Palette.accent : (affected ? Palette.accentText : Palette.wall)),
                         style: StrokeStyle(lineWidth: selected ? 8 : 5, lineCap: .square, lineJoin: .miter)
                     )
+                    if selected, let length = wall.length(in: plan) {
+                        let midpoint = CGPoint(x: (segment.start.x + segment.end.x) / 2, y: (segment.start.y + segment.end.y) / 2 - 18)
+                        context.draw(Text(settings.length(length)).font(Typography.meta).foregroundStyle(Palette.ink), at: midpoint)
+                        let fixed = anchor == .keepStart ? segment.start : segment.end
+                        context.fill(Path(ellipseIn: CGRect(x: fixed.x - 7, y: fixed.y - 7, width: 14, height: 14)), with: .color(Palette.accent))
+                        context.stroke(Path(ellipseIn: CGRect(x: fixed.x - 11, y: fixed.y - 11, width: 22, height: 22)), with: .color(Palette.accentText), lineWidth: 2)
+                    }
                 }
             }
             .contentShape(.rect)
@@ -379,7 +473,7 @@ private struct ParametricWallCanvas: View {
                     .onEnded { _ in lastZoom = zoom }
             )
             .simultaneousGesture(
-                DragGesture()
+                DragGesture(minimumDistance: 8)
                     .onChanged {
                         offset = .init(
                             width: lastOffset.width + $0.translation.width,
@@ -390,15 +484,26 @@ private struct ParametricWallCanvas: View {
             )
         }
         .accessibilityLabel(settings.t("precision.editor.canvas"))
+        .accessibilityIdentifier("precision.canvas")
     }
 
     private func selectWall(at point: CGPoint, in size: CGSize) {
         let transform = drawingTransform(in: size)
-        let closest = plan.walls.compactMap { wall -> (UUID, CGFloat)? in
+        let targets = plan.walls.compactMap { wall -> PrecisionWallHitTarget? in
             guard let segment = segment(for: wall, transform: transform) else { return nil }
-            return (wall.id, distance(point, to: segment))
-        }.min { $0.1 < $1.1 }
-        selectedWallID = closest.flatMap { $0.1 <= 28 ? $0.0 : nil }
+            return PrecisionWallHitTarget(wallID: wall.id, start: segment.start, end: segment.end)
+        }
+        selectedWallID = PrecisionWallHitTesting.selectedWall(at: point, targets: targets)
+    }
+
+    private func drawGrid(context: inout GraphicsContext, size: CGSize) {
+        let spacing: CGFloat = 28
+        var grid = Path()
+        var x = offset.width.truncatingRemainder(dividingBy: spacing)
+        while x < size.width { grid.move(to: CGPoint(x: x, y: 0)); grid.addLine(to: CGPoint(x: x, y: size.height)); x += spacing }
+        var y = offset.height.truncatingRemainder(dividingBy: spacing)
+        while y < size.height { grid.move(to: CGPoint(x: 0, y: y)); grid.addLine(to: CGPoint(x: size.width, y: y)); y += spacing }
+        context.stroke(grid, with: .color(Palette.planGrid.opacity(0.55)), lineWidth: 0.5)
     }
 
     private func drawingTransform(in size: CGSize) -> CGAffineTransform {
@@ -423,18 +528,4 @@ private struct ParametricWallCanvas: View {
         )
     }
 
-    private func distance(_ point: CGPoint, to segment: (start: CGPoint, end: CGPoint)) -> CGFloat {
-        let dx = segment.end.x - segment.start.x
-        let dy = segment.end.y - segment.start.y
-        let squared = dx * dx + dy * dy
-        guard squared > 0 else { return hypot(point.x - segment.start.x, point.y - segment.start.y) }
-        let projection = min(max(
-            ((point.x - segment.start.x) * dx + (point.y - segment.start.y) * dy) / squared,
-            0
-        ), 1)
-        return hypot(
-            point.x - (segment.start.x + projection * dx),
-            point.y - (segment.start.y + projection * dy)
-        )
-    }
 }
