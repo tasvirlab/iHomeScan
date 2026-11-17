@@ -32,3 +32,20 @@ enum PrecisionWallHitTesting {
         return hypot(point.x - (start.x + projection * dx), point.y - (start.y + projection * dy))
     }
 }
+
+enum PrecisionMeasurementInput {
+    static func meters(fromMillimeters text: String) -> Double? {
+        let normalized = text
+            .replacingOccurrences(of: "\u{202F}", with: "")
+            .replacingOccurrences(of: "\u{00A0}", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: ",", with: ".")
+        guard let millimeters = Double(normalized), millimeters.isFinite, millimeters > 0 else { return nil }
+        return millimeters / 1000
+    }
+
+    static func millimeters(fromMeters meters: Double?) -> String {
+        guard let meters, meters.isFinite, meters > 0 else { return "" }
+        return String(Int((meters * 1000).rounded()))
+    }
+}

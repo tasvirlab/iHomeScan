@@ -93,4 +93,35 @@ enum PrecisionLocalization {
     static let unsavedStatus = LocalizedStringResource("precision.editor.unsaved.status", defaultValue: "Unsaved", comment: "Compact status for accepted edits not yet written to disk")
     static let deselect = LocalizedStringResource("precision.editor.deselect", defaultValue: "Clear wall selection", comment: "Accessibility label for deselecting a wall")
     static let invalidMeasurement = LocalizedStringResource("precision.editor.invalidMeasurement", defaultValue: "Enter a positive measurement using the displayed unit.", comment: "Validation message for invalid wall length input")
+    static let inlineTitle = LocalizedStringResource("precision.inline.title", defaultValue: "Wall length", comment: "Title of the inline wall measurement sheet")
+    static let inlineCurrent = LocalizedStringResource("precision.inline.current", defaultValue: "Current: %@ mm", comment: "Current editable wall length in millimeters")
+    static let inlineLidarCurrent = LocalizedStringResource("precision.inline.lidarCurrent", defaultValue: "LiDAR: %@ mm", comment: "Original LiDAR-estimated wall length in millimeters")
+    static let inlineLaserCurrent = LocalizedStringResource("precision.inline.laserCurrent", defaultValue: "Laser verified: %@ mm", comment: "Current user-declared laser-verified wall length")
+    static let inlineInput = LocalizedStringResource("precision.inline.input", defaultValue: "Measurement", comment: "Placeholder for millimeter wall length input")
+    static let inlineLaser = LocalizedStringResource("precision.inline.laser", defaultValue: "Measured with a laser meter", comment: "User-declared laser measurement toggle")
+    static let inlineAnchorQuestion = LocalizedStringResource("precision.inline.anchorQuestion", defaultValue: "Which corner should stay in place?", comment: "Shown only when wall length anchoring is ambiguous")
+    static let inlineAnchorStart = LocalizedStringResource("precision.inline.anchorStart", defaultValue: "Start corner", comment: "Keep the wall start endpoint fixed")
+    static let inlineAnchorEnd = LocalizedStringResource("precision.inline.anchorEnd", defaultValue: "End corner", comment: "Keep the wall end endpoint fixed")
+    static let inlineConflict = LocalizedStringResource("precision.inline.conflict", defaultValue: "This measurement conflicts with protected geometry.", comment: "Simple hard-constraint conflict message")
+    static let inlineConfirm = LocalizedStringResource("precision.inline.confirm", defaultValue: "Confirm measurement", comment: "Applies and automatically saves a wall measurement")
+    static let inlineSaving = LocalizedStringResource("precision.inline.saving", defaultValue: "Saving…", comment: "Wall measurement save progress")
+    static let inlineSaved = LocalizedStringResource("precision.inline.saved", defaultValue: "Saved", comment: "Brief confirmation after a durable precision save")
+
+    static func englishFallback(for key: String) -> String? {
+        let values = [
+            "precision.edit.title": "Edit Floor Plan", "precision.editor.title": "Precision Geometry",
+            "precision.editor.undo": "Undo", "precision.editor.redo": "Redo",
+            "precision.editor.original3D": "3D remains original scan", "precision.editor.selectWall": "Select a wall to inspect its measurements.",
+            "precision.editor.wallDetails": "Wall details", "precision.anchor.start": "Keep start",
+            "precision.anchor.end": "Keep end", "precision.source.manual": "Manual",
+            "precision.source.laserVerified": "Laser verified", "precision.inline.title": "Wall length",
+            "precision.inline.input": "Measurement", "precision.inline.laser": "Measured with a laser meter",
+            "precision.inline.anchorQuestion": "Which corner should stay in place?", "precision.inline.anchorStart": "Start corner",
+            "precision.inline.anchorEnd": "End corner", "precision.inline.conflict": "This measurement conflicts with protected geometry.",
+            "precision.inline.confirm": "Confirm measurement", "precision.inline.saving": "Saving…",
+            "precision.inline.saved": "Saved", "precision.inline.current": "Current: %@ mm",
+            "precision.inline.lidarCurrent": "LiDAR: %@ mm", "precision.inline.laserCurrent": "Laser verified: %@ mm"
+        ]
+        return values[key]
+    }
 }

@@ -23,7 +23,16 @@ struct SavedScanViewerScreen: View {
     @State private var contentCache: [UUID: SavedScanContent] = [:]
     @State private var loadError: SavedScanLoadingError?
     @State private var selectedPlanRoomID: String?
-    @State private var showsParametricInspector = false
+    @State private var precisionSession: GeometryRevisionSession?
+    @State private var selectedWallID: UUID?
+    @State private var measurementInput = ""
+    @State private var laserVerified = false
+    @State private var selectedAnchor: WallLengthAnchorStrategy?
+    @State private var requiresAnchorChoice = false
+    @State private var precisionConflict = false
+    @State private var isSavingMeasurement = false
+    @State private var precisionSaveError = false
+    @State private var showsSavedConfirmation = false
 
     init(projectID: UUID, roomID: UUID, scanID: UUID? = nil) {
         self.projectID = projectID
@@ -67,20 +76,6 @@ struct SavedScanViewerScreen: View {
                 .padding(.horizontal, Spacing.screenEdge)
                 .padding(.bottom, 12)
 
-                if content != nil {
-                    Button {
-                        showsParametricInspector = true
-                    } label: {
-                        Label(settings.t("precision.edit.title"), systemImage: "point.3.connected.trianglepath.dotted")
-                            .font(Typography.control)
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Palette.accent)
-                    .padding(.horizontal, Spacing.screenEdge)
-                    .padding(.bottom, 12)
-                }
-
                 viewerContent
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipShape(.rect(cornerRadius: Radius.large))
@@ -92,13 +87,69 @@ struct SavedScanViewerScreen: View {
         .background(Palette.background)
         .navigationTitle(room?.name ?? settings.t("scan.viewer.title"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if mode == .plan2D, precisionSession != nil {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button { persistHistoryChange(isUndo: true) } label: {
+                        Image(systemName: "arrow.uturn.backward")
+                    }
+                    .disabled(!(precisionSession?.canUndo ?? false) || isSavingMeasurement)
+                    .accessibilityLabel(settings.t("precision.editor.undo"))
+                    .accessibilityIdentifier("precision.inline.undo")
+                    Button { persistHistoryChange(isUndo: false) } label: {
+                        Image(systemName: "arrow.uturn.forward")
+                    }
+                    .disabled(!(precisionSession?.canRedo ?? false) || isSavingMeasurement)
+                    .accessibilityLabel(settings.t("precision.editor.redo"))
+                    .accessibilityIdentifier("precision.inline.redo")
+                }
+            }
+        }
         .onAppear {
             if selectedScanID == nil { selectedScanID = scans.first?.id }
         }
         .task(id: selectedScan?.id) { loadSelectedScan() }
-        .sheet(isPresented: $showsParametricInspector) {
-            if let selectedScan, let content {
-                ParametricPlanInspectorScreen(scan: selectedScan, floorPlan: content.floorPlan)
+        .task(id: InlinePreviewRequest(input: measurementInput, wallID: selectedWallID, anchor: selectedAnchor, laserVerified: laserVerified)) {
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled else { return }
+            updatePrecisionPreview()
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if selectedWallID != nil, let currentMillimeters {
+                InlinePrecisionMeasurementSheet(
+                    currentMillimeters: currentMillimeters,
+                    currentLabelKey: currentMeasurementLabelKey,
+                    input: $measurementInput,
+                    laserVerified: $laserVerified,
+                    anchor: $selectedAnchor,
+                    requiresAnchorChoice: requiresAnchorChoice,
+                    hasValidPreview: precisionSession?.preview != nil,
+                    hasConflict: precisionConflict,
+                    isSaving: isSavingMeasurement,
+                    onConfirm: confirmMeasurement,
+                    onClose: closeMeasurementPanel
+                )
+                .fixedSize(horizontal: false, vertical: true)
+                .overlay(alignment: .top) { Divider() }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .alert(settings.t("precision.editor.saveError.title"), isPresented: $precisionSaveError) {
+            Button(settings.t("scanner.retry"), action: confirmMeasurement)
+            Button(settings.t("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(settings.t("precision.editor.saveError.body"))
+        }
+        .overlay(alignment: .top) {
+            if showsSavedConfirmation {
+                Label(settings.t("precision.inline.saved"), systemImage: "checkmark.circle.fill")
+                    .font(Typography.control)
+                    .foregroundStyle(Palette.onGraphite)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Palette.graphite, in: .capsule)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
     }
@@ -111,11 +162,14 @@ struct SavedScanViewerScreen: View {
                 FloorPlanViewer(
                     plan: content.floorPlan,
                     labels: planLabels,
-                    selectedRoomID: $selectedPlanRoomID
+                    selectedRoomID: $selectedPlanRoomID,
+                    precisionPlan: precisionSession?.displayedPlan,
+                    selectedPrecisionWallID: $selectedWallID,
+                    onPrecisionWallSelected: beginMeasurement
                 )
             case .model3D:
                 if let modelURL = content.modelURL {
-                    SavedUSDZViewer(url: modelURL)
+                    SavedUSDZViewer(url: modelURL, showsOriginalScanNotice: !(precisionSession?.document.revisions.isEmpty ?? true))
                 } else {
                     SavedScanLoadErrorView(error: content.modelError ?? .invalidModel) {
                         if let scanID = selectedScan?.id { contentCache.removeValue(forKey: scanID) }
@@ -143,18 +197,168 @@ struct SavedScanViewerScreen: View {
         guard let selectedScan else { return }
         if let cached = contentCache[selectedScan.id] {
             content = cached
+            loadPrecisionDocument(for: selectedScan, floorPlan: cached.floorPlan)
             return
         }
         do {
             let loaded = try SavedScanContentLoader(context: context, files: files).load(selectedScan)
             contentCache[selectedScan.id] = loaded
             content = loaded
+            loadPrecisionDocument(for: selectedScan, floorPlan: loaded.floorPlan)
         } catch let error as SavedScanLoadingError {
             loadError = error
         } catch {
             loadError = .invalidGeometry
         }
     }
+
+    private var currentMillimeters: String? {
+        guard let wallID = selectedWallID,
+              let plan = precisionSession?.document.currentPlan,
+              let wall = plan.wall(id: wallID) else { return nil }
+        return PrecisionMeasurementInput.millimeters(fromMeters: wall.length(in: plan))
+    }
+
+    private var currentMeasurementLabelKey: String {
+        guard let wallID = selectedWallID else { return "precision.inline.lidarCurrent" }
+        for revision in precisionSession?.document.revisions.reversed() ?? [] {
+            guard case .setWallLength(let command) = revision.command, command.wallID == wallID else { continue }
+            return command.provenance.source == .laserVerified
+                ? "precision.inline.laserCurrent" : "precision.inline.current"
+        }
+        return "precision.inline.lidarCurrent"
+    }
+
+    private func loadPrecisionDocument(for scan: SavedScan, floorPlan: FloorPlan) {
+        do {
+            let document = try ParametricPlanRepository(files: files).loadPrecisionDocument(scan: scan, floorPlan: floorPlan)
+            precisionSession = GeometryRevisionSession(document: document)
+        } catch {
+            precisionSession = nil
+        }
+    }
+
+    private func beginMeasurement(_ wallID: UUID) {
+        guard let plan = precisionSession?.document.currentPlan, let wall = plan.wall(id: wallID) else { return }
+        precisionSession?.cancelPreview()
+        selectedWallID = wallID
+        measurementInput = PrecisionMeasurementInput.millimeters(fromMeters: wall.length(in: plan))
+        selectedAnchor = nil
+        requiresAnchorChoice = false
+        precisionConflict = false
+        laserVerified = false
+    }
+
+    private func closeMeasurementPanel() {
+        precisionSession?.cancelPreview()
+        selectedWallID = nil
+        measurementInput = ""
+        selectedAnchor = nil
+        requiresAnchorChoice = false
+        precisionConflict = false
+    }
+
+    private func updatePrecisionPreview() {
+        guard var base = precisionSession, let wallID = selectedWallID,
+              let target = PrecisionMeasurementInput.meters(fromMillimeters: measurementInput) else {
+            precisionSession?.cancelPreview()
+            precisionConflict = false
+            return
+        }
+        base.cancelPreview()
+        let source: GeometrySourceKind = laserVerified ? .laserVerified : .manualEntered
+        let status: GeometryVerificationStatus = laserVerified ? .verified : .unverified
+        func proposed(_ anchor: WallLengthAnchorStrategy) -> GeometryRevisionSession? {
+            var candidate = base
+            let command = SetWallLengthCommand(
+                id: UUID(), wallID: wallID, targetLength: target, anchor: anchor,
+                provenance: .init(source: source, verificationStatus: status, timestamp: Date(), uncertainty: nil),
+                createdAt: Date()
+            )
+            if case .solved = candidate.propose(command) { return candidate }
+            return nil
+        }
+        if let selectedAnchor {
+            if let candidate = proposed(selectedAnchor) {
+                precisionSession = candidate
+                precisionConflict = false
+            } else {
+                precisionSession?.cancelPreview()
+                precisionConflict = true
+            }
+            return
+        }
+        let start = proposed(.keepStart)
+        let end = proposed(.keepEnd)
+        switch (start, end) {
+        case let (.some(start), .some(end)) where start.displayedPlan == end.displayedPlan:
+            selectedAnchor = .keepStart
+            precisionSession = start
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case (.some, .some):
+            precisionSession?.cancelPreview()
+            requiresAnchorChoice = true
+            precisionConflict = false
+        case let (.some(candidate), nil):
+            selectedAnchor = .keepStart
+            precisionSession = candidate
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case let (nil, .some(candidate)):
+            selectedAnchor = .keepEnd
+            precisionSession = candidate
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case (nil, nil):
+            precisionSession?.cancelPreview()
+            requiresAnchorChoice = false
+            precisionConflict = true
+        }
+    }
+
+    private func confirmMeasurement() {
+        guard !isSavingMeasurement, var candidate = precisionSession,
+              candidate.applyPreview() != nil, let selectedScan else { return }
+        isSavingMeasurement = true
+        do {
+            try ParametricPlanRepository(files: files).savePrecisionDocument(candidate.document, scan: selectedScan)
+            precisionSession = candidate
+            isSavingMeasurement = false
+            closeMeasurementPanel()
+            withAnimation { showsSavedConfirmation = true }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.5))
+                withAnimation { showsSavedConfirmation = false }
+            }
+        } catch {
+            isSavingMeasurement = false
+            precisionSaveError = true
+        }
+    }
+
+    private func persistHistoryChange(isUndo: Bool) {
+        guard !isSavingMeasurement, var candidate = precisionSession, let selectedScan else { return }
+        let changed = isUndo ? candidate.undo() : candidate.redo()
+        guard changed else { return }
+        isSavingMeasurement = true
+        do {
+            try ParametricPlanRepository(files: files).savePrecisionDocument(candidate.document, scan: selectedScan)
+            precisionSession = candidate
+            isSavingMeasurement = false
+            closeMeasurementPanel()
+        } catch {
+            isSavingMeasurement = false
+            precisionSaveError = true
+        }
+    }
+}
+
+private struct InlinePreviewRequest: Equatable {
+    let input: String
+    let wallID: UUID?
+    let anchor: WallLengthAnchorStrategy?
+    let laserVerified: Bool
 }
 
 private struct SavedScanVersionHeader: View {
@@ -229,6 +433,7 @@ private struct SavedScanLoadErrorView: View {
 
 private struct SavedUSDZViewer: View {
     let url: URL
+    let showsOriginalScanNotice: Bool
     @Environment(AppSettings.self) private var settings
     @State private var loadState: ArchitecturalModelLoadState = .loading
     @State private var resetID = 0
@@ -259,6 +464,16 @@ private struct SavedUSDZViewer: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(settings.t("plan.reset"))
                 .padding(12)
+            }
+            if showsOriginalScanNotice {
+                Text(settings.t("precision.editor.original3D"))
+                    .font(Typography.meta)
+                    .foregroundStyle(Palette.inkSecondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(.regularMaterial, in: .capsule)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding(12)
             }
         }
         .background(Palette.planBackground)

@@ -6,6 +6,25 @@ struct FloorPlanViewer: View {
     let plan: FloorPlan
     var labels: [String: PlanRoomLabel] = [:]
     @Binding var selectedRoomID: String?
+    var precisionPlan: ParametricFloorPlan?
+    @Binding var selectedPrecisionWallID: UUID?
+    var onPrecisionWallSelected: ((UUID) -> Void)?
+
+    init(
+        plan: FloorPlan,
+        labels: [String: PlanRoomLabel] = [:],
+        selectedRoomID: Binding<String?>,
+        precisionPlan: ParametricFloorPlan? = nil,
+        selectedPrecisionWallID: Binding<UUID?> = .constant(nil),
+        onPrecisionWallSelected: ((UUID) -> Void)? = nil
+    ) {
+        self.plan = plan
+        self.labels = labels
+        _selectedRoomID = selectedRoomID
+        self.precisionPlan = precisionPlan
+        _selectedPrecisionWallID = selectedPrecisionWallID
+        self.onPrecisionWallSelected = onPrecisionWallSelected
+    }
 
     @Environment(AppSettings.self) private var settings
 
@@ -36,6 +55,8 @@ struct FloorPlanViewer: View {
                 zoom: effectiveZoom,
                 offset: effectiveOffset,
                 rotation: alignmentRotation,
+                precisionPlan: precisionPlan,
+                selectedPrecisionWallID: selectedPrecisionWallID,
                 contentInsets: planInsets
             )
             .contentShape(.rect)
@@ -75,11 +96,41 @@ struct FloorPlanViewer: View {
         let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets,
                                                   zoom: effectiveZoom, offset: effectiveOffset,
                                                   rotation: alignmentRotation)
+        if let wallID = precisionWall(at: location, transform: transform, size: size) {
+            selectedPrecisionWallID = wallID
+            onPrecisionWallSelected?(wallID)
+            return
+        }
         let point = location.applying(transform.inverted())
         let room = plan.rooms.first { $0.rect.contains(point) }
         withAnimation(.easeOut(duration: 0.2)) {
             selectedRoomID = room?.id == selectedRoomID ? nil : room?.id
         }
+    }
+
+    private func precisionWall(at location: CGPoint, transform: CGAffineTransform, size: CGSize) -> UUID? {
+        guard let precisionPlan else { return nil }
+        let dimensions = FloorPlanCanvas.precisionDimensions(precisionPlan)
+        let annotations = FloorPlanDimensionLayoutEngine.layout(
+            dimensions: dimensions, transform: transform,
+            canvasBounds: CGRect(origin: .zero, size: size),
+            planCenter: CGPoint(x: plan.bounds.midX, y: plan.bounds.midY),
+            textForValue: settings.lengthValue
+        )
+        if let annotation = annotations.first(where: { $0.labelBounds.insetBy(dx: -8, dy: -8).contains(location) }),
+           annotation.sourceIndex < precisionPlan.walls.count {
+            return precisionPlan.walls[annotation.sourceIndex].id
+        }
+        let vertices = Dictionary(uniqueKeysWithValues: precisionPlan.vertices.map { ($0.id, $0.position) })
+        let targets = precisionPlan.walls.compactMap { wall -> PrecisionWallHitTarget? in
+            guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { return nil }
+            return PrecisionWallHitTarget(
+                wallID: wall.id,
+                start: CGPoint(x: start.x, y: start.y).applying(transform),
+                end: CGPoint(x: end.x, y: end.y).applying(transform)
+            )
+        }
+        return PrecisionWallHitTesting.selectedWall(at: location, targets: targets)
     }
 
     private func setZoom(_ value: CGFloat) {

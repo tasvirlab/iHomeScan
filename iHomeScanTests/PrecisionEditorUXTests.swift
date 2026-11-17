@@ -46,4 +46,45 @@ struct PrecisionEditorUXTests {
             defaults.removePersistentDomain(forName: suite)
         }
     }
+
+    @Test("Inline precision input is always interpreted as millimeters")
+    func millimeterInput() {
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "2800") == 2.8)
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "2800,5") == 2.8005)
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "2800.5") == 2.8005)
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "0") == nil)
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "-20") == nil)
+        #expect(PrecisionMeasurementInput.meters(fromMillimeters: "abc") == nil)
+    }
+
+    @Test("Presentation rotation keeps wall hit testing attached to rendered geometry")
+    func rotatedHitTesting() {
+        let transform = CGAffineTransform(translationX: 170, y: 110)
+            .rotated(by: .pi / 5)
+            .scaledBy(x: 55, y: 55)
+        let start = CGPoint(x: 0, y: 0).applying(transform)
+        let end = CGPoint(x: 2.4, y: 0).applying(transform)
+        let midpoint = CGPoint(x: (start.x + end.x) / 2, y: (start.y + end.y) / 2)
+        let target = PrecisionWallHitTarget(wallID: horizontalID, start: start, end: end)
+        #expect(PrecisionWallHitTesting.selectedWall(at: midpoint, targets: [target]) == horizontalID)
+    }
+
+    @Test("Precision localization never exposes known raw keys")
+    func localizationFallbacks() throws {
+        let keys = [
+            "precision.edit.title", "precision.editor.title", "precision.editor.undo",
+            "precision.editor.redo", "precision.editor.original3D", "precision.editor.selectWall",
+            "precision.editor.wallDetails", "precision.anchor.start", "precision.anchor.end",
+            "precision.source.manual", "precision.source.laserVerified", "precision.inline.title",
+            "precision.inline.confirm", "precision.inline.saved"
+        ]
+        for language in [AppLanguage.uzbek, .english, .russian] {
+            let suite = "PrecisionLocalization.\(language.rawValue)"
+            let defaults = try #require(UserDefaults(suiteName: suite))
+            defaults.set(language.rawValue, forKey: "settings.language")
+            let settings = AppSettings(defaults: defaults)
+            for key in keys { #expect(settings.t(key) != key) }
+            defaults.removePersistentDomain(forName: suite)
+        }
+    }
 }

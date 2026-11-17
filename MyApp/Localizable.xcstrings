@@ -793,6 +793,9 @@
         }
       }
     },
+    "mm" : {
+
+    },
     "plan.accessibility" : {
       "comment" : "Accessibility label for floor plan",
       "extractionState" : "manual",
@@ -1725,6 +1728,318 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Devor ma’lumotlari"
+          }
+        }
+      }
+    },
+    "precision.inline.anchorEnd" : {
+      "comment" : "Keep the wall end endpoint fixed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "End corner"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Конечный угол"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tugash burchagi"
+          }
+        }
+      }
+    },
+    "precision.inline.anchorQuestion" : {
+      "comment" : "Shown only when wall length anchoring is ambiguous",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Which corner should stay in place?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Какой угол должен остаться на месте?"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Qaysi burchak o‘z joyida qolsin?"
+          }
+        }
+      }
+    },
+    "precision.inline.anchorStart" : {
+      "comment" : "Keep the wall start endpoint fixed",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start corner"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Начальный угол"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshlanish burchagi"
+          }
+        }
+      }
+    },
+    "precision.inline.confirm" : {
+      "comment" : "Applies and automatically saves a wall measurement",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Confirm measurement"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Подтвердить размер"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamni tasdiqlash"
+          }
+        }
+      }
+    },
+    "precision.inline.conflict" : {
+      "comment" : "Simple hard-constraint conflict message",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This measurement conflicts with protected geometry."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Этот размер конфликтует с защищённой геометрией."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Bu o‘lcham himoyalangan geometriyaga zid."
+          }
+        }
+      }
+    },
+    "precision.inline.current" : {
+      "comment" : "Current editable wall length in millimeters",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Current: %@ mm"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Текущий размер: %@ мм"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Joriy: %@ mm"
+          }
+        }
+      }
+    },
+    "precision.inline.input" : {
+      "comment" : "Placeholder for millimeter wall length input",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measurement"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Размер"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lcham"
+          }
+        }
+      }
+    },
+    "precision.inline.laser" : {
+      "comment" : "User-declared laser measurement toggle",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measured with a laser meter"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Измерено лазерным дальномером"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Lazer metr bilan o‘lchadim"
+          }
+        }
+      }
+    },
+    "precision.inline.laserCurrent" : {
+      "comment" : "Current user-declared laser-verified wall length",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Laser verified: %@ mm"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Проверено лазером: %@ мм"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Lazer bilan tasdiqlangan: %@ mm"
+          }
+        }
+      }
+    },
+    "precision.inline.lidarCurrent" : {
+      "comment" : "Original LiDAR-estimated wall length in millimeters",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "LiDAR: %@ mm"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "LiDAR: %@ мм"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "LiDAR: %@ mm"
+          }
+        }
+      }
+    },
+    "precision.inline.saved" : {
+      "comment" : "Brief confirmation after a durable precision save",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saved"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранено"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlandi"
+          }
+        }
+      }
+    },
+    "precision.inline.saving" : {
+      "comment" : "Wall measurement save progress",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saving…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Сохранение…"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Saqlanmoqda…"
+          }
+        }
+      }
+    },
+    "precision.inline.title" : {
+      "comment" : "Title of the inline wall measurement sheet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Wall length"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Длина стены"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Devor uzunligi"
           }
         }
       }

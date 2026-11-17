@@ -122,7 +122,14 @@ final class AppSettings {
 
     /// Returns the localized string for `key` in the selected app language.
     func t(_ key: String) -> String {
-        bundle.localizedString(forKey: key, value: nil, table: nil)
+        let localized = bundle.localizedString(forKey: key, value: nil, table: nil)
+        if localized != key { return localized }
+        let source = Bundle.main.localizedString(forKey: key, value: nil, table: nil)
+        if source != key { return source }
+        if key.hasPrefix("precision."), let fallback = PrecisionLocalization.englishFallback(for: key) {
+            return fallback
+        }
+        return key
     }
 
     /// Returns the localized format string for `key`, filled with `arguments`.

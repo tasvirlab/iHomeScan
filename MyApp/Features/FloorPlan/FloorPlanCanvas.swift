@@ -26,6 +26,9 @@ struct FloorPlanCanvas: View {
     var offset: CGSize = .zero
     /// Presentation-only auto-alignment in radians. Persisted coordinates remain unchanged.
     var rotation: CGFloat = 0
+    /// Latest parametric geometry. When present, it is the authoritative editable wall layer.
+    var precisionPlan: ParametricFloorPlan?
+    var selectedPrecisionWallID: UUID?
     /// Space reserved for overlaid controls; the plan is fitted into the remaining area.
     var contentInsets = EdgeInsets()
 
@@ -94,10 +97,10 @@ struct FloorPlanCanvas: View {
 
             var planContext = context
             planContext.concatenate(transform)
-            drawGeometry(plan, in: &planContext)
+            drawGeometry(plan, precisionPlan: precisionPlan, in: &planContext)
 
             if style != .thumbnail {
-                drawLabels(plan, in: &context, size: size, transform: transform, scale: scale)
+                drawLabels(plan, precisionPlan: precisionPlan, in: &context, size: size, transform: transform, scale: scale)
             }
         }
         .background(Palette.planBackground)
@@ -123,7 +126,7 @@ struct FloorPlanCanvas: View {
         context.stroke(grid, with: .color(Palette.planGrid), lineWidth: 1)
     }
 
-    private func drawGeometry(_ plan: FloorPlan, in context: inout GraphicsContext) {
+    private func drawGeometry(_ plan: FloorPlan, precisionPlan: ParametricFloorPlan?, in context: inout GraphicsContext) {
         drawFloor(plan, in: &context)
 
         // Selected room highlight
@@ -133,36 +136,43 @@ struct FloorPlanCanvas: View {
             context.stroke(rect, with: .color(Palette.accent), lineWidth: 36)
         }
 
-        // Walls
-        var outer = Path()
-        for polyline in plan.outerWalls { outer.addLines(polyline) }
-        context.stroke(outer, with: .color(Palette.wall),
-                       style: StrokeStyle(lineWidth: 220, lineCap: .square, lineJoin: .miter))
+        if let precisionPlan {
+            drawPrecisionWalls(precisionPlan, in: &context)
+        } else {
+            var outer = Path()
+            for polyline in plan.outerWalls { outer.addLines(polyline) }
+            context.stroke(outer, with: .color(Palette.wall),
+                           style: StrokeStyle(lineWidth: 220, lineCap: .square, lineJoin: .miter))
 
-        var inner = Path()
-        for wall in plan.innerWalls {
-            inner.move(to: wall.start)
-            inner.addLine(to: wall.end)
+            var inner = Path()
+            for wall in plan.innerWalls {
+                inner.move(to: wall.start)
+                inner.addLine(to: wall.end)
+            }
+            context.stroke(inner, with: .color(Palette.wall), style: StrokeStyle(lineWidth: 130, lineCap: .square))
         }
-        context.stroke(inner, with: .color(Palette.wall), style: StrokeStyle(lineWidth: 130, lineCap: .square))
 
         // Real RoomPlan openings are preserved as rotated projected segments in metadata.
         // Cut them out of the wall before drawing door leaves and window center lines.
-        drawRoomPlanOpenings(plan, in: &context)
+        if let precisionPlan {
+            drawPrecisionOpenings(precisionPlan, in: &context)
+        } else {
+            drawRoomPlanOpenings(plan, in: &context)
+        }
 
         // Door leaves and swing arcs
-        var doors = Path()
-        for door in plan.doors {
-            let start = Angle(degrees: door.startAngle)
-            doors.move(to: door.hinge)
-            doors.addLine(to: CGPoint(x: door.hinge.x + door.radius * cos(start.radians),
-                                      y: door.hinge.y + door.radius * sin(start.radians)))
-            // In a y-down coordinate space, increasing angles sweep visually clockwise,
-            // which SwiftUI expresses as `clockwise: false`.
-            doors.addArc(center: door.hinge, radius: door.radius, startAngle: start,
-                         endAngle: .degrees(door.endAngle), clockwise: door.endAngle < door.startAngle)
+        if precisionPlan == nil {
+            var doors = Path()
+            for door in plan.doors {
+                let start = Angle(degrees: door.startAngle)
+                doors.move(to: door.hinge)
+                doors.addLine(to: CGPoint(x: door.hinge.x + door.radius * cos(start.radians),
+                                          y: door.hinge.y + door.radius * sin(start.radians)))
+                doors.addArc(center: door.hinge, radius: door.radius, startAngle: start,
+                             endAngle: .degrees(door.endAngle), clockwise: door.endAngle < door.startAngle)
+            }
+            context.stroke(doors, with: .color(Palette.inkTertiary), lineWidth: 22)
         }
-        context.stroke(doors, with: .color(Palette.inkTertiary), lineWidth: 22)
 
         // Legacy/sample windows. Real RoomPlan windows use their rotated metadata segments below.
         if plan.roomPlanMetadata == nil {
@@ -181,6 +191,20 @@ struct FloorPlanCanvas: View {
             }
         }
 
+    }
+
+    private func drawPrecisionWalls(_ precisionPlan: ParametricFloorPlan, in context: inout GraphicsContext) {
+        let vertices = Dictionary(uniqueKeysWithValues: precisionPlan.vertices.map { ($0.id, $0.position) })
+        for wall in precisionPlan.walls {
+            guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { continue }
+            var path = Path()
+            path.move(to: CGPoint(x: start.x * Self.millimetersPerMeter, y: start.y * Self.millimetersPerMeter))
+            path.addLine(to: CGPoint(x: end.x * Self.millimetersPerMeter, y: end.y * Self.millimetersPerMeter))
+            let selected = wall.id == selectedPrecisionWallID
+            let thickness = CGFloat(wall.thickness?.value ?? 0.18) * Self.millimetersPerMeter
+            context.stroke(path, with: .color(selected ? Palette.accent : Palette.wall),
+                           style: StrokeStyle(lineWidth: max(thickness, selected ? 180 : 120), lineCap: .square, lineJoin: .miter))
+        }
     }
 
     private func drawFloor(_ plan: FloorPlan, in context: inout GraphicsContext) {
@@ -223,6 +247,38 @@ struct FloorPlanCanvas: View {
         }
     }
 
+    private func drawPrecisionOpenings(_ plan: ParametricFloorPlan, in context: inout GraphicsContext) {
+        let vertices = Dictionary(uniqueKeysWithValues: plan.vertices.map { ($0.id, $0.position) })
+        let walls = Dictionary(uniqueKeysWithValues: plan.walls.map { ($0.id, $0) })
+        for opening in plan.openings {
+            guard let wall = walls[opening.hostWallID], let start = vertices[wall.startVertexID],
+                  let end = vertices[wall.endVertexID], let width = opening.width?.value else { continue }
+            let wallLength = start.distance(to: end)
+            guard wallLength > 0 else { continue }
+            let anchorDistance: Double
+            switch opening.horizontalAnchor {
+            case .distanceFromStart(let measurement): anchorDistance = measurement.value
+            }
+            let lower = max(0, anchorDistance - width / 2)
+            let upper = min(wallLength, anchorDistance + width / 2)
+            guard upper > lower else { continue }
+            let dx = (end.x - start.x) / wallLength
+            let dy = (end.y - start.y) / wallLength
+            let a = CGPoint(x: (start.x + dx * lower) * Self.millimetersPerMeter,
+                            y: (start.y + dy * lower) * Self.millimetersPerMeter)
+            let b = CGPoint(x: (start.x + dx * upper) * Self.millimetersPerMeter,
+                            y: (start.y + dy * upper) * Self.millimetersPerMeter)
+            var path = Path()
+            path.move(to: a)
+            path.addLine(to: b)
+            context.stroke(path, with: .color(Palette.planFloor), style: .init(lineWidth: 245, lineCap: .butt))
+            let color = opening.kind == .window ? Palette.accentText : Palette.inkTertiary
+            context.stroke(path, with: .color(color), style: .init(lineWidth: opening.kind == .opening ? 14 : 28,
+                                                                    lineCap: .butt,
+                                                                    dash: opening.kind == .opening ? [70, 55] : []))
+        }
+    }
+
     private func drawDimensionLines(_ annotations: [FloorPlanDimensionLayoutEngine.Annotation],
                                     in context: inout GraphicsContext) {
         var lines = Path()
@@ -249,7 +305,7 @@ struct FloorPlanCanvas: View {
         context.stroke(ticks, with: .color(Palette.inkSecondary.opacity(0.8)), lineWidth: 1.2)
     }
 
-    private func drawLabels(_ plan: FloorPlan, in context: inout GraphicsContext, size: CGSize,
+    private func drawLabels(_ plan: FloorPlan, precisionPlan: ParametricFloorPlan?, in context: inout GraphicsContext, size: CGSize,
                             transform: CGAffineTransform, scale: CGFloat) {
         // Font sizes are specified in plan millimeters, converted to points.
         let nameSize = 290 * scale
@@ -277,8 +333,9 @@ struct FloorPlanCanvas: View {
         }
 
         guard style == .draft else { return }
+        let dimensions = precisionPlan.map(Self.precisionDimensions) ?? plan.dimensions
         let annotations = FloorPlanDimensionLayoutEngine.layout(
-            dimensions: plan.dimensions, transform: transform,
+            dimensions: dimensions, transform: transform,
             canvasBounds: CGRect(origin: .zero, size: size),
             planCenter: CGPoint(x: plan.bounds.midX, y: plan.bounds.midY),
             textForValue: settings.lengthValue
@@ -287,12 +344,26 @@ struct FloorPlanCanvas: View {
         for annotation in annotations {
             context.fill(Path(roundedRect: annotation.labelBounds, cornerRadius: 5),
                          with: .color(Palette.planBackground.opacity(0.92)))
+            let selected = precisionPlan.flatMap { plan in
+                annotation.sourceIndex < plan.walls.count ? plan.walls[annotation.sourceIndex].id == selectedPrecisionWallID : false
+            } ?? false
             context.draw(
                 Text(settings.lengthValue(annotation.value))
                     .font(.system(size: max(detailSize, 11), weight: .medium, design: .monospaced))
-                    .foregroundStyle(Palette.inkSecondary),
+                    .foregroundStyle(selected ? Palette.accentText : Palette.inkSecondary),
                 at: annotation.labelCenter, anchor: .center
             )
+        }
+    }
+
+    nonisolated static func precisionDimensions(_ plan: ParametricFloorPlan) -> [FloorPlan.Dimension] {
+        let vertices = Dictionary(uniqueKeysWithValues: plan.vertices.map { ($0.id, $0.position) })
+        return plan.walls.compactMap { wall in
+            guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { return nil }
+            let a = CGPoint(x: start.x, y: start.y)
+            let b = CGPoint(x: end.x, y: end.y)
+            return FloorPlan.Dimension(start: a, end: b, value: hypot(b.x - a.x, b.y - a.y),
+                                       labelPosition: CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2), labelRotation: 0)
         }
     }
 }
