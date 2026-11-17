@@ -49,3 +49,27 @@ enum PrecisionMeasurementInput {
         return String(Int((meters * 1000).rounded()))
     }
 }
+
+enum PrecisionAutomaticAnchor {
+    /// Selects the valid solver result that disturbs the existing plan least.
+    /// UUID ordering is used only as a stable tie-breaker through the caller's order.
+    static func preferred(
+        from original: ParametricFloorPlan,
+        start: GeometryRevisionSession,
+        end: GeometryRevisionSession
+    ) -> (WallLengthAnchorStrategy, GeometryRevisionSession) {
+        let startCost = displacementCost(from: original, to: start.displayedPlan)
+        let endCost = displacementCost(from: original, to: end.displayedPlan)
+        return startCost <= endCost ? (.keepStart, start) : (.keepEnd, end)
+    }
+
+    private static func displacementCost(from original: ParametricFloorPlan, to candidate: ParametricFloorPlan) -> Double {
+        let positions = Dictionary(uniqueKeysWithValues: original.vertices.map { ($0.id, $0.position) })
+        return candidate.vertices.reduce(0) { total, vertex in
+            guard let old = positions[vertex.id] else { return total + 1_000_000 }
+            let dx = vertex.position.x - old.x
+            let dy = vertex.position.y - old.y
+            return total + dx * dx + dy * dy
+        }
+    }
+}

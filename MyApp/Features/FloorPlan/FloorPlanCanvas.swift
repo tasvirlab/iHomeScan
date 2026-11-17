@@ -129,13 +129,6 @@ struct FloorPlanCanvas: View {
     private func drawGeometry(_ plan: FloorPlan, precisionPlan: ParametricFloorPlan?, in context: inout GraphicsContext) {
         drawFloor(plan, in: &context)
 
-        // Selected room highlight
-        if let room = plan.rooms.first(where: { $0.id == selectedRoomID }) {
-            let rect = Path(roundedRect: room.rect.insetBy(dx: 110, dy: 110), cornerRadius: 140)
-            context.fill(rect, with: .color(Palette.accent.opacity(0.1)))
-            context.stroke(rect, with: .color(Palette.accent), lineWidth: 36)
-        }
-
         if let precisionPlan {
             drawPrecisionWalls(precisionPlan, in: &context)
         } else {

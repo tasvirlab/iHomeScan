@@ -16,6 +16,28 @@ struct InlinePrecisionMeasurementSheet: View {
     @Environment(AppSettings.self) private var settings
     @FocusState private var inputFocused: Bool
 
+    private var wheelCenter: Int {
+        let current = PrecisionMeasurementInput.meters(fromMillimeters: currentMillimeters)
+            .map { Int(($0 * 1_000).rounded()) }
+        return current ?? 1_000
+    }
+
+    private var wheelValues: ClosedRange<Int> {
+        max(1, wheelCenter - 1_000)...min(100_000, wheelCenter + 1_000)
+    }
+
+    private var wheelSelection: Binding<Int> {
+        Binding(
+            get: {
+                guard let meters = PrecisionMeasurementInput.meters(fromMillimeters: input) else {
+                    return min(max(wheelCenter, wheelValues.lowerBound), wheelValues.upperBound)
+                }
+                return min(max(Int((meters * 1_000).rounded()), wheelValues.lowerBound), wheelValues.upperBound)
+            },
+            set: { input = String($0) }
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
@@ -25,7 +47,7 @@ struct InlinePrecisionMeasurementSheet: View {
                 .foregroundStyle(Palette.inkSecondary)
                 .accessibilityIdentifier("precision.inline.current")
 
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
                 TextField(settings.t("precision.inline.input"), text: $input)
                     .keyboardType(.decimalPad)
                     .font(.system(.title2, design: .monospaced, weight: .semibold))
@@ -37,16 +59,22 @@ struct InlinePrecisionMeasurementSheet: View {
                     .foregroundStyle(Palette.inkSecondary)
             }
 
-            if requiresAnchorChoice {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(settings.t("precision.inline.anchorQuestion"))
-                        .font(Typography.rowTitle)
-                    Picker(settings.t("precision.editor.anchor"), selection: $anchor) {
-                        Text(settings.t("precision.inline.anchorStart")).tag(WallLengthAnchorStrategy?.some(.keepStart))
-                        Text(settings.t("precision.inline.anchorEnd")).tag(WallLengthAnchorStrategy?.some(.keepEnd))
+            HStack(spacing: 12) {
+                measurementStepButton(systemImage: "minus", delta: -1)
+
+                Picker(settings.t("precision.inline.input"), selection: wheelSelection) {
+                    ForEach(wheelValues, id: \.self) { value in
+                        Text(verbatim: "\\(value) mm")
+                            .font(.system(.title3, design: .monospaced, weight: .semibold))
+                            .tag(value)
                     }
-                    .pickerStyle(.segmented)
                 }
+                .pickerStyle(.wheel)
+                .frame(maxWidth: .infinity, minHeight: 108, maxHeight: 108)
+                .clipped()
+                .accessibilityIdentifier("precision.inline.wheel")
+
+                measurementStepButton(systemImage: "plus", delta: 1)
             }
 
             if hasConflict {
@@ -84,6 +112,22 @@ struct InlinePrecisionMeasurementSheet: View {
                 Button(settings.t("common.done")) { inputFocused = false }
             }
         }
+    }
+
+    private func measurementStepButton(systemImage: String, delta: Int) -> some View {
+        Button {
+            inputFocused = false
+            let current = wheelSelection.wrappedValue
+            wheelSelection.wrappedValue = min(max(current + delta, wheelValues.lowerBound), wheelValues.upperBound)
+        } label: {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.semibold))
+                .frame(width: 48, height: 48)
+                .background(Palette.card, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Palette.ink)
+        .accessibilityIdentifier(delta < 0 ? "precision.inline.decrement" : "precision.inline.increment")
     }
 }
 

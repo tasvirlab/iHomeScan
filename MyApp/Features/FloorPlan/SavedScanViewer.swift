@@ -313,9 +313,13 @@ struct SavedScanViewerScreen: View {
             precisionSession = start
             requiresAnchorChoice = false
             precisionConflict = false
-        case (.some, .some):
-            precisionSession?.cancelPreview()
-            requiresAnchorChoice = true
+        case let (.some(start), .some(end)):
+            let preferred = PrecisionAutomaticAnchor.preferred(
+                from: base.document.currentPlan, start: start, end: end
+            )
+            selectedAnchor = preferred.0
+            precisionSession = preferred.1
+            requiresAnchorChoice = false
             precisionConflict = false
         case let (.some(candidate), nil):
             selectedAnchor = .keepStart
