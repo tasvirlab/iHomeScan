@@ -30,7 +30,7 @@ struct RoomGeometryProcessorTests {
         kind: RoomGeometrySource.SurfaceKind,
         width: Double,
         height: Double = 2.5,
-        transform: RoomGeometrySource.Transform = .identity,
+        transform: RoomGeometrySource.Transform? = nil,
         polygon: [RoomGeometrySource.Vector3] = []
     ) -> RoomGeometrySource.Surface {
         RoomGeometrySource.Surface(
@@ -38,7 +38,7 @@ struct RoomGeometryProcessorTests {
             parentIdentifier: parent,
             kind: kind,
             dimensions: .init(x: width, y: height, z: 0),
-            transform: transform,
+            transform: transform ?? .identity,
             polygonCorners: polygon,
             confidence: .high,
             story: 0

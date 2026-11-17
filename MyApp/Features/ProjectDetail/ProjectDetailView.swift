@@ -21,8 +21,11 @@ struct ProjectDetailScreen: View {
 struct ProjectDetailView: View {
     let project: Project
 
+    @Query private var scans: [SavedScan]
+
     @Environment(AppModel.self) private var model
     @Environment(AppSettings.self) private var settings
+    @Environment(\.fileStorage) private var files
 
     private enum Mode: Hashable { case plan2D, model3D }
 
@@ -34,9 +37,34 @@ struct ProjectDetailView: View {
     @State private var showsRooms = false
     @State private var renaming: Project?
     @State private var deleting: Project?
+    @State private var precisionSession: GeometryRevisionSession?
+    @State private var selectedWallID: UUID?
+    @State private var measurementInput = ""
+    @State private var laserVerified = false
+    @State private var selectedAnchor: WallLengthAnchorStrategy?
+    @State private var requiresAnchorChoice = false
+    @State private var precisionConflict = false
+    @State private var isSavingMeasurement = false
+    @State private var precisionSaveError = false
+    @State private var precisionLoadError = false
+    @State private var showsSavedConfirmation = false
+
+    init(project: Project) {
+        self.project = project
+        let projectID = project.id
+        _scans = Query(
+            filter: #Predicate<SavedScan> { $0.projectID == projectID },
+            sort: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+    }
 
     private var selectedFloor: Floor? {
         project.floors.first { $0.id == selectedFloorID } ?? project.sortedFloors.first
+    }
+
+    private var selectedScan: SavedScan? {
+        guard let floorID = selectedFloor?.id else { return nil }
+        return scans.first { $0.floorID == floorID }
     }
 
     private var metaText: String {
@@ -90,7 +118,63 @@ struct ProjectDetailView: View {
         }
         .onChange(of: selectedFloorID) {
             selectedRoomID = nil
+            closeMeasurementPanel()
+            precisionSession = nil
             mode = .plan2D
+        }
+        .onChange(of: plan?.roomPlanMetadata?.roomIdentifier) {
+            loadPrecisionDocumentIfAvailable()
+        }
+        .task(id: selectedScan?.id) {
+            loadPrecisionDocumentIfAvailable()
+        }
+        .task(id: PrecisionInlinePreviewRequest(input: measurementInput, wallID: selectedWallID,
+                                                anchor: selectedAnchor, laserVerified: laserVerified)) {
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled else { return }
+            updatePrecisionPreview()
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if selectedWallID != nil, let currentMillimeters {
+                InlinePrecisionMeasurementSheet(
+                    currentMillimeters: currentMillimeters,
+                    currentLabelKey: currentMeasurementLabelKey,
+                    input: $measurementInput,
+                    laserVerified: $laserVerified,
+                    anchor: $selectedAnchor,
+                    requiresAnchorChoice: requiresAnchorChoice,
+                    hasValidPreview: precisionSession?.preview != nil,
+                    hasConflict: precisionConflict,
+                    isSaving: isSavingMeasurement,
+                    onConfirm: confirmMeasurement,
+                    onClose: closeMeasurementPanel
+                )
+                .fixedSize(horizontal: false, vertical: true)
+                .overlay(alignment: .top) { Divider() }
+            }
+        }
+        .alert(settings.t("precision.editor.saveError.title"), isPresented: $precisionSaveError) {
+            Button(settings.t("scanner.retry"), action: confirmMeasurement)
+            Button(settings.t("common.cancel"), role: .cancel) {}
+        } message: {
+            Text(settings.t("precision.editor.saveError.body"))
+        }
+        .alert(settings.t("precision.inline.unavailable.title"), isPresented: $precisionLoadError) {
+            Button(settings.t("scanner.retry"), action: loadPrecisionDocumentIfAvailable)
+            Button(settings.t("common.ok"), role: .cancel) {}
+        } message: {
+            Text(settings.t("precision.inline.unavailable.body"))
+        }
+        .overlay(alignment: .top) {
+            if showsSavedConfirmation {
+                Label(settings.t("precision.inline.saved"), systemImage: "checkmark.circle.fill")
+                    .font(Typography.control)
+                    .foregroundStyle(Palette.onGraphite)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(Palette.graphite, in: .capsule)
+                    .padding(.top, 8)
+            }
         }
         .sheet(isPresented: $showsRooms) {
             if let floor = selectedFloor {
@@ -134,7 +218,14 @@ struct ProjectDetailView: View {
         if let plan, let floor = selectedFloor {
             switch mode {
             case .plan2D:
-                FloorPlanViewer(plan: plan, labels: floor.planLabels, selectedRoomID: $selectedRoomID)
+                FloorPlanViewer(
+                    plan: plan,
+                    labels: floor.planLabels,
+                    selectedRoomID: $selectedRoomID,
+                    precisionPlan: precisionSession?.displayedPlan,
+                    selectedPrecisionWallID: $selectedWallID,
+                    onPrecisionWallSelected: beginMeasurement
+                )
             case .model3D:
                 PlanPlaceholder(systemImage: "cube.transparent",
                                 titleKey: "project.3d.title", bodyKey: "project.3d.body")
@@ -147,6 +238,138 @@ struct ProjectDetailView: View {
                             actionKey: "plan.scanAction") {
                 model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
             }
+        }
+    }
+
+    private var currentMillimeters: String? {
+        guard let wallID = selectedWallID,
+              let plan = precisionSession?.document.currentPlan,
+              let wall = plan.wall(id: wallID) else { return nil }
+        return PrecisionMeasurementInput.millimeters(fromMeters: wall.length(in: plan))
+    }
+
+    private var currentMeasurementLabelKey: String {
+        guard let wallID = selectedWallID else { return "precision.inline.lidarCurrent" }
+        for revision in precisionSession?.document.revisions.reversed() ?? [] {
+            guard case .setWallLength(let command) = revision.command, command.wallID == wallID else { continue }
+            return command.provenance.source == .laserVerified
+                ? "precision.inline.laserCurrent" : "precision.inline.current"
+        }
+        return "precision.inline.lidarCurrent"
+    }
+
+    private func loadPrecisionDocumentIfAvailable() {
+        guard let selectedScan, let plan else { return }
+        do {
+            let document = try ParametricPlanRepository(files: files)
+                .loadPrecisionDocument(scan: selectedScan, floorPlan: plan)
+            precisionSession = GeometryRevisionSession(document: document)
+            precisionLoadError = false
+        } catch {
+            precisionSession = nil
+            precisionLoadError = true
+        }
+    }
+
+    private func beginMeasurement(_ wallID: UUID) {
+        guard let plan = precisionSession?.document.currentPlan,
+              let wall = plan.wall(id: wallID) else { return }
+        precisionSession?.cancelPreview()
+        selectedWallID = wallID
+        measurementInput = PrecisionMeasurementInput.millimeters(fromMeters: wall.length(in: plan))
+        selectedAnchor = nil
+        requiresAnchorChoice = false
+        precisionConflict = false
+        laserVerified = false
+    }
+
+    private func closeMeasurementPanel() {
+        precisionSession?.cancelPreview()
+        selectedWallID = nil
+        measurementInput = ""
+        selectedAnchor = nil
+        requiresAnchorChoice = false
+        precisionConflict = false
+    }
+
+    private func updatePrecisionPreview() {
+        guard var base = precisionSession, let wallID = selectedWallID,
+              let target = PrecisionMeasurementInput.meters(fromMillimeters: measurementInput) else {
+            precisionSession?.cancelPreview()
+            precisionConflict = false
+            return
+        }
+        base.cancelPreview()
+        let source: GeometrySourceKind = laserVerified ? .laserVerified : .manualEntered
+        let status: GeometryVerificationStatus = laserVerified ? .verified : .unverified
+        func proposed(_ anchor: WallLengthAnchorStrategy) -> GeometryRevisionSession? {
+            var candidate = base
+            let command = SetWallLengthCommand(
+                id: UUID(), wallID: wallID, targetLength: target, anchor: anchor,
+                provenance: .init(source: source, verificationStatus: status,
+                                  timestamp: Date(), uncertainty: nil),
+                createdAt: Date()
+            )
+            if case .solved = candidate.propose(command) { return candidate }
+            return nil
+        }
+        if let selectedAnchor {
+            if let candidate = proposed(selectedAnchor) {
+                precisionSession = candidate
+                precisionConflict = false
+            } else {
+                precisionSession?.cancelPreview()
+                precisionConflict = true
+            }
+            return
+        }
+        let start = proposed(.keepStart)
+        let end = proposed(.keepEnd)
+        switch (start, end) {
+        case let (.some(start), .some(end)) where start.displayedPlan == end.displayedPlan:
+            selectedAnchor = .keepStart
+            precisionSession = start
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case (.some, .some):
+            precisionSession?.cancelPreview()
+            requiresAnchorChoice = true
+            precisionConflict = false
+        case let (.some(candidate), nil):
+            selectedAnchor = .keepStart
+            precisionSession = candidate
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case let (nil, .some(candidate)):
+            selectedAnchor = .keepEnd
+            precisionSession = candidate
+            requiresAnchorChoice = false
+            precisionConflict = false
+        case (nil, nil):
+            precisionSession?.cancelPreview()
+            requiresAnchorChoice = false
+            precisionConflict = true
+        }
+    }
+
+    private func confirmMeasurement() {
+        guard !isSavingMeasurement, var candidate = precisionSession,
+              candidate.applyPreview() != nil, let selectedScan else { return }
+        isSavingMeasurement = true
+        do {
+            try ParametricPlanRepository(files: files)
+                .savePrecisionDocument(candidate.document, scan: selectedScan)
+            precisionSession = candidate
+            isSavingMeasurement = false
+            closeMeasurementPanel()
+            withAnimation { showsSavedConfirmation = true }
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1.5))
+                withAnimation { showsSavedConfirmation = false }
+            }
+        } catch {
+            isSavingMeasurement = false
+            precisionSaveError = true
         }
     }
 

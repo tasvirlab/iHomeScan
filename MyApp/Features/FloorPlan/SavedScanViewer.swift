@@ -110,7 +110,7 @@ struct SavedScanViewerScreen: View {
             if selectedScanID == nil { selectedScanID = scans.first?.id }
         }
         .task(id: selectedScan?.id) { loadSelectedScan() }
-        .task(id: InlinePreviewRequest(input: measurementInput, wallID: selectedWallID, anchor: selectedAnchor, laserVerified: laserVerified)) {
+        .task(id: PrecisionInlinePreviewRequest(input: measurementInput, wallID: selectedWallID, anchor: selectedAnchor, laserVerified: laserVerified)) {
             try? await Task.sleep(for: .milliseconds(180))
             guard !Task.isCancelled else { return }
             updatePrecisionPreview()
@@ -365,7 +365,7 @@ struct SavedScanViewerScreen: View {
     }
 }
 
-private struct InlinePreviewRequest: Equatable {
+struct PrecisionInlinePreviewRequest: Equatable {
     let input: String
     let wallID: UUID?
     let anchor: WallLengthAnchorStrategy?
