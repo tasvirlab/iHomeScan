@@ -17,7 +17,8 @@ struct InlinePrecisionMeasurementSheet: View {
     @FocusState private var inputFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
             InlineMeasurementHeader(onClose: onClose)
             Text(settings.t(currentLabelKey, currentMillimeters))
                 .font(Typography.body)
@@ -35,10 +36,6 @@ struct InlinePrecisionMeasurementSheet: View {
                     .font(Typography.control)
                     .foregroundStyle(Palette.inkSecondary)
             }
-
-            Toggle(settings.t("precision.inline.laser"), isOn: $laserVerified)
-                .tint(Palette.accent)
-                .accessibilityIdentifier("precision.inline.laser")
 
             if requiresAnchorChoice {
                 VStack(alignment: .leading, spacing: 8) {
@@ -73,10 +70,20 @@ struct InlinePrecisionMeasurementSheet: View {
             .tint(Palette.accent)
             .disabled(!hasValidPreview || hasConflict || isSaving)
             .accessibilityIdentifier("precision.inline.confirm")
+
+            Toggle(settings.t("precision.inline.laser"), isOn: $laserVerified)
+                .tint(Palette.accent)
+                .accessibilityIdentifier("precision.inline.laser")
+            }
+            .padding(16)
         }
-        .padding(20)
+        .scrollDismissesKeyboard(.interactively)
         .background(Palette.surface)
-        .onAppear { inputFocused = true }
+        .toolbar {
+            ToolbarItem(placement: .keyboard) {
+                Button(settings.t("common.done")) { inputFocused = false }
+            }
+        }
     }
 }
 

@@ -25,6 +25,7 @@ struct SavedScanViewerScreen: View {
     @State private var selectedPlanRoomID: String?
     @State private var precisionSession: GeometryRevisionSession?
     @State private var selectedWallID: UUID?
+    @State private var showsMeasurementPanel = false
     @State private var measurementInput = ""
     @State private var laserVerified = false
     @State private var selectedAnchor: WallLengthAnchorStrategy?
@@ -115,10 +116,9 @@ struct SavedScanViewerScreen: View {
             guard !Task.isCancelled else { return }
             updatePrecisionPreview()
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if selectedWallID != nil, let currentMillimeters {
-                InlinePrecisionMeasurementSheet(
-                    currentMillimeters: currentMillimeters,
+        .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
+            InlinePrecisionMeasurementSheet(
+                    currentMillimeters: currentMillimeters ?? measurementInput,
                     currentLabelKey: currentMeasurementLabelKey,
                     input: $measurementInput,
                     laserVerified: $laserVerified,
@@ -130,10 +130,10 @@ struct SavedScanViewerScreen: View {
                     onConfirm: confirmMeasurement,
                     onClose: closeMeasurementPanel
                 )
-                .fixedSize(horizontal: false, vertical: true)
-                .overlay(alignment: .top) { Divider() }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationContentInteraction(.scrolls)
+                .interactiveDismissDisabled(isSavingMeasurement)
         }
         .alert(settings.t("precision.editor.saveError.title"), isPresented: $precisionSaveError) {
             Button(settings.t("scanner.retry"), action: confirmMeasurement)
@@ -258,10 +258,16 @@ struct SavedScanViewerScreen: View {
         requiresAnchorChoice = false
         precisionConflict = false
         laserVerified = false
+        Task { @MainActor in
+            await Task.yield()
+            guard selectedWallID == wallID else { return }
+            showsMeasurementPanel = true
+        }
     }
 
     private func closeMeasurementPanel() {
         precisionSession?.cancelPreview()
+        showsMeasurementPanel = false
         selectedWallID = nil
         measurementInput = ""
         selectedAnchor = nil

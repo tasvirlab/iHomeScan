@@ -10,7 +10,21 @@ enum FloorPlanAlignmentEngine {
     }
 
     static func alignment(for plan: FloorPlan, minimumConfidence: CGFloat = 0.55) -> Result {
-        let segments = wallSegments(in: plan).filter { segment in
+        alignment(for: wallSegments(in: plan), minimumConfidence: minimumConfidence)
+    }
+
+    static func alignment(for plan: ParametricFloorPlan, minimumConfidence: CGFloat = 0.55) -> Result {
+        let vertices = Dictionary(uniqueKeysWithValues: plan.vertices.map { ($0.id, $0.position) })
+        let segments = plan.walls.compactMap { wall -> FloorPlan.Segment? in
+            guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { return nil }
+            return FloorPlan.Segment(start: CGPoint(x: start.x, y: start.y),
+                                     end: CGPoint(x: end.x, y: end.y))
+        }
+        return alignment(for: segments, minimumConfidence: minimumConfidence)
+    }
+
+    private static func alignment(for sourceSegments: [FloorPlan.Segment], minimumConfidence: CGFloat) -> Result {
+        let segments = sourceSegments.filter { segment in
             let vector = CGVector(dx: segment.end.x - segment.start.x, dy: segment.end.y - segment.start.y)
             return vector.dx.isFinite && vector.dy.isFinite && hypot(vector.dx, vector.dy) >= 0.25
         }

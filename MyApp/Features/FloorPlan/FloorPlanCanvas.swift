@@ -333,7 +333,20 @@ struct FloorPlanCanvas: View {
         }
 
         guard style == .draft else { return }
-        let dimensions = precisionPlan.map(Self.precisionDimensions) ?? plan.dimensions
+        let dimensions = precisionPlan.map { precisionPlan in
+            Self.precisionDimensions(precisionPlan).map { dimension in
+                FloorPlan.Dimension(
+                    start: CGPoint(x: dimension.start.x * Self.millimetersPerMeter,
+                                   y: dimension.start.y * Self.millimetersPerMeter),
+                    end: CGPoint(x: dimension.end.x * Self.millimetersPerMeter,
+                                 y: dimension.end.y * Self.millimetersPerMeter),
+                    value: dimension.value,
+                    labelPosition: CGPoint(x: dimension.labelPosition.x * Self.millimetersPerMeter,
+                                           y: dimension.labelPosition.y * Self.millimetersPerMeter),
+                    labelRotation: dimension.labelRotation
+                )
+            }
+        } ?? plan.dimensions
         let annotations = FloorPlanDimensionLayoutEngine.layout(
             dimensions: dimensions, transform: transform,
             canvasBounds: CGRect(origin: .zero, size: size),

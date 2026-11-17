@@ -16,18 +16,18 @@ final class iHomeScanUITests: XCTestCase {
         XCTAssertTrue(canvas.waitForExistence(timeout: 3))
 
         // Top wall in the deterministic 4 m × 3 m fixture.
-        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.50, dy: 0.35)).tap()
-        let title = app.staticTexts["precision.inline.title"]
+        let title = app.descendants(matching: .any)["precision.inline.title"]
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.39)).tap()
         XCTAssertTrue(title.waitForExistence(timeout: 3), "Wall tap must open the inline measurement panel")
-        XCTAssertTrue(app.staticTexts["precision.inline.current"].label.contains("4000"))
+        XCTAssertTrue(app.descendants(matching: .any)["precision.inline.current"].label.contains("4000"))
 
         app.buttons["precision.inline.close"].tap()
         XCTAssertFalse(title.waitForExistence(timeout: 1))
 
         // Dimension annotation is laid out immediately above the same top wall.
-        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.50, dy: 0.375)).tap()
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.368)).tap()
         XCTAssertTrue(title.waitForExistence(timeout: 3), "Dimension label tap must select its associated wall")
-        XCTAssertTrue(app.staticTexts["precision.inline.current"].label.contains("4000"))
+        XCTAssertTrue(app.descendants(matching: .any)["precision.inline.current"].label.contains("4000"))
 
         let input = app.textFields["precision.inline.input"]
         XCTAssertTrue(input.waitForExistence(timeout: 2))
@@ -42,8 +42,8 @@ final class iHomeScanUITests: XCTestCase {
         app.launchArguments = ["--precision-tap-ui-test"]
         app.launch()
         XCTAssertTrue(canvas.waitForExistence(timeout: 5))
-        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.50, dy: 0.35)).tap()
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.45, dy: 0.39)).tap()
         XCTAssertTrue(title.waitForExistence(timeout: 3))
-        XCTAssertTrue(app.staticTexts["precision.inline.current"].label.contains("4250"))
+        XCTAssertTrue(app.descendants(matching: .any)["precision.inline.current"].label.contains("4250"))
     }
 }

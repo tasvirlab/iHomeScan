@@ -42,7 +42,10 @@ struct FloorPlanViewer: View {
         CGSize(width: offset.width + drag.width, height: offset.height + drag.height)
     }
     private var alignmentRotation: CGFloat {
-        FloorPlanAlignmentEngine.alignment(for: plan).rotation
+        if let precisionPlan {
+            return FloorPlanAlignmentEngine.alignment(for: precisionPlan).rotation
+        }
+        return FloorPlanAlignmentEngine.alignment(for: plan).rotation
     }
 
     var body: some View {

@@ -7,6 +7,7 @@ struct PrecisionTapUITestFixtureView: View {
     private static let wallID = UUID(uuidString: "A1000000-0000-0000-0000-000000000001")!
     @State private var selectedRoomID: String?
     @State private var selectedWallID: UUID?
+    @State private var showsMeasurementPanel = false
     @State private var input = ""
     @State private var laserVerified = false
     @State private var anchor: WallLengthAnchorStrategy?
@@ -35,9 +36,8 @@ struct PrecisionTapUITestFixtureView: View {
             )
         }
         .background(Palette.background)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if selectedWallID != nil {
-                InlinePrecisionMeasurementSheet(
+        .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
+            InlinePrecisionMeasurementSheet(
                     currentMillimeters: PrecisionMeasurementInput.millimeters(fromMeters: plan.walls.first?.length(in: plan)),
                     currentLabelKey: "precision.inline.current",
                     input: $input,
@@ -48,15 +48,26 @@ struct PrecisionTapUITestFixtureView: View {
                     hasConflict: false,
                     isSaving: false,
                     onConfirm: confirm,
-                    onClose: { selectedWallID = nil }
+                    onClose: closeMeasurementPanel
                 )
-            }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 
     private func selectWall(_ id: UUID) {
         selectedWallID = id
         input = PrecisionMeasurementInput.millimeters(fromMeters: plan.wall(id: id)?.length(in: plan))
+        Task { @MainActor in
+            await Task.yield()
+            guard selectedWallID == id else { return }
+            showsMeasurementPanel = true
+        }
+    }
+
+    private func closeMeasurementPanel() {
+        showsMeasurementPanel = false
+        selectedWallID = nil
     }
 
     private func confirm() {
@@ -72,7 +83,7 @@ struct PrecisionTapUITestFixtureView: View {
             y: start.y + (end.y - start.y) / length * meters
         )
         UserDefaults.standard.set(meters, forKey: Self.persistedMetersKey)
-        selectedWallID = nil
+        closeMeasurementPanel()
     }
 
     private static let fixtureFloorPlan = FloorPlan(
