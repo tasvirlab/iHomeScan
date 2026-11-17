@@ -16,14 +16,16 @@ struct GeometryRevisionSession: Sendable {
         _ command: SetWallLengthCommand,
         solver: GeometryConstraintSolver = GeometryConstraintSolver(),
         allowsReplacingVerifiedMeasurement: Bool = false,
-        allowsRectangularPropagation: Bool = false
+        allowsRectangularPropagation: Bool = false,
+        preservesUnrelatedGeometry: Bool = false
     ) -> ConstraintSolveResult {
         let result = solver.preview(
             command: command,
             plan: document.currentPlan,
             constraints: document.constraints,
             allowsReplacingVerifiedMeasurement: allowsReplacingVerifiedMeasurement,
-            allowsRectangularPropagation: allowsRectangularPropagation
+            allowsRectangularPropagation: allowsRectangularPropagation,
+            preservesUnrelatedGeometry: preservesUnrelatedGeometry
         )
         switch result {
         case .solved(let transaction, _):

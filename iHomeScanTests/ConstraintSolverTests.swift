@@ -185,6 +185,74 @@ struct ConstraintSolverTests {
         })
     }
 
+    @Test("4d. Local wall editing never moves unrelated geometry across room shapes")
+    func localEditingPreservesUnrelatedGeometry() throws {
+        let fixtures: [ParametricFloorPlan] = [
+            rectangle(),
+            plan(
+                points: [.init(x: 0, y: 0), .init(x: 3, y: 0), .init(x: 2.5, y: 2), .init(x: 0.4, y: 2)],
+                edges: [(0, 1), (1, 2), (2, 3), (3, 0)]
+            ),
+            plan(
+                points: [.init(x: 0, y: 0), .init(x: 3, y: 0), .init(x: 3, y: 1), .init(x: 2, y: 1), .init(x: 2, y: 3), .init(x: 0, y: 3)],
+                edges: [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 0)]
+            ),
+            plan(
+                points: [.init(x: 0, y: 0), .init(x: 2, y: 1), .init(x: 3, y: 2)],
+                edges: [(0, 1), (1, 2)]
+            ),
+            plan(
+                points: [.init(x: 0, y: 0), .init(x: 2, y: 0), .init(x: 8, y: 4), .init(x: 9, y: 5)],
+                edges: [(0, 1), (2, 3)]
+            )
+        ]
+
+        for original in fixtures {
+            let wall = original.walls[0]
+            let originalLength = try #require(wall.length(in: original))
+            let originalOrientation = try #require(wall.orientation(in: original))
+            let result = GeometryConstraintSolver().preview(
+                command: command(wallID: wall.id, target: originalLength + 0.125),
+                plan: original,
+                constraints: [],
+                preservesUnrelatedGeometry: true
+            )
+            guard case .solved(let transaction, _) = result else {
+                Issue.record("Expected safe local edit for fixture")
+                continue
+            }
+            let candidate = transaction.candidatePlan
+            for vertex in original.vertices where vertex.id != wall.endVertexID {
+                #expect(candidate.vertex(id: vertex.id)?.position == vertex.position)
+            }
+            let candidateWall = try #require(candidate.wall(id: wall.id))
+            #expect(abs((candidateWall.length(in: candidate) ?? 0) - (originalLength + 0.125)) < 0.000_1)
+            #expect(abs((candidateWall.orientation(in: candidate) ?? 0) - originalOrientation) < 0.000_1)
+        }
+    }
+
+    @Test("4e. Local edit protects an independently verified adjacent wall")
+    func localEditingProtectsVerifiedAdjacentWall() {
+        let original = rectangle()
+        let target = original.walls[0]
+        let adjacent = original.walls[1]
+        let verifiedAdjacent = constraint(
+            23,
+            .wallLength(wallID: adjacent.id, meters: adjacent.length(in: original) ?? 0),
+            status: .verified
+        )
+        let result = GeometryConstraintSolver().preview(
+            command: command(wallID: target.id, target: 4.1),
+            plan: original,
+            constraints: [verifiedAdjacent],
+            preservesUnrelatedGeometry: true
+        )
+        guard case .conflict = result else {
+            Issue.record("Expected verified adjacent measurement to block the local move")
+            return
+        }
+    }
+
     @Test("5. Rectangle height adjustment uses documented start anchor")
     func rectangleHeight() throws {
         let original = rectangle()

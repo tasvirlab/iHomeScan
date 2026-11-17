@@ -320,7 +320,7 @@ struct ProjectDetailView: View {
             if case .solved = candidate.propose(
                 command,
                 allowsReplacingVerifiedMeasurement: true,
-                allowsRectangularPropagation: true
+                preservesUnrelatedGeometry: true
             ) {
                 return candidate
             }

@@ -26,7 +26,8 @@ struct GeometryConstraintSolver: Sendable {
         plan: ParametricFloorPlan,
         constraints: [GeometryConstraint],
         allowsReplacingVerifiedMeasurement: Bool = false,
-        allowsRectangularPropagation: Bool = false
+        allowsRectangularPropagation: Bool = false,
+        preservesUnrelatedGeometry: Bool = false
     ) -> ConstraintSolveResult {
         guard command.targetLength.isFinite, command.targetLength >= configuration.minimumLength else {
             return .conflict([conflict(.invalidTarget, geometry: [command.wallID])])
@@ -40,9 +41,14 @@ struct GeometryConstraintSolver: Sendable {
         let enabled = constraints.filter(\.isEnabled)
         let modelConflicts = GeometryConstraintValidator().validate(enabled, in: plan)
         if !modelConflicts.isEmpty { return .conflict(modelConflicts) }
-        let fixed = fixedPositions(from: enabled)
+        var fixed = fixedPositions(from: enabled)
         let anchorID = command.anchor == .keepStart ? targetWall.startVertexID : targetWall.endVertexID
         let movingID = command.anchor == .keepStart ? targetWall.endVertexID : targetWall.startVertexID
+        if preservesUnrelatedGeometry {
+            for vertex in plan.vertices where vertex.id != movingID {
+                fixed[vertex.id] = vertex.position
+            }
+        }
         if let locked = fixed[movingID], fixed[anchorID] != nil {
             let residual = locked.distance(to: fixed[anchorID]!) - command.targetLength
             if abs(residual) > configuration.distanceTolerance {
@@ -82,10 +88,19 @@ struct GeometryConstraintSolver: Sendable {
         let propagatedWallIDs = allowsRectangularPropagation
             ? rectangularPropagationWallIDs(targetWallID: command.wallID, in: plan)
             : []
+        let locallyAffectedWallIDs: Set<UUID> = preservesUnrelatedGeometry
+            ? Set(plan.walls.filter {
+                $0.startVertexID == movingID || $0.endVertexID == movingID
+            }.map(\.id))
+            : []
         let active = (enabled.filter { constraint in
             if case .wallLength(let wallID, _) = constraint.kind {
                 if wallID == command.wallID { return false }
                 if propagatedWallIDs.contains(wallID),
+                   constraint.provenance.verificationStatus != .verified {
+                    return false
+                }
+                if locallyAffectedWallIDs.contains(wallID),
                    constraint.provenance.verificationStatus != .verified {
                     return false
                 }
@@ -106,6 +121,15 @@ struct GeometryConstraintSolver: Sendable {
 
         if allowsRectangularPropagation {
             propagateRectangleIfApplicable(targetWallID: command.wallID, original: plan, candidate: &candidate)
+        }
+
+        if preservesUnrelatedGeometry,
+           let changedVertexID = firstChangedVertex(excluding: movingID, original: plan, candidate: candidate) {
+            return .conflict([conflict(.unsatisfiedHardConstraint, geometry: [changedVertexID])])
+        }
+        if preservesUnrelatedGeometry,
+           !preservesWallDirection(wallID: command.wallID, original: plan, candidate: candidate) {
+            return .conflict([conflict(.unsatisfiedHardConstraint, geometry: [command.wallID])])
         }
 
         let residualConflicts = hardConstraintConflicts(active, plan: candidate)
@@ -188,6 +212,31 @@ struct GeometryConstraintSolver: Sendable {
         var wallIDs = Set([targetWallID])
         if let opposite { wallIDs.insert(opposite.id) }
         return wallIDs
+    }
+
+    private func firstChangedVertex(
+        excluding editableVertexID: UUID,
+        original: ParametricFloorPlan,
+        candidate: ParametricFloorPlan
+    ) -> UUID? {
+        original.vertices.first { vertex in
+            guard vertex.id != editableVertexID,
+                  let candidatePosition = candidate.vertex(id: vertex.id)?.position else { return false }
+            return vertex.position.distance(to: candidatePosition) > configuration.distanceTolerance
+        }?.id
+    }
+
+    private func preservesWallDirection(
+        wallID: UUID,
+        original: ParametricFloorPlan,
+        candidate: ParametricFloorPlan
+    ) -> Bool {
+        guard let originalAngle = original.wall(id: wallID)?.orientation(in: original),
+              let candidateAngle = candidate.wall(id: wallID)?.orientation(in: candidate) else {
+            return false
+        }
+        let delta = atan2(sin(candidateAngle - originalAngle), cos(candidateAngle - originalAngle))
+        return abs(delta) <= configuration.angularTolerance
     }
 
     private func rectangleCycle(startingWith target: ParametricWall, in plan: ParametricFloorPlan) -> [UUID]? {
