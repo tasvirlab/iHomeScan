@@ -217,17 +217,53 @@ struct RoomPlanToParametricAdapter {
         let direction = normalized(from: start, to: end)
         let offset = (midpoint.x - start.x) * direction.x + (midpoint.y - start.y) * direction.y
         let anchor = LengthMeasurement(value: offset, provenance: provenance)
+        let width = measurement(surface.dimensions.x, provenance: provenance)
+        let height = measurement(surface.dimensions.y, provenance: provenance)
         let kind: WallOpeningKind = switch surface.kind {
         case .door: .door
         case .window: .window
         default: .opening
         }
+        let openingID = StableGeometryID.make(namespace: scanID, components: ["opening", surface.id.uuidString])
+        var architecturalMeasurements: [OpeningMeasurement] = []
+        if let width {
+            architecturalMeasurements.append(OpeningMeasurement(
+                id: StableGeometryID.make(namespace: openingID, components: ["measurement", "startOffset"]),
+                openingID: openingID,
+                kind: .offsetFromStart,
+                value: LengthMeasurement(value: max(0, offset - width.value / 2), provenance: provenance),
+                reference: OpeningMeasurementReference(
+                    endpoint: .wallStart,
+                    vertexID: host.startVertexID,
+                    reliability: .estimated
+                ),
+                relatedConstraintIDs: []
+            ))
+            architecturalMeasurements.append(OpeningMeasurement(
+                id: StableGeometryID.make(namespace: openingID, components: ["measurement", "width"]),
+                openingID: openingID,
+                kind: .width,
+                value: width,
+                reference: nil,
+                relatedConstraintIDs: []
+            ))
+        }
+        if let height {
+            architecturalMeasurements.append(OpeningMeasurement(
+                id: StableGeometryID.make(namespace: openingID, components: ["measurement", "height"]),
+                openingID: openingID,
+                kind: .height,
+                value: height,
+                reference: nil,
+                relatedConstraintIDs: []
+            ))
+        }
         return WallOpening(
-            id: StableGeometryID.make(namespace: scanID, components: ["opening", surface.id.uuidString]),
+            id: openingID,
             hostWallID: hostWallID,
             kind: kind,
-            width: measurement(surface.dimensions.x, provenance: provenance),
-            height: measurement(surface.dimensions.y, provenance: provenance),
+            width: width,
+            height: height,
             // RoomGeometryProcessor does not retain a defensible wall-relative sill elevation.
             verticalOffset: nil,
             horizontalAnchor: .distanceFromStart(anchor),
@@ -235,6 +271,11 @@ struct RoomPlanToParametricAdapter {
                 surface,
                 originalStart: point(segment.start),
                 originalEnd: point(segment.end)
+            ),
+            architecturalMetadata: OpeningArchitecturalMetadata(
+                measurements: architecturalMeasurements,
+                completeness: width == nil ? .partial : .complete,
+                doorSwing: nil
             )
         )
     }

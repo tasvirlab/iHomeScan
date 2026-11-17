@@ -268,8 +268,11 @@ struct ParametricGeometryTests {
             .appending(path: "ParametricTests-\(UUID().uuidString)", directoryHint: .isDirectory)
         defer { try? FileManager.default.removeItem(at: root) }
         let files = LocalFileStorageService(rootURL: root)
+        let hostID = id(1)
         let sourcePlan = floorPlan(walls: [
-            wall(id(1), .zero, .init(x: 2, y: 0)),
+            wall(hostID, .zero, .init(x: 2, y: 0)),
+        ], extras: [
+            wall(id(2), .init(x: 0.6, y: 0), .init(x: 1.5, y: 0), parent: hostID, kind: .door)
         ], completeness: .incomplete)
         let modelURL = root.appending(path: "fixture.usdz")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -300,6 +303,7 @@ struct ParametricGeometryTests {
         let reopened = try repository.loadPrecisionDocument(scan: scan, floorPlan: sourcePlan)
         #expect(reopened.currentPlan == edited)
         #expect(reopened.baselinePlan == created)
+        #expect(reopened.currentPlan.openings.first?.architecturalMetadata?.measurements.isEmpty == false)
     }
 
     @Test("Existing scan artifacts remain byte-for-byte compatible")

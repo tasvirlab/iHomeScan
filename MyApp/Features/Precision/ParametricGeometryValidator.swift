@@ -18,6 +18,11 @@ enum GeometryValidationCode: String, Codable, Sendable {
     case openChain
     case degenerateFloorBoundary
     case inconsistentSourceMetadata
+    case invalidOpeningMeasurement
+    case overlappingOpenings
+    case inconsistentMeasurementChain
+    case invalidOpeningReference
+    case invalidVerticalMeasurement
 }
 
 struct GeometryValidationIssue: Codable, Hashable, Identifiable, Sendable {
@@ -121,6 +126,22 @@ struct ParametricGeometryValidator {
                 append(.warning, .degenerateFloorBoundary, nil,
                        "Floor boundary \(index) is degenerate.", to: &issues)
             }
+        }
+        let openingResolution = OpeningMeasurementResolver().resolve(plan: plan)
+        for conflict in openingResolution.conflicts {
+            let code: GeometryValidationCode = switch conflict.code {
+            case .overlappingOpenings: .overlappingOpenings
+            case .contradictoryMeasurements: .inconsistentMeasurementChain
+            case .invalidReference: .invalidOpeningReference
+            case .invalidVerticalChain, .exceedsWallHeight: .invalidVerticalMeasurement
+            default: .invalidOpeningMeasurement
+            }
+            append(.error, code, conflict.openingIDs.first,
+                   "Opening measurement conflict: \(conflict.code.rawValue).", to: &issues)
+        }
+        for openingID in openingResolution.unresolvedOpeningIDs {
+            append(.warning, .invalidOpeningMeasurement, openingID,
+                   "Opening placement is underdetermined.", to: &issues)
         }
         return GeometryValidationResult(issues: issues)
     }

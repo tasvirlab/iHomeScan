@@ -100,6 +100,8 @@ struct WallOpening: Codable, Hashable, Identifiable, Sendable {
     let verticalOffset: LengthMeasurement?
     let horizontalAnchor: WallHorizontalAnchor
     let source: GeometrySourceMetadata
+    /// Optional P1.4 architectural measurements. Nil keeps version-1 opening JSON readable.
+    var architecturalMetadata: OpeningArchitecturalMetadata? = nil
 }
 
 struct ParametricColumn: Codable, Hashable, Identifiable, Sendable {
@@ -159,7 +161,7 @@ struct EndpointMergeRecord: Codable, Hashable, Sendable {
 }
 
 struct ParametricFloorPlan: Codable, Hashable, Identifiable, Sendable {
-    static let currentFormatVersion = 1
+    static let currentFormatVersion = 2
 
     let id: UUID
     let projectID: UUID
@@ -214,10 +216,11 @@ struct ParametricFloorPlan: Codable, Hashable, Identifiable, Sendable {
     static func decode(from data: Data) throws -> ParametricFloorPlan {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        let plan = try decoder.decode(ParametricFloorPlan.self, from: data)
+        var plan = try decoder.decode(ParametricFloorPlan.self, from: data)
         guard plan.formatVersion <= currentFormatVersion else {
             throw ParametricGeometryCodingError.unsupportedVersion(plan.formatVersion)
         }
+        plan.formatVersion = currentFormatVersion
         return plan
     }
 }

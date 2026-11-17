@@ -134,6 +134,20 @@ struct GeometryConstraintSolver: Sendable {
 
         let residualConflicts = hardConstraintConflicts(active, plan: candidate)
         if !residualConflicts.isEmpty { return .conflict(residualConflicts) }
+        let openingResolution = OpeningMeasurementResolver(
+            computationalTolerance: configuration.distanceTolerance
+        ).resolve(plan: candidate)
+        if !openingResolution.conflicts.isEmpty {
+            return .conflict(openingResolution.conflicts.map { issue in
+                conflict(
+                    .openingOutsideHost,
+                    constraints: issue.measurementIDs,
+                    geometry: issue.openingIDs,
+                    residual: issue.residual
+                )
+            })
+        }
+        candidate = openingResolution.candidatePlan
         let openingConflicts = validateOpenings(in: candidate, constraints: active)
         if !openingConflicts.isEmpty { return .conflict(openingConflicts) }
 
