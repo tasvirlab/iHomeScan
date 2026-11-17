@@ -32,6 +32,7 @@ struct SavedScanViewerScreen: View {
     @State private var precisionConflict = false
     @State private var isSavingMeasurement = false
     @State private var precisionSaveError = false
+    @State private var precisionLoadError = false
     @State private var showsSavedConfirmation = false
 
     init(projectID: UUID, roomID: UUID, scanID: UUID? = nil) {
@@ -140,6 +141,14 @@ struct SavedScanViewerScreen: View {
         } message: {
             Text(settings.t("precision.editor.saveError.body"))
         }
+        .alert(settings.t("precision.inline.unavailable.title"), isPresented: $precisionLoadError) {
+            Button(settings.t("scanner.retry")) {
+                if let selectedScan, let content { loadPrecisionDocument(for: selectedScan, floorPlan: content.floorPlan) }
+            }
+            Button(settings.t("common.ok"), role: .cancel) {}
+        } message: {
+            Text(settings.t("precision.inline.unavailable.body"))
+        }
         .overlay(alignment: .top) {
             if showsSavedConfirmation {
                 Label(settings.t("precision.inline.saved"), systemImage: "checkmark.circle.fill")
@@ -233,8 +242,10 @@ struct SavedScanViewerScreen: View {
         do {
             let document = try ParametricPlanRepository(files: files).loadPrecisionDocument(scan: scan, floorPlan: floorPlan)
             precisionSession = GeometryRevisionSession(document: document)
+            precisionLoadError = false
         } catch {
             precisionSession = nil
+            precisionLoadError = true
         }
     }
 

@@ -22,6 +22,7 @@ struct InlinePrecisionMeasurementSheet: View {
             Text(settings.t(currentLabelKey, currentMillimeters))
                 .font(Typography.body)
                 .foregroundStyle(Palette.inkSecondary)
+                .accessibilityIdentifier("precision.inline.current")
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 TextField(settings.t("precision.inline.input"), text: $input)
@@ -88,6 +89,7 @@ private struct InlineMeasurementHeader: View {
             Text(settings.t("precision.inline.title"))
                 .font(Typography.cardTitle)
                 .foregroundStyle(Palette.ink)
+                .accessibilityIdentifier("precision.inline.title")
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")

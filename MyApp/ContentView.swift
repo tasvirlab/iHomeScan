@@ -9,8 +9,20 @@ struct ContentView: View {
 
     var body: some View {
         @Bindable var model = model
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--precision-tap-ui-test") {
+            PrecisionTapUITestFixtureView()
+        } else {
+            appShell(model: model)
+        }
+        #else
+        appShell(model: model)
+        #endif
+    }
 
-        NavigationStack(path: $model.path) {
+    private func appShell(model: AppModel) -> some View {
+        @Bindable var model = model
+        return NavigationStack(path: $model.path) {
             VStack(spacing: 0) {
                 AppHeader()
                 tabContent

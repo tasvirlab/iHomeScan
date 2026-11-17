@@ -106,6 +106,8 @@ enum PrecisionLocalization {
     static let inlineConfirm = LocalizedStringResource("precision.inline.confirm", defaultValue: "Confirm measurement", comment: "Applies and automatically saves a wall measurement")
     static let inlineSaving = LocalizedStringResource("precision.inline.saving", defaultValue: "Saving…", comment: "Wall measurement save progress")
     static let inlineSaved = LocalizedStringResource("precision.inline.saved", defaultValue: "Saved", comment: "Brief confirmation after a durable precision save")
+    static let inlineUnavailableTitle = LocalizedStringResource("precision.inline.unavailable.title", defaultValue: "Measurement editing unavailable", comment: "Title when editable parametric geometry cannot be loaded")
+    static let inlineUnavailableBody = LocalizedStringResource("precision.inline.unavailable.body", defaultValue: "The scan is still safe, but its editable wall model could not be prepared. Try again.", comment: "Explains safe recovery when precision geometry loading fails")
 
     static func englishFallback(for key: String) -> String? {
         let values = [
@@ -120,7 +122,9 @@ enum PrecisionLocalization {
             "precision.inline.anchorEnd": "End corner", "precision.inline.conflict": "This measurement conflicts with protected geometry.",
             "precision.inline.confirm": "Confirm measurement", "precision.inline.saving": "Saving…",
             "precision.inline.saved": "Saved", "precision.inline.current": "Current: %@ mm",
-            "precision.inline.lidarCurrent": "LiDAR: %@ mm", "precision.inline.laserCurrent": "Laser verified: %@ mm"
+            "precision.inline.lidarCurrent": "LiDAR: %@ mm", "precision.inline.laserCurrent": "Laser verified: %@ mm",
+            "precision.inline.unavailable.title": "Measurement editing unavailable",
+            "precision.inline.unavailable.body": "The scan is still safe, but its editable wall model could not be prepared. Try again."
         ]
         return values[key]
     }

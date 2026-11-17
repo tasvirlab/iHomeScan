@@ -60,21 +60,23 @@ struct FloorPlanViewer: View {
                 contentInsets: planInsets
             )
             .contentShape(.rect)
-            .gesture(panGesture.simultaneously(with: zoomGesture))
-            .onTapGesture(coordinateSpace: .local) { location in
-                selectRoom(at: location, in: proxy.size)
-            }
+            .highPriorityGesture(
+                SpatialTapGesture(coordinateSpace: .local)
+                    .onEnded { selectRoom(at: $0.location, in: proxy.size) }
+            )
+            .simultaneousGesture(panGesture.simultaneously(with: zoomGesture))
         }
         .overlay(alignment: .bottomLeading) { unitBadge }
         .overlay(alignment: .bottomTrailing) { zoomControls }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(settings.t("plan.accessibility"))
+        .accessibilityIdentifier("precision.floorPlanCanvas")
     }
 
     // MARK: - Gestures
 
     private var panGesture: some Gesture {
-        DragGesture(minimumDistance: 3)
+        DragGesture(minimumDistance: 10)
             .updating($drag) { value, state, _ in state = value.translation }
             .onEnded { value in
                 offset.width += value.translation.width

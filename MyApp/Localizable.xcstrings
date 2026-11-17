@@ -2044,6 +2044,54 @@
         }
       }
     },
+    "precision.inline.unavailable.body" : {
+      "comment" : "Explains safe recovery when precision geometry loading fails",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The scan is still safe, but its editable wall model could not be prepared. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Скан сохранён, но редактируемую модель стен подготовить не удалось. Повторите попытку."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Skan xavfsiz saqlangan, ammo tahrirlanadigan devor modeli tayyorlanmadi. Qayta urinib ko‘ring."
+          }
+        }
+      }
+    },
+    "precision.inline.unavailable.title" : {
+      "comment" : "Title when editable parametric geometry cannot be loaded",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measurement editing unavailable"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Редактирование размера недоступно"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamni tahrirlab bo‘lmaydi"
+          }
+        }
+      }
+    },
     "precision.source.laserVerified" : {
       "comment" : "Explicitly marks a manually entered laser measurement as verified",
       "extractionState" : "extracted_with_value",
