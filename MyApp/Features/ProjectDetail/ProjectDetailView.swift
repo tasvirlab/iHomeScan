@@ -221,7 +221,7 @@ struct ProjectDetailView: View {
             case .plan2D:
                 FloorPlanViewer(
                     plan: plan,
-                    labels: floor.planLabels,
+                    labels: currentPlanLabels(for: floor),
                     selectedRoomID: $selectedRoomID,
                     precisionPlan: precisionSession?.displayedPlan,
                     selectedPrecisionWallID: $selectedWallID,
@@ -240,6 +240,18 @@ struct ProjectDetailView: View {
                 model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
             }
         }
+    }
+
+    private func currentPlanLabels(for floor: Floor) -> [String: PlanRoomLabel] {
+        var labels = floor.planLabels
+        guard let selectedScan,
+              let room = floor.rooms.first(where: { $0.id == selectedScan.roomID }),
+              let identifier = room.geometryIdentifier else { return labels }
+        labels[identifier] = PlanRoomLabel(
+            name: room.name,
+            area: precisionSession?.displayedPlan.derivedFloorArea ?? room.effectiveArea
+        )
+        return labels
     }
 
     private var currentMillimeters: String? {

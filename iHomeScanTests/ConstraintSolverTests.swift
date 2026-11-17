@@ -253,6 +253,27 @@ struct ConstraintSolverTests {
         }
     }
 
+    @Test("4f. Local wall edit recalculates the closed floor area")
+    func localEditingRecalculatesArea() throws {
+        var original = rectangle()
+        original.floorBoundary = [original.vertices.map(\.position)]
+        let originalArea = try #require(original.derivedFloorArea)
+        let wall = original.walls[0]
+        let originalLength = try #require(wall.length(in: original))
+        let result = GeometryConstraintSolver().preview(
+            command: command(wallID: wall.id, target: originalLength + 0.4),
+            plan: original,
+            constraints: [],
+            preservesUnrelatedGeometry: true
+        )
+        guard case .solved(let transaction, _) = result else {
+            Issue.record("Expected local area revision to solve")
+            return
+        }
+        let revisedArea = try #require(transaction.candidatePlan.derivedFloorArea)
+        #expect(abs(revisedArea - originalArea) > 0.000_1)
+    }
+
     @Test("5. Rectangle height adjustment uses documented start anchor")
     func rectangleHeight() throws {
         let original = rectangle()

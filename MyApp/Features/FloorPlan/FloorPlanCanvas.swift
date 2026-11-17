@@ -127,7 +127,7 @@ struct FloorPlanCanvas: View {
     }
 
     private func drawGeometry(_ plan: FloorPlan, precisionPlan: ParametricFloorPlan?, in context: inout GraphicsContext) {
-        drawFloor(plan, in: &context)
+        drawFloor(plan, precisionPlan: precisionPlan, in: &context)
 
         if let precisionPlan {
             drawPrecisionWalls(precisionPlan, in: &context)
@@ -200,7 +200,20 @@ struct FloorPlanCanvas: View {
         }
     }
 
-    private func drawFloor(_ plan: FloorPlan, in context: inout GraphicsContext) {
+    private func drawFloor(
+        _ plan: FloorPlan,
+        precisionPlan: ParametricFloorPlan?,
+        in context: inout GraphicsContext
+    ) {
+        if let polygon = precisionPlan?.floorBoundary?.first, polygon.count >= 3 {
+            var path = Path()
+            path.addLines(polygon.map {
+                CGPoint(x: $0.x * Self.millimetersPerMeter, y: $0.y * Self.millimetersPerMeter)
+            })
+            path.closeSubpath()
+            context.fill(path, with: .color(Palette.planFloor.opacity(0.72)))
+            return
+        }
         if let metadata = plan.roomPlanMetadata {
             for surface in metadata.surfaces where surface.kind == .floor && surface.projectedPolygon.count >= 3 {
                 var polygon = Path()
@@ -307,7 +320,8 @@ struct FloorPlanCanvas: View {
         for room in plan.rooms {
             guard let label = labels[room.id] else { continue }
             let isSelected = room.id == selectedRoomID
-            let baseline = CGPoint(x: room.labelCenter.x, y: room.labelCenter.y + 100).applying(transform)
+            let center = precisionLabelCenter(for: room, in: plan, precisionPlan: precisionPlan)
+            let baseline = CGPoint(x: center.x, y: center.y - 70).applying(transform)
             context.draw(
                 Text(label.name)
                     .font(.system(size: nameSize, weight: .semibold))
@@ -315,7 +329,7 @@ struct FloorPlanCanvas: View {
                 at: baseline, anchor: .bottom
             )
             if style == .draft, let area = label.area {
-                let areaPoint = CGPoint(x: room.labelCenter.x, y: room.labelCenter.y + 460).applying(transform)
+                let areaPoint = CGPoint(x: center.x, y: center.y + 270).applying(transform)
                 context.draw(
                     Text(settings.area(area))
                         .font(.system(size: detailSize, weight: isSelected ? .semibold : .medium, design: .monospaced))
@@ -360,6 +374,43 @@ struct FloorPlanCanvas: View {
                 at: annotation.labelCenter, anchor: .center
             )
         }
+    }
+
+    private func precisionLabelCenter(
+        for room: FloorPlan.PlanRoom,
+        in plan: FloorPlan,
+        precisionPlan: ParametricFloorPlan?
+    ) -> CGPoint {
+        guard let precisionPlan,
+              plan.rooms.count == 1 || room.id == selectedRoomID else { return room.labelCenter }
+        if let polygon = precisionPlan.floorBoundary?.first,
+           let centroid = polygonCentroid(polygon) {
+            return CGPoint(x: centroid.x * Self.millimetersPerMeter,
+                           y: centroid.y * Self.millimetersPerMeter)
+        }
+        guard !precisionPlan.vertices.isEmpty else { return room.labelCenter }
+        let count = Double(precisionPlan.vertices.count)
+        return CGPoint(
+            x: precisionPlan.vertices.reduce(0) { $0 + $1.position.x } / count * Self.millimetersPerMeter,
+            y: precisionPlan.vertices.reduce(0) { $0 + $1.position.y } / count * Self.millimetersPerMeter
+        )
+    }
+
+    private func polygonCentroid(_ polygon: [PlanPoint2D]) -> PlanPoint2D? {
+        guard polygon.count >= 3 else { return nil }
+        var doubledArea = 0.0
+        var x = 0.0
+        var y = 0.0
+        for index in polygon.indices {
+            let current = polygon[index]
+            let next = polygon[(index + 1) % polygon.count]
+            let cross = current.x * next.y - next.x * current.y
+            doubledArea += cross
+            x += (current.x + next.x) * cross
+            y += (current.y + next.y) * cross
+        }
+        guard abs(doubledArea) > 0.000_001 else { return nil }
+        return PlanPoint2D(x: x / (3 * doubledArea), y: y / (3 * doubledArea))
     }
 
     nonisolated static func precisionDimensions(_ plan: ParametricFloorPlan) -> [FloorPlan.Dimension] {

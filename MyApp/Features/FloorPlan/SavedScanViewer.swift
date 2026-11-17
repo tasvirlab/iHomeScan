@@ -197,7 +197,8 @@ struct SavedScanViewerScreen: View {
 
     private var planLabels: [String: PlanRoomLabel] {
         guard let room, let identifier = room.geometryIdentifier else { return [:] }
-        return [identifier: PlanRoomLabel(name: room.name, area: selectedScan?.floorArea)]
+        let area = precisionSession?.displayedPlan.derivedFloorArea ?? selectedScan?.floorArea
+        return [identifier: PlanRoomLabel(name: room.name, area: area)]
     }
 
     private func loadSelectedScan() {
