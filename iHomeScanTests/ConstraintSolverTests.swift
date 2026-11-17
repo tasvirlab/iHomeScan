@@ -155,6 +155,36 @@ struct ConstraintSolverTests {
         #expect(abs(points[1].distance(to: points[2]) - points[3].distance(to: points[0])) < 0.000_1)
     }
 
+    @Test("4c. Rectangle remeasurement replaces its stale derived opposite length")
+    func rectangleRemeasurementReplacesDerivedOppositeLength() throws {
+        let original = rectangle()
+        let target = original.walls[1]
+        let opposite = original.walls[3]
+        let previousTarget = constraint(
+            21, .wallLength(wallID: target.id, meters: 3), status: .unverified
+        )
+        let previousOpposite = constraint(
+            22, .wallLength(wallID: opposite.id, meters: 3), status: .unverified
+        )
+        let result = GeometryConstraintSolver().preview(
+            command: command(wallID: target.id, target: 3.001),
+            plan: original,
+            constraints: [previousTarget, previousOpposite],
+            allowsReplacingVerifiedMeasurement: true,
+            allowsRectangularPropagation: true
+        )
+        guard case .solved(let transaction, _) = result else {
+            Issue.record("Expected one-millimeter rectangle remeasurement to solve")
+            return
+        }
+        #expect(abs((transaction.candidatePlan.wall(id: target.id)?.length(in: transaction.candidatePlan) ?? 0) - 3.001) < 0.000_1)
+        #expect(abs((transaction.candidatePlan.wall(id: opposite.id)?.length(in: transaction.candidatePlan) ?? 0) - 3.001) < 0.000_1)
+        #expect(!transaction.constraints.contains { constraint in
+            if case .wallLength(let wallID, _) = constraint.kind { return wallID == opposite.id }
+            return false
+        })
+    }
+
     @Test("5. Rectangle height adjustment uses documented start anchor")
     func rectangleHeight() throws {
         let original = rectangle()

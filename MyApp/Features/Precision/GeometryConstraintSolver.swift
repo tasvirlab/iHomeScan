@@ -79,8 +79,17 @@ struct GeometryConstraintSolver: Sendable {
             createdAt: command.createdAt,
             isEnabled: true
         )
+        let propagatedWallIDs = allowsRectangularPropagation
+            ? rectangularPropagationWallIDs(targetWallID: command.wallID, in: plan)
+            : []
         let active = (enabled.filter { constraint in
-            if case .wallLength(let wallID, _) = constraint.kind { return wallID != command.wallID }
+            if case .wallLength(let wallID, _) = constraint.kind {
+                if wallID == command.wallID { return false }
+                if propagatedWallIDs.contains(wallID),
+                   constraint.provenance.verificationStatus != .verified {
+                    return false
+                }
+            }
             return true
         } + [commandConstraint]).sorted { lhs, rhs in
             if lhs.priority.rawValue == rhs.priority.rawValue { return lhs.id.uuidString < rhs.id.uuidString }
@@ -158,6 +167,27 @@ struct GeometryConstraintSolver: Sendable {
         let ny = ux * sign
         setPosition(.init(x: b.x + nx * height, y: b.y + ny * height), for: cycle[2], in: &candidate)
         setPosition(.init(x: a.x + nx * height, y: a.y + ny * height), for: cycle[3], in: &candidate)
+    }
+
+    /// Length constraints on the opposite side of a near rectangle are derived when the
+    /// edited side is propagated. Stale manual/LiDAR values must not block that revision;
+    /// independently verified measurements remain protected in `active`.
+    private func rectangularPropagationWallIDs(
+        targetWallID: UUID,
+        in plan: ParametricFloorPlan
+    ) -> Set<UUID> {
+        guard plan.walls.count == 4, plan.vertices.count == 4,
+              let target = plan.wall(id: targetWallID),
+              let cycle = rectangleCycle(startingWith: target, in: plan),
+              isNearRectangle(cycle.compactMap { plan.vertex(id: $0)?.position }) else {
+            return []
+        }
+        let opposite = plan.walls.first { wall in
+            Set([wall.startVertexID, wall.endVertexID]) == Set([cycle[2], cycle[3]])
+        }
+        var wallIDs = Set([targetWallID])
+        if let opposite { wallIDs.insert(opposite.id) }
+        return wallIDs
     }
 
     private func rectangleCycle(startingWith target: ParametricWall, in plan: ParametricFloorPlan) -> [UUID]? {
