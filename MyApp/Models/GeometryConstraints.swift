@@ -57,10 +57,22 @@ struct RemoveConstraintCommand: Codable, Hashable, Sendable {
     let constraintID: UUID
 }
 
+enum PlanReplacementReason: String, Codable, Hashable, Sendable {
+    case structuralCreation
+    case structuralProperties
+    case structuralDrag
+}
+
+struct ReplacePlanCommand: Codable, Hashable, Sendable {
+    let reason: PlanReplacementReason
+    let geometryID: UUID
+}
+
 enum GeometryRevisionCommand: Codable, Hashable, Sendable {
     case setWallLength(SetWallLengthCommand)
     case addConstraint(AddConstraintCommand)
     case removeConstraint(RemoveConstraintCommand)
+    case replacePlan(ReplacePlanCommand)
 }
 
 struct GeometryRevisionRecord: Codable, Hashable, Identifiable, Sendable {
@@ -122,6 +134,26 @@ struct PrecisionPlanDocument: Codable, Hashable, Sendable {
     var currentPlan: ParametricFloorPlan
     var constraints: [GeometryConstraint]
     var revisions: [GeometryRevisionRecord]
+
+    mutating func recordPlanReplacement(
+        _ plan: ParametricFloorPlan,
+        reason: PlanReplacementReason,
+        geometryID: UUID
+    ) {
+        let validation = ParametricGeometryValidator().validate(plan)
+        let record = GeometryRevisionRecord(
+            id: UUID(),
+            createdAt: .now,
+            command: .replacePlan(.init(reason: reason, geometryID: geometryID)),
+            previousPlan: currentPlan,
+            resultingPlan: plan,
+            previousConstraints: constraints,
+            resultingConstraints: constraints,
+            validation: validation
+        )
+        currentPlan = plan
+        revisions.append(record)
+    }
 
     func encoded() throws -> Data {
         let encoder = JSONEncoder()

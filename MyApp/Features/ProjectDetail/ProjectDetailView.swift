@@ -64,6 +64,7 @@ struct ProjectDetailView: View {
     @State private var structuralPropertiesPreview: StructuralPropertiesPreview?
     @State private var showsStructuralProperties = false
     @State private var structuralPropertiesErrorKey: String?
+    @State private var structuralDragPreview: ParametricFloorPlan?
 
     init(project: Project) {
         self.project = project
@@ -302,7 +303,8 @@ struct ProjectDetailView: View {
                     plan: plan,
                     labels: currentPlanLabels(for: floor),
                     selectedRoomID: $selectedRoomID,
-                    precisionPlan: openingPreview?.candidatePlan
+                    precisionPlan: structuralDragPreview
+                        ?? openingPreview?.candidatePlan
                         ?? structuralPropertiesPreview?.plan
                         ?? precisionSession?.displayedPlan,
                     selectedPrecisionWallID: $selectedWallID,
@@ -317,7 +319,12 @@ struct ProjectDetailView: View {
                     structuralPlacementActive: structuralDraft.isPlacing,
                     onStructuralPointSelected: placeStructuralPoint,
                     onCancelStructuralPlacement: cancelStructuralCreation,
-                    structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft
+                    structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft,
+                    onStructuralDrag: handleStructuralDrag,
+                    onUndo: { persistHistoryChange(isUndo: true) },
+                    onRedo: { persistHistoryChange(isUndo: false) },
+                    canUndo: precisionSession?.canUndo ?? false,
+                    canRedo: precisionSession?.canRedo ?? false
                 )
             case .model3D:
                 PlanPlaceholder(systemImage: "cube.transparent",
@@ -460,11 +467,17 @@ struct ProjectDetailView: View {
             structuralErrorKey = error == .missingPlacement
                 ? "precision.structural.placeRequired" : "precision.structural.invalidDimension"
         case .success(let candidate):
-            document.currentPlan = candidate.plan
+            document.recordPlanReplacement(
+                candidate.plan,
+                reason: .structuralCreation,
+                geometryID: candidate.createdID
+            )
             do {
                 try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
                 synchronizeStoredArea(document.currentPlan, scan: selectedScan)
-                precisionSession = GeometryRevisionSession(document: document)
+                var updatedSession = precisionSession
+                updatedSession?.acceptPersistedDocument(document)
+                precisionSession = updatedSession
                 selectedColumnID = candidate.kind == .column ? candidate.createdID : nil
                 selectedBeamID = candidate.kind == .beam ? candidate.createdID : nil
                 structuralDraft = .init()
@@ -535,11 +548,17 @@ struct ProjectDetailView: View {
               let selectedScan else { return }
         draft.isSaving = true
         structuralPropertiesDraft = draft
-        document.currentPlan = preview.plan
+        document.recordPlanReplacement(
+            preview.plan,
+            reason: .structuralProperties,
+            geometryID: draft.id
+        )
         do {
             try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
             synchronizeStoredArea(document.currentPlan, scan: selectedScan)
-            precisionSession = GeometryRevisionSession(document: document)
+            var updatedSession = precisionSession
+            updatedSession?.acceptPersistedDocument(document)
+            precisionSession = updatedSession
             showsStructuralProperties = false
             withAnimation { showsSavedConfirmation = true }
             dismissSavedConfirmationLater()
@@ -561,6 +580,44 @@ struct ProjectDetailView: View {
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(1.5))
             withAnimation { showsSavedConfirmation = false }
+        }
+    }
+
+    private func handleStructuralDrag(_ event: StructuralDragEvent) {
+        guard !isSavingMeasurement,
+              let plan = precisionSession?.document.currentPlan,
+              let candidate = StructuralDragResolver.candidate(event: event, in: plan) else { return }
+        structuralDragPreview = candidate.plan
+        guard event.phase == .ended, var document = precisionSession?.document, let selectedScan else { return }
+        document.recordPlanReplacement(candidate.plan, reason: .structuralDrag, geometryID: event.id)
+        do {
+            try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
+            var session = precisionSession
+            session?.acceptPersistedDocument(document)
+            precisionSession = session
+            structuralDragPreview = nil
+            withAnimation { showsSavedConfirmation = true }
+            dismissSavedConfirmationLater()
+        } catch {
+            structuralDragPreview = nil
+            precisionSaveError = true
+        }
+    }
+
+    private func persistHistoryChange(isUndo: Bool) {
+        guard !isSavingMeasurement, var candidate = precisionSession, let selectedScan else { return }
+        let changed = isUndo ? candidate.undo() : candidate.redo()
+        guard changed else { return }
+        do {
+            try ParametricPlanRepository(files: files).savePrecisionDocument(candidate.document, scan: selectedScan)
+            synchronizeStoredArea(candidate.document.currentPlan, scan: selectedScan)
+            precisionSession = candidate
+            structuralDragPreview = nil
+            closeMeasurementPanel()
+            closeOpeningPanel()
+            closeStructuralProperties()
+        } catch {
+            precisionSaveError = true
         }
     }
 

@@ -1,5 +1,14 @@
 import SwiftUI
 
+enum StructuralDragPhase: Sendable, Equatable { case changed, ended }
+
+struct StructuralDragEvent: Sendable {
+    let id: UUID
+    let kind: StructuralCreationKind
+    let modelPoint: PlanPoint2D
+    let phase: StructuralDragPhase
+}
+
 /// Interactive floor plan: drag to pan, pinch or use the buttons to zoom, tap a room to select it.
 struct FloorPlanViewer: View {
     /// Plan geometry in meters.
@@ -20,6 +29,11 @@ struct FloorPlanViewer: View {
     var onStructuralPointSelected: ((PlanPoint2D) -> Void)?
     var onCancelStructuralPlacement: (() -> Void)?
     var structuralDraftPreview: StructuralCreationDraft?
+    var onStructuralDrag: ((StructuralDragEvent) -> Void)?
+    var onUndo: (() -> Void)?
+    var onRedo: (() -> Void)?
+    var canUndo = false
+    var canRedo = false
 
     init(
         plan: FloorPlan,
@@ -38,7 +52,12 @@ struct FloorPlanViewer: View {
         structuralPlacementActive: Bool = false,
         onStructuralPointSelected: ((PlanPoint2D) -> Void)? = nil,
         onCancelStructuralPlacement: (() -> Void)? = nil,
-        structuralDraftPreview: StructuralCreationDraft? = nil
+        structuralDraftPreview: StructuralCreationDraft? = nil,
+        onStructuralDrag: ((StructuralDragEvent) -> Void)? = nil,
+        onUndo: (() -> Void)? = nil,
+        onRedo: (() -> Void)? = nil,
+        canUndo: Bool = false,
+        canRedo: Bool = false
     ) {
         self.plan = plan
         self.labels = labels
@@ -57,6 +76,11 @@ struct FloorPlanViewer: View {
         self.onStructuralPointSelected = onStructuralPointSelected
         self.onCancelStructuralPlacement = onCancelStructuralPlacement
         self.structuralDraftPreview = structuralDraftPreview
+        self.onStructuralDrag = onStructuralDrag
+        self.onUndo = onUndo
+        self.onRedo = onRedo
+        self.canUndo = canUndo
+        self.canRedo = canRedo
     }
 
     @Environment(AppSettings.self) private var settings
@@ -65,6 +89,7 @@ struct FloorPlanViewer: View {
     @State private var offset: CGSize = .zero
     @GestureState private var pinch: CGFloat = 1
     @GestureState private var drag: CGSize = .zero
+    @State private var radialMenuLocation: CGPoint?
 
     private let zoomRange: ClosedRange<CGFloat> = 0.6...3
     /// Keeps the fitted plan clear of the zoom controls on the trailing edge.
@@ -100,20 +125,19 @@ struct FloorPlanViewer: View {
                     contentInsets: planInsets
                 )
                 .contentShape(.rect)
-                .highPriorityGesture(
-                    SpatialTapGesture(coordinateSpace: .local)
-                        .onEnded { selectRoom(at: $0.location, in: proxy.size) }
-                )
+                .highPriorityGesture(planTapGesture(in: proxy.size))
                 .simultaneousGesture(panGesture.simultaneously(with: zoomGesture))
 
                 structuralPlacementPreview(in: proxy.size)
                 openingAccessibilityTargets(in: proxy.size)
                 structuralAccessibilityTargets(in: proxy.size)
+                radialMenu(in: proxy.size)
             }
+            .coordinateSpace(.named("floorPlanCanvas"))
         }
         .overlay(alignment: .bottomLeading) { unitBadge }
         .overlay(alignment: .bottomTrailing) { zoomControls }
-        .overlay(alignment: .topTrailing) { addStructuralButton }
+        .overlay(alignment: .topTrailing) { viewerTools }
         .overlay(alignment: .top) { structuralPlacementHint }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(settings.t("plan.accessibility"))
@@ -216,6 +240,7 @@ struct FloorPlanViewer: View {
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
+                .highPriorityGesture(structuralDragGesture(target: target, transform: transform))
                 .position(x: target.bounds.midX, y: target.bounds.midY)
                 .accessibilityLabel(settings.t(target.kind == .column
                                                 ? "precision.structural.column"
@@ -270,6 +295,44 @@ struct FloorPlanViewer: View {
     }
 
     // MARK: - Gestures
+
+    private func planTapGesture(in size: CGSize) -> some Gesture {
+        SpatialTapGesture(count: 2, coordinateSpace: .local)
+            .exclusively(before: SpatialTapGesture(coordinateSpace: .local))
+            .onEnded { result in
+                switch result {
+                case .first(let value):
+                    withAnimation(.snappy(duration: 0.25)) { radialMenuLocation = value.location }
+                case .second(let value):
+                    if radialMenuLocation == nil { selectRoom(at: value.location, in: size) }
+                }
+            }
+    }
+
+    private func structuralDragGesture(
+        target: StructuralHitTarget,
+        transform: CGAffineTransform
+    ) -> some Gesture {
+        DragGesture(minimumDistance: 4, coordinateSpace: .named("floorPlanCanvas"))
+            .onChanged { value in sendStructuralDrag(target, location: value.location, transform: transform, phase: .changed) }
+            .onEnded { value in sendStructuralDrag(target, location: value.location, transform: transform, phase: .ended) }
+    }
+
+    private func sendStructuralDrag(
+        _ target: StructuralHitTarget,
+        location: CGPoint,
+        transform: CGAffineTransform,
+        phase: StructuralDragPhase
+    ) {
+        let point = location.applying(transform.inverted())
+        guard point.x.isFinite, point.y.isFinite else { return }
+        onStructuralDrag?(.init(
+            id: target.id,
+            kind: target.kind,
+            modelPoint: .init(x: point.x, y: point.y),
+            phase: phase
+        ))
+    }
 
     private var panGesture: some Gesture {
         DragGesture(minimumDistance: 10)
@@ -420,20 +483,83 @@ struct FloorPlanViewer: View {
     }
 
     @ViewBuilder
-    private var addStructuralButton: some View {
-        if let onAddStructuralElement, !structuralPlacementActive {
-            Button(action: onAddStructuralElement) {
-                Image(systemName: "plus")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(Palette.accentText)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: .circle)
-                    .overlay(Circle().strokeBorder(Palette.accent.opacity(0.35), lineWidth: 1))
+    private var viewerTools: some View {
+        if !structuralPlacementActive {
+            HStack(spacing: 6) {
+                if let onUndo {
+                    toolButton("arrow.uturn.backward", labelKey: "precision.editor.undo", enabled: canUndo, action: onUndo)
+                }
+                if let onRedo {
+                    toolButton("arrow.uturn.forward", labelKey: "precision.editor.redo", enabled: canRedo, action: onRedo)
+                }
+                if let onAddStructuralElement {
+                    toolButton("plus", labelKey: "precision.structural.addTitle", enabled: true, action: onAddStructuralElement)
+                        .accessibilityIdentifier("structural.add.button")
+                }
             }
-            .buttonStyle(.plain)
             .padding(12)
-            .accessibilityLabel(settings.t("precision.structural.addTitle"))
-            .accessibilityIdentifier("structural.add.button")
+        }
+    }
+
+    private func toolButton(
+        _ systemImage: String,
+        labelKey: String,
+        enabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(enabled ? Palette.accentText : Palette.inkTertiary)
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial, in: .circle)
+                .overlay(Circle().strokeBorder(Palette.accent.opacity(enabled ? 0.35 : 0.12), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .accessibilityLabel(settings.t(labelKey))
+    }
+
+    @ViewBuilder
+    private func radialMenu(in size: CGSize) -> some View {
+        if let location = radialMenuLocation {
+            RadialMeasurementMenu(
+                onDimension: {
+                    radialMenuLocation = nil
+                    selectNearestWall(at: location, in: size)
+                },
+                onAdd: {
+                    radialMenuLocation = nil
+                    onAddStructuralElement?()
+                },
+                onProperties: {
+                    radialMenuLocation = nil
+                    selectRoom(at: location, in: size)
+                },
+                onFit: {
+                    radialMenuLocation = nil
+                    withAnimation(.snappy) { zoom = 1; offset = .zero }
+                },
+                onClose: { withAnimation(.snappy) { radialMenuLocation = nil } }
+            )
+            .position(radialMenuPosition(location, in: size))
+            .transition(.scale(scale: 0.7).combined(with: .opacity))
+        }
+    }
+
+    private func radialMenuPosition(_ point: CGPoint, in size: CGSize) -> CGPoint {
+        .init(x: min(max(point.x, 125), size.width - 125), y: min(max(point.y, 90), size.height - 90))
+    }
+
+    private func selectNearestWall(at location: CGPoint, in size: CGSize) {
+        let transform = FloorPlanCanvas.transform(
+            for: plan, in: size, insets: planInsets, zoom: effectiveZoom,
+            offset: effectiveOffset, rotation: alignmentRotation, precisionPlan: precisionPlan
+        )
+        if let wallID = precisionWall(at: location, transform: transform, size: size) {
+            selectedPrecisionOpeningID = nil
+            selectedPrecisionWallID = wallID
+            onPrecisionWallSelected?(wallID)
         }
     }
 

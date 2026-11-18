@@ -178,7 +178,11 @@ enum PrecisionLocalization {
         .init("precision.structural.axisY", defaultValue: "Y", comment: "Vertical coordinate axis"),
         .init("precision.structural.verticalMeasurements", defaultValue: "Height and elevation", comment: "Structural vertical measurements disclosure"),
         .init("precision.structural.noChanges", defaultValue: "Change a measurement to enable confirmation.", comment: "No structural property changes"),
-        .init("precision.structural.verticalConflict", defaultValue: "The elevation and depth measurements do not agree.", comment: "Beam vertical measurement conflict")
+        .init("precision.structural.verticalConflict", defaultValue: "The elevation and depth measurements do not agree.", comment: "Beam vertical measurement conflict"),
+        .init("precision.radial.dimension", defaultValue: "Measure", comment: "Radial menu action that selects a nearby dimension"),
+        .init("precision.radial.add", defaultValue: "Add element", comment: "Radial menu action that adds a structural element"),
+        .init("precision.radial.properties", defaultValue: "Properties", comment: "Radial menu action that opens selected element measurements"),
+        .init("precision.radial.fit", defaultValue: "Fit plan", comment: "Radial menu action that fits the plan to the viewport")
     ]
 
     static func englishFallback(for key: String) -> String? {
@@ -243,7 +247,9 @@ enum PrecisionLocalization {
             "precision.structural.axisX": "X", "precision.structural.axisY": "Y",
             "precision.structural.verticalMeasurements": "Height and elevation",
             "precision.structural.noChanges": "Change a measurement to enable confirmation.",
-            "precision.structural.verticalConflict": "The elevation and depth measurements do not agree."
+            "precision.structural.verticalConflict": "The elevation and depth measurements do not agree.",
+            "precision.radial.dimension": "Measure", "precision.radial.add": "Add element",
+            "precision.radial.properties": "Properties", "precision.radial.fit": "Fit plan"
         ]
         return values[key]
     }

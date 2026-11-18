@@ -5,11 +5,13 @@ struct GeometryRevisionSession: Sendable {
     private(set) var preview: GeometryRevisionTransaction?
     private(set) var conflicts: [ConstraintConflict] = []
     private(set) var redoStack: [GeometryRevisionRecord] = []
+    private let sessionRevisionFloor: Int
     let historyLimit: Int
 
     init(document: PrecisionPlanDocument, historyLimit: Int = 30) {
         self.document = document
         self.historyLimit = max(historyLimit, 1)
+        self.sessionRevisionFloor = document.revisions.count
     }
 
     mutating func propose(
@@ -43,6 +45,13 @@ struct GeometryRevisionSession: Sendable {
         conflicts = []
     }
 
+    mutating func acceptPersistedDocument(_ document: PrecisionPlanDocument) {
+        self.document = document
+        preview = nil
+        conflicts = []
+        redoStack = []
+    }
+
     @discardableResult
     mutating func applyPreview() -> GeometryRevisionRecord? {
         guard let preview else { return nil }
@@ -70,7 +79,8 @@ struct GeometryRevisionSession: Sendable {
 
     @discardableResult
     mutating func undo() -> Bool {
-        guard let record = document.revisions.popLast() else { return false }
+        guard document.revisions.count > sessionRevisionFloor,
+              let record = document.revisions.popLast() else { return false }
         document.currentPlan = record.previousPlan
         document.constraints = record.previousConstraints
         redoStack.append(record)
@@ -94,6 +104,6 @@ struct GeometryRevisionSession: Sendable {
         preview?.candidatePlan ?? document.currentPlan
     }
 
-    var canUndo: Bool { !document.revisions.isEmpty }
+    var canUndo: Bool { document.revisions.count > sessionRevisionFloor }
     var canRedo: Bool { !redoStack.isEmpty }
 }

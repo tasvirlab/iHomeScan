@@ -112,6 +112,70 @@ struct StructuralPropertiesEditingTests {
         #expect(reopened.currentPlan.columns.first?.width.value == 0.375)
     }
 
+    @Test("Column drag snaps to the measurement grid without changing the room")
+    func columnDragSnap() throws {
+        let committed = try planWithColumn(shape: .rectangular)
+        let column = try #require(committed.columns.first)
+        let event = StructuralDragEvent(
+            id: column.id,
+            kind: .column,
+            modelPoint: .init(x: 1.23, y: 1.17),
+            phase: .changed
+        )
+        let candidate = try #require(StructuralDragResolver.candidate(event: event, in: committed))
+        let position = try #require(candidate.plan.columns.first?.position)
+        #expect(abs(position.x - 1.25) < 0.0001)
+        #expect(abs(position.y - 1.15) < 0.0001)
+        #expect(candidate.plan.vertices == committed.vertices)
+        #expect(candidate.plan.walls == committed.walls)
+        #expect(candidate.plan.derivedFloorArea == committed.derivedFloorArea)
+    }
+
+    @Test("Beam drag translates both endpoints and preserves length")
+    func beamDragPreservesLength() throws {
+        let committed = try planWithBeam()
+        let beam = try #require(committed.beams.first)
+        let event = StructuralDragEvent(
+            id: beam.id,
+            kind: .beam,
+            modelPoint: .init(x: 2, y: 1.5),
+            phase: .ended
+        )
+        let candidate = try #require(StructuralDragResolver.candidate(event: event, in: committed))
+        let moved = try #require(candidate.plan.beams.first)
+        guard case .point(let start) = moved.start, case .point(let end) = moved.end else {
+            Issue.record("Dragged beam must resolve to explicit points")
+            return
+        }
+        #expect(abs(start.distance(to: end) - 3) < 0.0001)
+        #expect(abs((start.y + end.y) / 2 - 1.5) < 0.0001)
+    }
+
+    @Test("Undo boundary contains only changes made in the current viewer session")
+    func currentSessionUndoBoundary() throws {
+        let baseline = basePlan()
+        var persisted = PrecisionPlanDocument(
+            baselinePlan: baseline,
+            currentPlan: baseline,
+            constraints: [],
+            revisions: []
+        )
+        let older = try planWithColumn(shape: .square)
+        persisted.recordPlanReplacement(older, reason: .structuralCreation, geometryID: try #require(older.columns.first?.id))
+        var session = GeometryRevisionSession(document: persisted)
+        #expect(!session.canUndo)
+
+        let newer = try planWithBeam()
+        var revised = persisted
+        revised.recordPlanReplacement(newer, reason: .structuralCreation, geometryID: try #require(newer.beams.first?.id))
+        session.acceptPersistedDocument(revised)
+        #expect(session.canUndo)
+        let didUndo = session.undo()
+        #expect(didUndo)
+        #expect(!session.canUndo)
+        #expect(session.canRedo)
+    }
+
     private func planWithColumn(shape: ColumnShape) throws -> ParametricFloorPlan {
         var draft = StructuralCreationDraft()
         draft.beginColumn(shape: shape)

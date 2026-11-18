@@ -2695,6 +2695,102 @@
         }
       }
     },
+    "precision.radial.add" : {
+      "comment" : "Radial menu action that adds a structural element",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add element"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Добавить элемент"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Element qo‘shish"
+          }
+        }
+      }
+    },
+    "precision.radial.dimension" : {
+      "comment" : "Radial menu action that selects a nearby dimension",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measure"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Измерить"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchash"
+          }
+        }
+      }
+    },
+    "precision.radial.fit" : {
+      "comment" : "Radial menu action that fits the plan to the viewport",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fit plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Вписать план"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rejani sig‘dirish"
+          }
+        }
+      }
+    },
+    "precision.radial.properties" : {
+      "comment" : "Radial menu action that opens selected element measurements",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Properties"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Параметры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamlar"
+          }
+        }
+      }
+    },
     "precision.source.laserVerified" : {
       "comment" : "Explicitly marks a manually entered laser measurement as verified",
       "extractionState" : "extracted_with_value",
