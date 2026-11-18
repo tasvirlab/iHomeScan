@@ -151,6 +151,26 @@ struct GeometryConstraintSolver: Sendable {
         let openingConflicts = validateOpenings(in: candidate, constraints: active)
         if !openingConflicts.isEmpty { return .conflict(openingConflicts) }
 
+        let structuralResolution = StructuralGeometryResolver(
+            computationalTolerance: configuration.distanceTolerance
+        ).resolve(plan: candidate)
+        if !structuralResolution.conflicts.isEmpty {
+            return .conflict(structuralResolution.conflicts.map { issue in
+                let code: ConstraintConflictCode = switch issue.code {
+                case .verifiedMeasurementConflict, .contradictoryReferences: .verifiedMeasurement
+                case .missingReference, .missingEntity, .underdeterminedPlacement: .missingAnchor
+                case .invalidMeasurement, .invalidVerticalChain, .invalidBeamGeometry: .invalidResult
+                }
+                return conflict(
+                    code,
+                    constraints: issue.measurementIDs,
+                    geometry: issue.entityIDs,
+                    residual: issue.residual
+                )
+            })
+        }
+        candidate = structuralResolution.candidatePlan
+
         candidate.floorBoundary = closedBoundary(in: candidate)
         candidate.revision = ParametricRevision(
             number: plan.revision.number + 1,

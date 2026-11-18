@@ -113,11 +113,14 @@ struct ParametricColumn: Codable, Hashable, Identifiable, Sendable {
     /// Radians from the positive x axis.
     var orientation: Double
     var referenceVertexIDs: [UUID]
+    /// Optional P1.4.3 architectural measurements; nil keeps legacy JSON readable.
+    var architecturalMetadata: ColumnArchitecturalMetadata? = nil
 }
 
 enum BeamAnchor: Codable, Hashable, Sendable {
     case vertex(UUID)
     case point(PlanPoint2D)
+    case unresolved
 }
 
 struct ParametricBeam: Codable, Hashable, Identifiable, Sendable {
@@ -127,6 +130,8 @@ struct ParametricBeam: Codable, Hashable, Identifiable, Sendable {
     var width: LengthMeasurement
     var depth: LengthMeasurement
     var bottomElevation: LengthMeasurement
+    /// Optional P1.4.3 architectural measurements; nil keeps legacy JSON readable.
+    var architecturalMetadata: BeamArchitecturalMetadata? = nil
 
     func orientation(in plan: ParametricFloorPlan) -> Double? {
         guard let startPoint = point(for: start, in: plan),
@@ -138,6 +143,7 @@ struct ParametricBeam: Codable, Hashable, Identifiable, Sendable {
         switch anchor {
         case .vertex(let id): plan.vertex(id: id)?.position
         case .point(let point): point
+        case .unresolved: nil
         }
     }
 }

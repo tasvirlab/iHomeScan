@@ -23,6 +23,11 @@ enum GeometryValidationCode: String, Codable, Sendable {
     case inconsistentMeasurementChain
     case invalidOpeningReference
     case invalidVerticalMeasurement
+    case invalidColumnGeometry
+    case invalidStructuralReference
+    case invalidBeamGeometry
+    case inconsistentStructuralMeasurement
+    case incompleteStructuralGeometry
 }
 
 struct GeometryValidationIssue: Codable, Hashable, Identifiable, Sendable {
@@ -49,8 +54,21 @@ struct ParametricGeometryValidator {
 
     func validate(_ plan: ParametricFloorPlan) -> GeometryValidationResult {
         var issues: [GeometryValidationIssue] = []
-        let allIDs = plan.vertices.map(\.id) + plan.walls.map(\.id) + plan.openings.map(\.id)
-            + plan.columns.map(\.id) + plan.beams.map(\.id)
+        let columnReferenceIDs = plan.columns.flatMap {
+            $0.architecturalMetadata?.references.map(\.id) ?? []
+        }
+        let columnMeasurementIDs = plan.columns.flatMap {
+            $0.architecturalMetadata?.measurements.map(\.id) ?? []
+        }
+        let beamMeasurementIDs = plan.beams.flatMap {
+            $0.architecturalMetadata?.measurements.map(\.id) ?? []
+        }
+        var allIDs = plan.vertices.map(\.id)
+        allIDs += plan.walls.map(\.id)
+        allIDs += plan.openings.map(\.id)
+        allIDs += plan.columns.map(\.id)
+        allIDs += plan.beams.map(\.id)
+        allIDs += columnReferenceIDs + columnMeasurementIDs + beamMeasurementIDs
         for id in duplicateIDs(allIDs) {
             append(.error, .duplicateIdentifier, id, "Duplicate geometry identifier.", to: &issues)
         }
@@ -143,7 +161,103 @@ struct ParametricGeometryValidator {
             append(.warning, .invalidOpeningMeasurement, openingID,
                    "Opening placement is underdetermined.", to: &issues)
         }
+        validateStructuralGeometry(plan, vertices: vertices, walls: walls, into: &issues)
         return GeometryValidationResult(issues: issues)
+    }
+
+    private func validateStructuralGeometry(
+        _ plan: ParametricFloorPlan,
+        vertices: [UUID: PlanVertex],
+        walls: [UUID: ParametricWall],
+        into issues: inout [GeometryValidationIssue]
+    ) {
+        for column in plan.columns {
+            if !column.position.isFinite || !column.orientation.isFinite {
+                append(.error, .invalidColumnGeometry, column.id,
+                       "Column position or rotation is not finite.", to: &issues)
+            }
+            validate(column.width, entityID: column.id, into: &issues)
+            validate(column.depth, entityID: column.id, into: &issues)
+            validate(column.height, entityID: column.id, into: &issues)
+            if let metadata = column.architecturalMetadata {
+                if metadata.shape == .square,
+                   abs(column.width.value - column.depth.value) > 0.000_1 {
+                    append(.error, .invalidColumnGeometry, column.id,
+                           "Square column width and depth differ.", to: &issues)
+                }
+                if metadata.shape == .circular,
+                   abs(column.width.value - column.depth.value) > 0.000_1 {
+                    append(.error, .invalidColumnGeometry, column.id,
+                           "Circular column diameter is inconsistent.", to: &issues)
+                }
+                for reference in metadata.references {
+                    switch reference.entity {
+                    case .wall(let id, _, _) where walls[id] == nil,
+                         .vertex(let id) where vertices[id] == nil:
+                        append(.error, .invalidStructuralReference, column.id,
+                               "Column reference entity is missing.", to: &issues)
+                    case .unresolved:
+                        append(.warning, .incompleteStructuralGeometry, column.id,
+                               "Column reference is unresolved.", to: &issues)
+                    default: break
+                    }
+                }
+                let referenceIDs = Set(metadata.references.map(\.id))
+                for measurement in metadata.measurements {
+                    if measurement.columnID != column.id
+                        || (measurement.referenceID.map { !referenceIDs.contains($0) } ?? false) {
+                        append(.error, .invalidStructuralReference, column.id,
+                               "Column measurement target or reference is invalid.", to: &issues)
+                    }
+                }
+                if let base = metadata.baseElevation {
+                    validate(base, entityID: column.id, allowsZero: true, into: &issues)
+                }
+            }
+        }
+
+        for beam in plan.beams {
+            validate(beam.width, entityID: beam.id, into: &issues)
+            validate(beam.depth, entityID: beam.id, into: &issues)
+            validate(beam.bottomElevation, entityID: beam.id, allowsZero: true, into: &issues)
+            for anchor in [beam.start, beam.end] {
+                switch anchor {
+                case .vertex(let id) where vertices[id] == nil:
+                    append(.error, .invalidStructuralReference, beam.id,
+                           "Beam endpoint vertex is missing.", to: &issues)
+                case .point(let point) where !point.isFinite:
+                    append(.error, .invalidBeamGeometry, beam.id,
+                           "Beam endpoint is not finite.", to: &issues)
+                case .unresolved:
+                    append(.warning, .incompleteStructuralGeometry, beam.id,
+                           "Beam endpoint is unresolved.", to: &issues)
+                default: break
+                }
+            }
+            if let metadata = beam.architecturalMetadata {
+                for measurement in metadata.measurements where measurement.beamID != beam.id {
+                    append(.error, .invalidStructuralReference, beam.id,
+                           "Beam measurement target is invalid.", to: &issues)
+                }
+            }
+        }
+
+        let structural = StructuralGeometryResolver().resolve(plan: plan)
+        for issue in structural.conflicts {
+            let code: GeometryValidationCode = switch issue.code {
+            case .missingReference, .missingEntity: .invalidStructuralReference
+            case .invalidBeamGeometry, .invalidVerticalChain: .invalidBeamGeometry
+            case .invalidMeasurement: .invalidDimension
+            case .underdeterminedPlacement: .incompleteStructuralGeometry
+            case .contradictoryReferences, .verifiedMeasurementConflict: .inconsistentStructuralMeasurement
+            }
+            append(.error, code, issue.entityIDs.first,
+                   "Structural measurement conflict: \(issue.code.rawValue).", to: &issues)
+        }
+        for id in structural.unresolvedEntityIDs {
+            append(.warning, .incompleteStructuralGeometry, id,
+                   "Structural placement is underdetermined.", to: &issues)
+        }
     }
 
     private func validate(
