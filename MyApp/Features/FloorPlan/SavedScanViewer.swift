@@ -39,6 +39,12 @@ struct SavedScanViewerScreen: View {
     @State private var precisionSaveError = false
     @State private var precisionLoadError = false
     @State private var showsSavedConfirmation = false
+    @State private var selectedColumnID: UUID?
+    @State private var selectedBeamID: UUID?
+    @State private var structuralDraft = StructuralCreationDraft()
+    @State private var showsStructuralChooser = false
+    @State private var showsStructuralDimensions = false
+    @State private var structuralErrorKey: String?
 
     init(projectID: UUID, roomID: UUID, scanID: UUID? = nil) {
         self.projectID = projectID
@@ -165,6 +171,20 @@ struct SavedScanViewerScreen: View {
                 .interactiveDismissDisabled(isSavingMeasurement)
             }
         }
+        .sheet(isPresented: $showsStructuralChooser) {
+            StructuralCreationSheet(
+                draft: $structuralDraft, showsChooser: true, errorKey: nil,
+                onBeginColumn: beginColumnCreation, onBeginBeam: beginBeamCreation,
+                onConfirm: {}, onClose: cancelStructuralCreation
+            )
+        }
+        .sheet(isPresented: $showsStructuralDimensions, onDismiss: structuralDimensionsDismissed) {
+            StructuralCreationSheet(
+                draft: $structuralDraft, showsChooser: false, errorKey: structuralErrorKey,
+                onBeginColumn: { _ in }, onBeginBeam: {},
+                onConfirm: confirmStructuralCreation, onClose: cancelStructuralCreation
+            )
+        }
         .alert(settings.t("precision.editor.saveError.title"), isPresented: $precisionSaveError) {
             Button(settings.t("scanner.retry"), action: confirmMeasurement)
             Button(settings.t("common.cancel"), role: .cancel) {}
@@ -205,8 +225,15 @@ struct SavedScanViewerScreen: View {
                     precisionPlan: openingPreview?.candidatePlan ?? precisionSession?.displayedPlan,
                     selectedPrecisionWallID: $selectedWallID,
                     selectedPrecisionOpeningID: $selectedOpeningID,
+                    selectedPrecisionColumnID: $selectedColumnID,
+                    selectedPrecisionBeamID: $selectedBeamID,
                     onPrecisionWallSelected: beginMeasurement,
-                    onPrecisionOpeningSelected: beginOpeningMeasurement
+                    onPrecisionOpeningSelected: beginOpeningMeasurement,
+                    onAddStructuralElement: { showsStructuralChooser = true },
+                    structuralPlacementActive: structuralDraft.isPlacing,
+                    onStructuralPointSelected: placeStructuralPoint,
+                    onCancelStructuralPlacement: cancelStructuralCreation,
+                    structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft
                 )
             case .model3D:
                 if let modelURL = content.modelURL {
@@ -234,6 +261,7 @@ struct SavedScanViewerScreen: View {
     }
 
     private func loadSelectedScan() {
+        cancelStructuralCreation()
         content = nil
         loadError = nil
         guard let selectedScan else { return }
@@ -313,6 +341,70 @@ struct SavedScanViewerScreen: View {
             guard selectedOpeningID == openingID else { return }
             showsOpeningPanel = true
         }
+    }
+
+    private func beginColumnCreation(_ shape: ColumnShape) {
+        structuralDraft.beginColumn(shape: shape)
+        structuralErrorKey = nil
+        showsStructuralChooser = false
+    }
+
+    private func beginBeamCreation() {
+        structuralDraft.beginBeam()
+        structuralErrorKey = nil
+        showsStructuralChooser = false
+    }
+
+    private func placeStructuralPoint(_ point: PlanPoint2D) {
+        structuralDraft.place(point)
+        if structuralDraft.placementStep == .dimensions {
+            Task { @MainActor in
+                await Task.yield()
+                showsStructuralDimensions = true
+            }
+        }
+    }
+
+    private func confirmStructuralCreation() {
+        guard !structuralDraft.isSaving,
+              let plan = precisionSession?.document.currentPlan,
+              var document = precisionSession?.document,
+              let selectedScan else { return }
+        structuralDraft.isSaving = true
+        switch StructuralCreationEngine().candidate(from: structuralDraft, in: plan) {
+        case .failure(let error):
+            structuralDraft.isSaving = false
+            structuralErrorKey = error == .missingPlacement
+                ? "precision.structural.placeRequired" : "precision.structural.invalidDimension"
+        case .success(let candidate):
+            document.currentPlan = candidate.plan
+            do {
+                try ParametricPlanRepository(files: files).savePrecisionDocument(document, scan: selectedScan)
+                synchronizeStoredArea(document.currentPlan, scan: selectedScan)
+                precisionSession = GeometryRevisionSession(document: document)
+                selectedColumnID = candidate.kind == .column ? candidate.createdID : nil
+                selectedBeamID = candidate.kind == .beam ? candidate.createdID : nil
+                structuralDraft = .init()
+                showsStructuralDimensions = false
+                withAnimation { showsSavedConfirmation = true }
+            } catch {
+                structuralDraft.isSaving = false
+                structuralErrorKey = "precision.structural.saveFailed"
+            }
+        }
+    }
+
+    private func structuralDimensionsDismissed() {
+        if structuralDraft.placementStep == .dimensions, !structuralDraft.isSaving {
+            structuralDraft = .init()
+        }
+    }
+
+    private func cancelStructuralCreation() {
+        showsStructuralChooser = false
+        showsStructuralDimensions = false
+        structuralDraft = .init()
+        structuralErrorKey = nil
     }
 
     private func closeOpeningPanel() {

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "0" : {
+
+    },
     "a11y.language" : {
       "comment" : "Accessibility label for language menu",
       "extractionState" : "manual",
@@ -2760,6 +2763,750 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Qo‘lda"
+          }
+        }
+      }
+    },
+    "precision.structural.addBeam" : {
+      "comment" : "Confirms beam creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add beam"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Добавить ригель"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigelni qo‘shish"
+          }
+        }
+      }
+    },
+    "precision.structural.addColumn" : {
+      "comment" : "Confirms column creation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add column"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Добавить колонну"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ustunni qo‘shish"
+          }
+        }
+      }
+    },
+    "precision.structural.addTitle" : {
+      "comment" : "Title and accessibility label for adding a structural element",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add element"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Добавить элемент"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Element qo‘shish"
+          }
+        }
+      }
+    },
+    "precision.structural.baseElevation" : {
+      "comment" : "Column base elevation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Base elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Отметка основания"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Asos balandligi"
+          }
+        }
+      }
+    },
+    "precision.structural.beam" : {
+      "comment" : "Overhead beam option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Beam"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ригель"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigel"
+          }
+        }
+      }
+    },
+    "precision.structural.beamHint" : {
+      "comment" : "Beam creation explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mark the beam start and end"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Укажите начало и конец ригеля"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigelning boshlanish va tugash nuqtasini belgilang"
+          }
+        }
+      }
+    },
+    "precision.structural.beamTitle" : {
+      "comment" : "Beam creation dimension sheet title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Beam dimensions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Размеры ригеля"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigel o‘lchamlari"
+          }
+        }
+      }
+    },
+    "precision.structural.bottomElevation" : {
+      "comment" : "Beam bottom elevation above floor",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bottom elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Нижняя отметка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Pastki balandlik"
+          }
+        }
+      }
+    },
+    "precision.structural.circular" : {
+      "comment" : "Circular column shape",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Circle"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Круг"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Aylana"
+          }
+        }
+      }
+    },
+    "precision.structural.column" : {
+      "comment" : "Architectural column option",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Column"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Колонна"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ustun"
+          }
+        }
+      }
+    },
+    "precision.structural.columnHint" : {
+      "comment" : "Column creation explanation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Place a column footprint on the plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Укажите расположение колонны на плане"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rejada ustun joyini belgilang"
+          }
+        }
+      }
+    },
+    "precision.structural.columnTitle" : {
+      "comment" : "Column creation dimension sheet title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Column dimensions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Размеры колонны"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ustun o‘lchamlari"
+          }
+        }
+      }
+    },
+    "precision.structural.depth" : {
+      "comment" : "Structural element depth",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Depth"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Глубина"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Chuqurlik"
+          }
+        }
+      }
+    },
+    "precision.structural.diameter" : {
+      "comment" : "Circular column diameter",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Diameter"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Диаметр"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Diametr"
+          }
+        }
+      }
+    },
+    "precision.structural.height" : {
+      "comment" : "Column height",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Height"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Balandlik"
+          }
+        }
+      }
+    },
+    "precision.structural.invalidDimension" : {
+      "comment" : "Invalid structural dimension error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter valid positive dimensions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Введите корректные положительные размеры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Musbat va to‘g‘ri o‘lchamlarni kiriting"
+          }
+        }
+      }
+    },
+    "precision.structural.optional" : {
+      "comment" : "Optional structural measurements disclosure",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Other dimensions"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Другие размеры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshqa o‘lchamlar"
+          }
+        }
+      }
+    },
+    "precision.structural.optionalShort" : {
+      "comment" : "Marks an optional measurement",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "optional"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "необязательно"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "ixtiyoriy"
+          }
+        }
+      }
+    },
+    "precision.structural.placeRequired" : {
+      "comment" : "Missing placement error",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Choose a placement on the plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Выберите расположение на плане"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rejada joylashuvni tanlang"
+          }
+        }
+      }
+    },
+    "precision.structural.rectangular" : {
+      "comment" : "Rectangular column shape",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Rectangle"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Прямоугольник"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "To‘rtburchak"
+          }
+        }
+      }
+    },
+    "precision.structural.rotation" : {
+      "comment" : "Column rotation in degrees",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Rotation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Поворот"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Burilish"
+          }
+        }
+      }
+    },
+    "precision.structural.saveFailed" : {
+      "comment" : "Structural creation save failure",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The change was not saved. Try again."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Изменение не сохранено. Повторите попытку."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘zgarish saqlanmadi. Qayta urinib ko‘ring."
+          }
+        }
+      }
+    },
+    "precision.structural.shape" : {
+      "comment" : "Column shape picker label",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Shape"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Форма"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Shakl"
+          }
+        }
+      }
+    },
+    "precision.structural.side" : {
+      "comment" : "Square column side length",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Side length"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Длина стороны"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tomon uzunligi"
+          }
+        }
+      }
+    },
+    "precision.structural.square" : {
+      "comment" : "Square column shape",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Square"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Квадрат"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Kvadrat"
+          }
+        }
+      }
+    },
+    "precision.structural.tapBeamEnd" : {
+      "comment" : "Beam end placement instruction",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tap the beam end point"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Нажмите конечную точку ригеля"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigelning tugash nuqtasini bosing"
+          }
+        }
+      }
+    },
+    "precision.structural.tapBeamStart" : {
+      "comment" : "Beam start placement instruction",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tap the beam start point"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Нажмите начальную точку ригеля"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigelning boshlanish nuqtasini bosing"
+          }
+        }
+      }
+    },
+    "precision.structural.tapColumnPlacement" : {
+      "comment" : "Column placement instruction",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tap where the column should be placed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Нажмите место установки колонны"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ustun joylashadigan nuqtani bosing"
+          }
+        }
+      }
+    },
+    "precision.structural.tapPlacement" : {
+      "comment" : "Instruction during structural placement",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tap the placement point on the plan"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Коснитесь точки размещения на плане"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rejada joylashuv nuqtasini bosing"
+          }
+        }
+      }
+    },
+    "precision.structural.topElevation" : {
+      "comment" : "Beam top elevation",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Top elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Верхняя отметка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Yuqori balandlik"
+          }
+        }
+      }
+    },
+    "precision.structural.width" : {
+      "comment" : "Structural element width",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Width"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ширина"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Kenglik"
           }
         }
       }

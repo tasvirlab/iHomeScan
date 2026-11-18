@@ -30,6 +30,8 @@ struct FloorPlanCanvas: View {
     var precisionPlan: ParametricFloorPlan?
     var selectedPrecisionWallID: UUID?
     var selectedPrecisionOpeningID: UUID?
+    var selectedPrecisionColumnID: UUID?
+    var selectedPrecisionBeamID: UUID?
     /// Space reserved for overlaid controls; the plan is fitted into the remaining area.
     var contentInsets = EdgeInsets()
 
@@ -55,9 +57,22 @@ struct FloorPlanCanvas: View {
     }
 
     private static func precisionBounds(_ plan: ParametricFloorPlan) -> CGRect? {
-        let points = plan.vertices.map {
+        var points = plan.vertices.map {
             CGPoint(x: $0.position.x * millimetersPerMeter, y: $0.position.y * millimetersPerMeter)
         }.filter { $0.x.isFinite && $0.y.isFinite }
+        points += plan.columns.flatMap { column in
+            let halfWidth = column.width.value * millimetersPerMeter / 2
+            let halfDepth = column.depth.value * millimetersPerMeter / 2
+            let center = CGPoint(x: column.position.x * millimetersPerMeter,
+                                 y: column.position.y * millimetersPerMeter)
+            return [CGPoint(x: center.x - halfWidth, y: center.y - halfDepth),
+                    CGPoint(x: center.x + halfWidth, y: center.y + halfDepth)]
+        }
+        points += plan.beams.flatMap { beam -> [CGPoint] in
+            [beamPoint(beam.start, in: plan), beamPoint(beam.end, in: plan)]
+                .compactMap { $0 }
+                .map { CGPoint(x: $0.x * millimetersPerMeter, y: $0.y * millimetersPerMeter) }
+        }
         guard let first = points.first else { return nil }
         let bounds = points.dropFirst().reduce(CGRect(origin: first, size: .zero)) {
             $0.union(CGRect(origin: $1, size: .zero))
@@ -175,6 +190,7 @@ struct FloorPlanCanvas: View {
         // Cut them out of the wall before drawing door leaves and window center lines.
         if let precisionPlan {
             drawPrecisionOpenings(precisionPlan, in: &context)
+            drawStructuralElements(precisionPlan, in: &context)
         } else {
             drawRoomPlanOpenings(plan, in: &context)
         }
@@ -210,6 +226,61 @@ struct FloorPlanCanvas: View {
             }
         }
 
+    }
+
+    private static func beamPoint(_ anchor: BeamAnchor, in plan: ParametricFloorPlan) -> PlanPoint2D? {
+        switch anchor {
+        case .point(let point): point
+        case .vertex(let id): plan.vertex(id: id)?.position
+        case .unresolved: nil
+        }
+    }
+
+    private func drawStructuralElements(_ plan: ParametricFloorPlan, in context: inout GraphicsContext) {
+        for column in plan.columns {
+            let width = column.width.value * Self.millimetersPerMeter
+            let depth = column.depth.value * Self.millimetersPerMeter
+            guard width.isFinite, depth.isFinite, width > 0, depth > 0 else { continue }
+            let center = CGPoint(x: column.position.x * Self.millimetersPerMeter,
+                                 y: column.position.y * Self.millimetersPerMeter)
+            let rect = CGRect(x: center.x - width / 2, y: center.y - depth / 2,
+                              width: width, height: depth)
+            var path = column.architecturalMetadata?.shape == .circular
+                ? Path(ellipseIn: rect) : Path(rect)
+            if column.architecturalMetadata?.shape != .circular {
+                path = path.applying(.init(translationX: center.x, y: center.y)
+                    .rotated(by: column.orientation)
+                    .translatedBy(x: -center.x, y: -center.y))
+            }
+            let selected = column.id == selectedPrecisionColumnID
+            context.fill(path, with: .color(selected ? Palette.accent.opacity(0.28) : Palette.inkTertiary.opacity(0.18)))
+            context.stroke(path, with: .color(selected ? Palette.accent : Palette.inkSecondary),
+                           lineWidth: selected ? 26 : 18)
+        }
+
+        for beam in plan.beams {
+            guard let start = Self.beamPoint(beam.start, in: plan),
+                  let end = Self.beamPoint(beam.end, in: plan) else { continue }
+            let a = CGPoint(x: start.x * Self.millimetersPerMeter,
+                            y: start.y * Self.millimetersPerMeter)
+            let b = CGPoint(x: end.x * Self.millimetersPerMeter,
+                            y: end.y * Self.millimetersPerMeter)
+            let length = hypot(b.x - a.x, b.y - a.y)
+            guard length > 0 else { continue }
+            let halfWidth = max(beam.width.value * Self.millimetersPerMeter / 2, 20)
+            let normal = CGVector(dx: -(b.y - a.y) / length * halfWidth,
+                                  dy: (b.x - a.x) / length * halfWidth)
+            var footprint = Path()
+            footprint.move(to: CGPoint(x: a.x + normal.dx, y: a.y + normal.dy))
+            footprint.addLine(to: CGPoint(x: b.x + normal.dx, y: b.y + normal.dy))
+            footprint.addLine(to: CGPoint(x: b.x - normal.dx, y: b.y - normal.dy))
+            footprint.addLine(to: CGPoint(x: a.x - normal.dx, y: a.y - normal.dy))
+            footprint.closeSubpath()
+            let selected = beam.id == selectedPrecisionBeamID
+            context.fill(footprint, with: .color((selected ? Palette.accent : Palette.inkSecondary).opacity(0.08)))
+            context.stroke(footprint, with: .color(selected ? Palette.accent : Palette.inkSecondary.opacity(0.78)),
+                           style: .init(lineWidth: selected ? 22 : 16, lineJoin: .round, dash: [160, 100]))
+        }
     }
 
     private func drawPrecisionWalls(_ precisionPlan: ParametricFloorPlan, in context: inout GraphicsContext) {
@@ -356,11 +427,36 @@ struct FloorPlanCanvas: View {
         let nameSize = 290 * scale
         let detailSize = 220 * scale
 
+        let precisionTransform = transform.scaledBy(x: Self.millimetersPerMeter, y: Self.millimetersPerMeter)
+        let labelAvoidance: [CGRect] = precisionPlan.map { precisionPlan -> [CGRect] in
+            var rects: [CGRect] = StructuralHitTesting.targets(
+                for: precisionPlan, transform: precisionTransform
+            ).map { $0.bounds.insetBy(dx: -12, dy: -12) }
+            let vertices = Dictionary(uniqueKeysWithValues: precisionPlan.vertices.map { ($0.id, $0.position) })
+            rects += precisionPlan.walls.compactMap { wall -> CGRect? in
+                guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { return nil }
+                let a = CGPoint(x: start.x, y: start.y).applying(precisionTransform)
+                let b = CGPoint(x: end.x, y: end.y).applying(precisionTransform)
+                return CGRect(x: min(a.x, b.x), y: min(a.y, b.y),
+                              width: max(abs(a.x - b.x), 1), height: max(abs(a.y - b.y), 1))
+                    .insetBy(dx: -24, dy: -24)
+            }
+            return rects
+        } ?? []
+
         for room in plan.rooms {
             guard let label = labels[room.id] else { continue }
             let isSelected = room.id == selectedRoomID
             let center = precisionLabelCenter(for: room, in: plan, precisionPlan: precisionPlan)
-            let baseline = CGPoint(x: center.x, y: center.y - 70).applying(transform)
+            let originalBaseline = CGPoint(x: center.x, y: center.y - 70).applying(transform)
+            let originalAreaPoint = CGPoint(x: center.x, y: center.y + 270).applying(transform)
+            let offset = roomLabelOffset(
+                baseline: originalBaseline,
+                areaPoint: originalAreaPoint,
+                canvasSize: size,
+                avoiding: labelAvoidance
+            )
+            let baseline = CGPoint(x: originalBaseline.x + offset.width, y: originalBaseline.y + offset.height)
             context.draw(
                 Text(label.name)
                     .font(.system(size: nameSize, weight: .semibold))
@@ -368,7 +464,7 @@ struct FloorPlanCanvas: View {
                 at: baseline, anchor: .bottom
             )
             if style == .draft, let area = label.area {
-                let areaPoint = CGPoint(x: center.x, y: center.y + 270).applying(transform)
+                let areaPoint = CGPoint(x: originalAreaPoint.x + offset.width, y: originalAreaPoint.y + offset.height)
                 context.draw(
                     Text(settings.area(area))
                         .font(.system(size: detailSize, weight: isSelected ? .semibold : .medium, design: .monospaced))
@@ -426,6 +522,29 @@ struct FloorPlanCanvas: View {
             precisionPlan, in: &context,
             transform: transform.scaledBy(x: Self.millimetersPerMeter, y: Self.millimetersPerMeter)
         )
+    }
+
+    private func roomLabelOffset(
+        baseline: CGPoint,
+        areaPoint: CGPoint,
+        canvasSize: CGSize,
+        avoiding obstacles: [CGRect]
+    ) -> CGSize {
+        let candidates = [
+            CGSize.zero,
+            CGSize(width: 0, height: -88),
+            CGSize(width: 0, height: 88),
+            CGSize(width: -112, height: 0),
+            CGSize(width: 112, height: 0)
+        ]
+        let canvas = CGRect(origin: .zero, size: canvasSize).insetBy(dx: 12, dy: 12)
+        return candidates.first { offset in
+            let minY = min(baseline.y, areaPoint.y) - 30 + offset.height
+            let maxY = max(baseline.y, areaPoint.y) + 16 + offset.height
+            let rect = CGRect(x: baseline.x - 92 + offset.width, y: minY,
+                              width: 184, height: maxY - minY)
+            return canvas.contains(rect) && !obstacles.contains(where: { $0.intersects(rect) })
+        } ?? .zero
     }
 
     private func drawOpeningReferenceMarkers(

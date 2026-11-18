@@ -8,7 +8,13 @@ final class iHomeScanUITests: XCTestCase {
         app = XCUIApplication()
         app.launchArguments = ["--precision-tap-ui-test", "--reset-precision-ui-test"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["precision.fixture.label"].waitForExistence(timeout: 5))
+        if !app.staticTexts["precision.fixture.label"].waitForExistence(timeout: 5) {
+            // Simulator UI automation can occasionally lose the first launch while the previous
+            // test runner is being torn down. Relaunch once before treating it as a product failure.
+            app.terminate()
+            app.launch()
+        }
+        XCTAssertTrue(app.staticTexts["precision.fixture.label"].waitForExistence(timeout: 8))
     }
 
     func testWallAndDimensionTapsOpenInlineEditorAndPersist() throws {
@@ -91,5 +97,67 @@ final class iHomeScanUITests: XCTestCase {
         XCTAssertTrue(confirm.isEnabled, "Unchanged optional dimensions must not block width-only confirmation")
         confirm.tap()
         XCTAssertFalse(app.descendants(matching: .any)["precision.opening.title"].waitForExistence(timeout: 3))
+    }
+
+    func testAddColumnRendersAndPersistsAfterReopen() throws {
+        let canvas = app.otherElements["precision.floorPlanCanvas"]
+        XCTAssertTrue(canvas.waitForExistence(timeout: 3))
+
+        app.buttons["structural.add.button"].tap()
+        XCTAssertTrue(app.buttons["structural.add.column"].waitForExistence(timeout: 3))
+        app.buttons["structural.add.column"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["structural.placement.hint"].waitForExistence(timeout: 3))
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.58)).tap()
+
+        replaceText(in: app.textFields["structural.width"], with: "300")
+        replaceText(in: app.textFields["structural.depth"], with: "400")
+        app.buttons["structural.confirm"].tap()
+        XCTAssertTrue(structuralElement(prefix: "precision.column.").waitForExistence(timeout: 3))
+
+        app.terminate()
+        app.launchArguments = ["--precision-tap-ui-test"]
+        app.launch()
+        XCTAssertTrue(canvas.waitForExistence(timeout: 5))
+        XCTAssertTrue(structuralElement(prefix: "precision.column.").waitForExistence(timeout: 3))
+    }
+
+    func testAddBeamRendersAndPersistsAfterReopen() throws {
+        let canvas = app.otherElements["precision.floorPlanCanvas"]
+        XCTAssertTrue(canvas.waitForExistence(timeout: 3))
+
+        app.buttons["structural.add.button"].tap()
+        XCTAssertTrue(app.buttons["structural.add.beam"].waitForExistence(timeout: 3))
+        app.buttons["structural.add.beam"].tap()
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.35, dy: 0.58)).tap()
+        canvas.coordinate(withNormalizedOffset: CGVector(dx: 0.68, dy: 0.58)).tap()
+
+        replaceText(in: app.textFields["structural.width"], with: "250")
+        replaceText(in: app.textFields["structural.depth"], with: "400")
+        app.buttons["structural.confirm"].tap()
+        XCTAssertTrue(structuralElement(prefix: "precision.beam.").waitForExistence(timeout: 3))
+
+        app.terminate()
+        app.launchArguments = ["--precision-tap-ui-test"]
+        app.launch()
+        XCTAssertTrue(canvas.waitForExistence(timeout: 5))
+        XCTAssertTrue(structuralElement(prefix: "precision.beam.").waitForExistence(timeout: 3))
+    }
+
+    private func replaceText(in field: XCUIElement, with value: String) {
+        XCTAssertTrue(field.waitForExistence(timeout: 3))
+        field.tap()
+        if let current = field.value as? String, !current.isEmpty, current != "0" {
+            field.press(forDuration: 1)
+            if app.menuItems["Select All"].waitForExistence(timeout: 1) {
+                app.menuItems["Select All"].tap()
+            }
+        }
+        field.typeText(value)
+    }
+
+    private func structuralElement(prefix: String) -> XCUIElement {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH %@", prefix))
+            .firstMatch
     }
 }

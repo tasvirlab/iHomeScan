@@ -133,6 +133,39 @@ enum PrecisionLocalization {
     static let openingUnknown = LocalizedStringResource("precision.opening.unknown", defaultValue: "Not measured", comment: "Value shown for an optional unknown opening measurement")
     static let openingStartOffset = LocalizedStringResource("precision.opening.startOffset", defaultValue: "From corner A", comment: "Read-only distance from corner A")
     static let openingEndOffset = LocalizedStringResource("precision.opening.endOffset", defaultValue: "From corner B", comment: "Read-only distance from corner B")
+    static let structuralStrings: [LocalizedStringResource] = [
+        .init("precision.structural.addTitle", defaultValue: "Add element", comment: "Title and accessibility label for adding a structural element"),
+        .init("precision.structural.column", defaultValue: "Column", comment: "Architectural column option"),
+        .init("precision.structural.beam", defaultValue: "Beam", comment: "Overhead beam option"),
+        .init("precision.structural.columnHint", defaultValue: "Place a column footprint on the plan", comment: "Column creation explanation"),
+        .init("precision.structural.beamHint", defaultValue: "Mark the beam start and end", comment: "Beam creation explanation"),
+        .init("precision.structural.shape", defaultValue: "Shape", comment: "Column shape picker label"),
+        .init("precision.structural.rectangular", defaultValue: "Rectangle", comment: "Rectangular column shape"),
+        .init("precision.structural.square", defaultValue: "Square", comment: "Square column shape"),
+        .init("precision.structural.circular", defaultValue: "Circle", comment: "Circular column shape"),
+        .init("precision.structural.columnTitle", defaultValue: "Column dimensions", comment: "Column creation dimension sheet title"),
+        .init("precision.structural.beamTitle", defaultValue: "Beam dimensions", comment: "Beam creation dimension sheet title"),
+        .init("precision.structural.width", defaultValue: "Width", comment: "Structural element width"),
+        .init("precision.structural.depth", defaultValue: "Depth", comment: "Structural element depth"),
+        .init("precision.structural.side", defaultValue: "Side length", comment: "Square column side length"),
+        .init("precision.structural.diameter", defaultValue: "Diameter", comment: "Circular column diameter"),
+        .init("precision.structural.height", defaultValue: "Height", comment: "Column height"),
+        .init("precision.structural.rotation", defaultValue: "Rotation", comment: "Column rotation in degrees"),
+        .init("precision.structural.baseElevation", defaultValue: "Base elevation", comment: "Column base elevation"),
+        .init("precision.structural.bottomElevation", defaultValue: "Bottom elevation", comment: "Beam bottom elevation above floor"),
+        .init("precision.structural.topElevation", defaultValue: "Top elevation", comment: "Beam top elevation"),
+        .init("precision.structural.optional", defaultValue: "Other dimensions", comment: "Optional structural measurements disclosure"),
+        .init("precision.structural.optionalShort", defaultValue: "optional", comment: "Marks an optional measurement"),
+        .init("precision.structural.addColumn", defaultValue: "Add column", comment: "Confirms column creation"),
+        .init("precision.structural.addBeam", defaultValue: "Add beam", comment: "Confirms beam creation"),
+        .init("precision.structural.tapPlacement", defaultValue: "Tap the placement point on the plan", comment: "Instruction during structural placement"),
+        .init("precision.structural.tapColumnPlacement", defaultValue: "Tap where the column should be placed", comment: "Column placement instruction"),
+        .init("precision.structural.tapBeamStart", defaultValue: "Tap the beam start point", comment: "Beam start placement instruction"),
+        .init("precision.structural.tapBeamEnd", defaultValue: "Tap the beam end point", comment: "Beam end placement instruction"),
+        .init("precision.structural.placeRequired", defaultValue: "Choose a placement on the plan", comment: "Missing placement error"),
+        .init("precision.structural.invalidDimension", defaultValue: "Enter valid positive dimensions", comment: "Invalid structural dimension error"),
+        .init("precision.structural.saveFailed", defaultValue: "The change was not saved. Try again.", comment: "Structural creation save failure")
+    ]
 
     static func englishFallback(for key: String) -> String? {
         let values = [
@@ -164,7 +197,26 @@ enum PrecisionLocalization {
             "precision.opening.referenceRequired": "Choose corner A or B for this distance.",
             "precision.opening.noChanges": "Change a measurement to enable confirmation.",
             "precision.opening.unknown": "Not measured", "precision.opening.startOffset": "From corner A",
-            "precision.opening.endOffset": "From corner B"
+            "precision.opening.endOffset": "From corner B",
+            "precision.structural.addTitle": "Add element", "precision.structural.column": "Column",
+            "precision.structural.beam": "Beam", "precision.structural.columnHint": "Place a column footprint on the plan",
+            "precision.structural.beamHint": "Mark the beam start and end", "precision.structural.shape": "Shape",
+            "precision.structural.rectangular": "Rectangle", "precision.structural.square": "Square",
+            "precision.structural.circular": "Circle", "precision.structural.columnTitle": "Column dimensions",
+            "precision.structural.beamTitle": "Beam dimensions", "precision.structural.width": "Width",
+            "precision.structural.depth": "Depth", "precision.structural.side": "Side length",
+            "precision.structural.diameter": "Diameter", "precision.structural.height": "Height",
+            "precision.structural.rotation": "Rotation", "precision.structural.baseElevation": "Base elevation",
+            "precision.structural.bottomElevation": "Bottom elevation", "precision.structural.topElevation": "Top elevation",
+            "precision.structural.optional": "Other dimensions", "precision.structural.optionalShort": "optional",
+            "precision.structural.addColumn": "Add column", "precision.structural.addBeam": "Add beam",
+            "precision.structural.tapPlacement": "Tap the placement point on the plan",
+            "precision.structural.tapColumnPlacement": "Tap where the column should be placed",
+            "precision.structural.tapBeamStart": "Tap the beam start point",
+            "precision.structural.tapBeamEnd": "Tap the beam end point",
+            "precision.structural.placeRequired": "Choose a placement on the plan",
+            "precision.structural.invalidDimension": "Enter valid positive dimensions",
+            "precision.structural.saveFailed": "The change was not saved. Try again."
         ]
         return values[key]
     }

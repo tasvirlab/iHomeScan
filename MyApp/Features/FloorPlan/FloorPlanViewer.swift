@@ -9,8 +9,17 @@ struct FloorPlanViewer: View {
     var precisionPlan: ParametricFloorPlan?
     @Binding var selectedPrecisionWallID: UUID?
     @Binding var selectedPrecisionOpeningID: UUID?
+    @Binding var selectedPrecisionColumnID: UUID?
+    @Binding var selectedPrecisionBeamID: UUID?
     var onPrecisionWallSelected: ((UUID) -> Void)?
     var onPrecisionOpeningSelected: ((UUID) -> Void)?
+    var onPrecisionColumnSelected: ((UUID) -> Void)?
+    var onPrecisionBeamSelected: ((UUID) -> Void)?
+    var onAddStructuralElement: (() -> Void)?
+    var structuralPlacementActive = false
+    var onStructuralPointSelected: ((PlanPoint2D) -> Void)?
+    var onCancelStructuralPlacement: (() -> Void)?
+    var structuralDraftPreview: StructuralCreationDraft?
 
     init(
         plan: FloorPlan,
@@ -19,8 +28,17 @@ struct FloorPlanViewer: View {
         precisionPlan: ParametricFloorPlan? = nil,
         selectedPrecisionWallID: Binding<UUID?> = .constant(nil),
         selectedPrecisionOpeningID: Binding<UUID?> = .constant(nil),
+        selectedPrecisionColumnID: Binding<UUID?> = .constant(nil),
+        selectedPrecisionBeamID: Binding<UUID?> = .constant(nil),
         onPrecisionWallSelected: ((UUID) -> Void)? = nil,
-        onPrecisionOpeningSelected: ((UUID) -> Void)? = nil
+        onPrecisionOpeningSelected: ((UUID) -> Void)? = nil,
+        onPrecisionColumnSelected: ((UUID) -> Void)? = nil,
+        onPrecisionBeamSelected: ((UUID) -> Void)? = nil,
+        onAddStructuralElement: (() -> Void)? = nil,
+        structuralPlacementActive: Bool = false,
+        onStructuralPointSelected: ((PlanPoint2D) -> Void)? = nil,
+        onCancelStructuralPlacement: (() -> Void)? = nil,
+        structuralDraftPreview: StructuralCreationDraft? = nil
     ) {
         self.plan = plan
         self.labels = labels
@@ -28,8 +46,17 @@ struct FloorPlanViewer: View {
         self.precisionPlan = precisionPlan
         _selectedPrecisionWallID = selectedPrecisionWallID
         _selectedPrecisionOpeningID = selectedPrecisionOpeningID
+        _selectedPrecisionColumnID = selectedPrecisionColumnID
+        _selectedPrecisionBeamID = selectedPrecisionBeamID
         self.onPrecisionWallSelected = onPrecisionWallSelected
         self.onPrecisionOpeningSelected = onPrecisionOpeningSelected
+        self.onPrecisionColumnSelected = onPrecisionColumnSelected
+        self.onPrecisionBeamSelected = onPrecisionBeamSelected
+        self.onAddStructuralElement = onAddStructuralElement
+        self.structuralPlacementActive = structuralPlacementActive
+        self.onStructuralPointSelected = onStructuralPointSelected
+        self.onCancelStructuralPlacement = onCancelStructuralPlacement
+        self.structuralDraftPreview = structuralDraftPreview
     }
 
     @Environment(AppSettings.self) private var settings
@@ -68,6 +95,8 @@ struct FloorPlanViewer: View {
                     precisionPlan: precisionPlan,
                     selectedPrecisionWallID: selectedPrecisionWallID,
                     selectedPrecisionOpeningID: selectedPrecisionOpeningID,
+                    selectedPrecisionColumnID: selectedPrecisionColumnID,
+                    selectedPrecisionBeamID: selectedPrecisionBeamID,
                     contentInsets: planInsets
                 )
                 .contentShape(.rect)
@@ -77,14 +106,123 @@ struct FloorPlanViewer: View {
                 )
                 .simultaneousGesture(panGesture.simultaneously(with: zoomGesture))
 
+                structuralPlacementPreview(in: proxy.size)
                 openingAccessibilityTargets(in: proxy.size)
+                structuralAccessibilityTargets(in: proxy.size)
             }
         }
         .overlay(alignment: .bottomLeading) { unitBadge }
         .overlay(alignment: .bottomTrailing) { zoomControls }
+        .overlay(alignment: .topTrailing) { addStructuralButton }
+        .overlay(alignment: .top) { structuralPlacementHint }
         .accessibilityElement(children: .contain)
         .accessibilityLabel(settings.t("plan.accessibility"))
         .accessibilityIdentifier("precision.floorPlanCanvas")
+    }
+
+    @ViewBuilder
+    private func structuralPlacementPreview(in size: CGSize) -> some View {
+        if let draft = structuralDraftPreview,
+           draft.columnPosition != nil || draft.beamStart != nil {
+            let transform = FloorPlanCanvas.transform(
+                for: plan, in: size, insets: planInsets,
+                zoom: effectiveZoom, offset: effectiveOffset,
+                rotation: alignmentRotation, precisionPlan: precisionPlan
+            )
+            Canvas { context, _ in
+                var path = Path()
+                if let position = draft.columnPosition {
+                    let center = CGPoint(x: position.x, y: position.y).applying(transform)
+                    let width = previewMeters(draft.widthMillimeters)
+                    let depth = draft.columnShape == .rectangular
+                        ? previewMeters(draft.depthMillimeters) : width
+                    if let width, let depth {
+                        let angle = (Double(draft.rotationDegrees) ?? 0) * .pi / 180
+                        let corners = [
+                            PlanPoint2D(x: -width / 2, y: -depth / 2),
+                            PlanPoint2D(x: width / 2, y: -depth / 2),
+                            PlanPoint2D(x: width / 2, y: depth / 2),
+                            PlanPoint2D(x: -width / 2, y: depth / 2)
+                        ].map { point -> CGPoint in
+                            let rotated = PlanPoint2D(
+                                x: position.x + point.x * cos(angle) - point.y * sin(angle),
+                                y: position.y + point.x * sin(angle) + point.y * cos(angle)
+                            )
+                            return CGPoint(x: rotated.x, y: rotated.y).applying(transform)
+                        }
+                        if draft.columnShape == .circular {
+                            let edge = CGPoint(x: position.x + width / 2, y: position.y).applying(transform)
+                            let radius = hypot(edge.x - center.x, edge.y - center.y)
+                            path.addEllipse(in: CGRect(x: center.x - radius, y: center.y - radius,
+                                                       width: radius * 2, height: radius * 2))
+                        } else if let first = corners.first {
+                            path.move(to: first)
+                            corners.dropFirst().forEach { path.addLine(to: $0) }
+                            path.closeSubpath()
+                        }
+                    } else {
+                        path.addEllipse(in: CGRect(x: center.x - 10, y: center.y - 10, width: 20, height: 20))
+                    }
+                    context.fill(path, with: .color(Palette.accent.opacity(0.18)))
+                    context.stroke(path, with: .color(Palette.accent), style: .init(lineWidth: 2, dash: [5, 3]))
+                } else if let start = draft.beamStart {
+                    let a = CGPoint(x: start.x, y: start.y).applying(transform)
+                    if let end = draft.beamEnd {
+                        let b = CGPoint(x: end.x, y: end.y).applying(transform)
+                        path.move(to: a)
+                        path.addLine(to: b)
+                    } else {
+                        path.addEllipse(in: CGRect(x: a.x - 7, y: a.y - 7, width: 14, height: 14))
+                    }
+                    context.stroke(path, with: .color(Palette.accent), style: .init(lineWidth: 4, dash: [8, 5]))
+                }
+            }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+    }
+
+    private func previewMeters(_ millimeters: String) -> Double? {
+        guard let value = Double(millimeters.replacingOccurrences(of: ",", with: ".")),
+              value.isFinite, value > 0 else { return nil }
+        return value / 1_000
+    }
+
+    @ViewBuilder
+    private func structuralAccessibilityTargets(in size: CGSize) -> some View {
+        if let precisionPlan {
+            let transform = FloorPlanCanvas.transform(
+                for: plan, in: size, insets: planInsets,
+                zoom: effectiveZoom, offset: effectiveOffset,
+                rotation: alignmentRotation, precisionPlan: precisionPlan
+            )
+            let targets = StructuralHitTesting.targets(for: precisionPlan, transform: transform)
+            ForEach(targets, id: \.id) { target in
+                Button {
+                    selectedPrecisionWallID = nil
+                    selectedPrecisionOpeningID = nil
+                    if target.kind == .column {
+                        selectedPrecisionColumnID = target.id
+                        selectedPrecisionBeamID = nil
+                        onPrecisionColumnSelected?(target.id)
+                    } else {
+                        selectedPrecisionColumnID = nil
+                        selectedPrecisionBeamID = target.id
+                        onPrecisionBeamSelected?(target.id)
+                    }
+                } label: {
+                    Color.clear
+                        .frame(width: max(target.bounds.width, 44), height: max(target.bounds.height, 44))
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .position(x: target.bounds.midX, y: target.bounds.midY)
+                .accessibilityLabel(settings.t(target.kind == .column
+                                                ? "precision.structural.column"
+                                                : "precision.structural.beam"))
+                .accessibilityIdentifier("precision.\(target.kind == .column ? "column" : "beam").\(target.id.uuidString)")
+            }
+        }
     }
 
     @ViewBuilder
@@ -156,10 +294,31 @@ struct FloorPlanViewer: View {
         let transform = FloorPlanCanvas.transform(for: plan, in: size, insets: planInsets,
                                                   zoom: effectiveZoom, offset: effectiveOffset,
                                                   rotation: alignmentRotation, precisionPlan: precisionPlan)
+        if structuralPlacementActive {
+            let point = location.applying(transform.inverted())
+            guard point.x.isFinite, point.y.isFinite else { return }
+            onStructuralPointSelected?(.init(x: point.x, y: point.y))
+            return
+        }
         if let openingID = precisionOpening(at: location, transform: transform) {
             selectedPrecisionWallID = nil
             selectedPrecisionOpeningID = openingID
             onPrecisionOpeningSelected?(openingID)
+            return
+        }
+        if let target = structuralElement(at: location, transform: transform) {
+            selectedPrecisionWallID = nil
+            selectedPrecisionOpeningID = nil
+            switch target.kind {
+            case .column:
+                selectedPrecisionColumnID = target.id
+                selectedPrecisionBeamID = nil
+                onPrecisionColumnSelected?(target.id)
+            case .beam:
+                selectedPrecisionBeamID = target.id
+                selectedPrecisionColumnID = nil
+                onPrecisionBeamSelected?(target.id)
+            }
             return
         }
         if let wallID = precisionWall(at: location, transform: transform, size: size) {
@@ -173,6 +332,14 @@ struct FloorPlanViewer: View {
         withAnimation(.easeOut(duration: 0.2)) {
             selectedRoomID = room?.id == selectedRoomID ? nil : room?.id
         }
+    }
+
+    private func structuralElement(at location: CGPoint, transform: CGAffineTransform) -> StructuralHitTarget? {
+        guard let precisionPlan else { return nil }
+        return StructuralHitTesting.selected(
+            at: location,
+            targets: StructuralHitTesting.targets(for: precisionPlan, transform: transform)
+        )
     }
 
     private func precisionOpening(at location: CGPoint, transform: CGAffineTransform) -> UUID? {
@@ -250,6 +417,60 @@ struct FloorPlanViewer: View {
             .overlay(Circle().strokeBorder(Palette.line, lineWidth: 0.5))
         }
         .padding(12)
+    }
+
+    @ViewBuilder
+    private var addStructuralButton: some View {
+        if let onAddStructuralElement, !structuralPlacementActive {
+            Button(action: onAddStructuralElement) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Palette.accentText)
+                    .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: .circle)
+                    .overlay(Circle().strokeBorder(Palette.accent.opacity(0.35), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .padding(12)
+            .accessibilityLabel(settings.t("precision.structural.addTitle"))
+            .accessibilityIdentifier("structural.add.button")
+        }
+    }
+
+    @ViewBuilder
+    private var structuralPlacementHint: some View {
+        if structuralPlacementActive {
+            HStack(spacing: 8) {
+                Label(settings.t(structuralPlacementHintKey), systemImage: "hand.tap")
+                    .font(Typography.control)
+                    .foregroundStyle(Palette.ink)
+                    .accessibilityIdentifier("structural.placement.hint")
+                if let onCancelStructuralPlacement {
+                    Button(action: onCancelStructuralPlacement) {
+                        Image(systemName: "xmark")
+                            .frame(width: 32, height: 32)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(settings.t("common.cancel"))
+                    .accessibilityIdentifier("structural.placement.cancel")
+                }
+            }
+            .padding(.leading, 14)
+            .padding(.trailing, 6)
+            .frame(minHeight: 44)
+            .background(.ultraThinMaterial, in: .capsule)
+            .overlay(Capsule().strokeBorder(Palette.line, lineWidth: 0.5))
+            .padding(12)
+        }
+    }
+
+    private var structuralPlacementHintKey: String {
+        switch structuralDraftPreview?.placementStep {
+        case .columnPoint: "precision.structural.tapColumnPlacement"
+        case .beamStart: "precision.structural.tapBeamStart"
+        case .beamEnd: "precision.structural.tapBeamEnd"
+        default: "precision.structural.tapPlacement"
+        }
     }
 
     private func controlButton(_ systemImage: String, labelKey: String, action: @escaping () -> Void) -> some View {

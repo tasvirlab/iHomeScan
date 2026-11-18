@@ -148,7 +148,7 @@ struct ResolvedBeamGeometry: Codable, Hashable, Sendable {
     let start: PlanPoint2D
     let end: PlanPoint2D
     let length: LengthMeasurement
-    let topElevation: LengthMeasurement
+    let topElevation: LengthMeasurement?
 }
 
 struct StructuralResolutionResult: Sendable {

@@ -109,7 +109,7 @@ struct ParametricColumn: Codable, Hashable, Identifiable, Sendable {
     var position: PlanPoint2D
     var width: LengthMeasurement
     var depth: LengthMeasurement
-    var height: LengthMeasurement
+    var height: LengthMeasurement?
     /// Radians from the positive x axis.
     var orientation: Double
     var referenceVertexIDs: [UUID]
@@ -129,7 +129,7 @@ struct ParametricBeam: Codable, Hashable, Identifiable, Sendable {
     var end: BeamAnchor
     var width: LengthMeasurement
     var depth: LengthMeasurement
-    var bottomElevation: LengthMeasurement
+    var bottomElevation: LengthMeasurement?
     /// Optional P1.4.3 architectural measurements; nil keeps legacy JSON readable.
     var architecturalMetadata: BeamArchitecturalMetadata? = nil
 

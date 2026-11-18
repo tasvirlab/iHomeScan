@@ -128,14 +128,14 @@ struct StructuralGeometryTests {
         let result = StructuralGeometryResolver().resolve(plan: fixturePlan())
         let beam = result.beamGeometries.first
         #expect(abs((beam?.length.value ?? 0) - 4.25) < 0.0001)
-        #expect(abs((beam?.topElevation.value ?? 0) - 2.7) < 0.0001)
-        #expect(beam?.topElevation.provenance.source == .derived)
+        #expect(abs((beam?.topElevation?.value ?? 0) - 2.7) < 0.0001)
+        #expect(beam?.topElevation?.provenance.source == .derived)
     }
 
     @Test("Beam bottom plus depth derives top elevation")
     func beamVerticalChain() {
         let beam = StructuralGeometryResolver().resolve(plan: fixturePlan()).beamGeometries[0]
-        #expect(abs(beam.topElevation.value - (2.3 + 0.4)) < 0.0001)
+        #expect(abs((beam.topElevation?.value ?? 0) - (2.3 + 0.4)) < 0.0001)
     }
 
     @Test("Beam section and bottom elevation measurements revise geometry")
@@ -150,7 +150,7 @@ struct StructuralGeometryTests {
         let beam = StructuralGeometryResolver().resolve(plan: plan).candidatePlan.beams[0]
         #expect(beam.width.value == 0.3)
         #expect(beam.depth.value == 0.45)
-        #expect(beam.bottomElevation.value == 2.2)
+        #expect(beam.bottomElevation?.value == 2.2)
     }
 
     @Test("Verified beam length conflict is protected")
@@ -280,7 +280,7 @@ struct StructuralGeometryTests {
         )
         let result = StructuralGeometryResolver().resolve(plan: plan)
         #expect(!result.isValid)
-        #expect(committed.beams[0].bottomElevation.value == 2.3)
+        #expect(committed.beams[0].bottomElevation?.value == 2.3)
         #expect(committed.vertices == plan.vertices)
     }
 

@@ -209,17 +209,19 @@ struct StructuralGeometryResolver: Sendable {
             ))
         }
 
-        let bottom = authoritativeValue(.bottomElevation, beamID: beam.id, metadata: metadata) ?? beam.bottomElevation.value
+        let bottom = authoritativeValue(.bottomElevation, beamID: beam.id, metadata: metadata)
+            ?? beam.bottomElevation?.value
         let depth = authoritativeValue(.depth, beamID: beam.id, metadata: metadata) ?? beam.depth.value
-        let top = bottom + depth
-        if !bottom.isFinite || !depth.isFinite || bottom < 0 || depth <= 0 {
+        let top = bottom.map { $0 + depth }
+        if !depth.isFinite || depth <= 0 || (bottom.map { !$0.isFinite || $0 < 0 } ?? false) {
             conflicts.append(conflict(.invalidVerticalChain, entity: beam.id))
         }
         let measuredTop = authoritativeMeasurement(.topElevation, beamID: beam.id, metadata: metadata)
         if let measuredTop {
             if measuredTop.value.unit != .meters || !measuredTop.value.value.isFinite {
                 conflicts.append(conflict(.invalidMeasurement, entity: beam.id, measurements: [measuredTop.id]))
-            } else if measuredTop.value.provenance.verificationStatus == .verified,
+            } else if let top,
+                      measuredTop.value.provenance.verificationStatus == .verified,
                       abs(measuredTop.value.value - top) > computationalTolerance {
                 conflicts.append(conflict(
                     .invalidVerticalChain,
@@ -236,7 +238,7 @@ struct StructuralGeometryResolver: Sendable {
         let resolvedLength = lengthMeasurements.first.map { lengthMeasurement($0.value) }
             ?? LengthMeasurement(value: length, provenance: derived)
         let resolvedTop = measuredTop.map { lengthMeasurement($0.value) }
-            ?? LengthMeasurement(value: top, provenance: derived)
+            ?? top.map { LengthMeasurement(value: $0, provenance: derived) }
         return (.init(
             beamID: beam.id, start: start, end: end,
             length: resolvedLength, topElevation: resolvedTop

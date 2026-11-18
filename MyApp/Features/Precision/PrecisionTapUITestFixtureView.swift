@@ -5,8 +5,12 @@ import SwiftUI
 struct PrecisionTapUITestFixtureView: View {
     private static let persistedMetersKey = "precision.uiTest.persistedMeters"
     private static let persistedDoorOffsetKey = "precision.uiTest.persistedDoorOffset"
+    private static let persistedColumnKey = "precision.uiTest.persistedColumn"
+    private static let persistedBeamKey = "precision.uiTest.persistedBeam"
     private static let wallID = UUID(uuidString: "A1000000-0000-0000-0000-000000000001")!
     private static let doorID = UUID(uuidString: "A1000000-0000-0000-0000-000000000002")!
+    private static let columnID = UUID(uuidString: "A1000000-0000-0000-0000-000000000003")!
+    private static let beamID = UUID(uuidString: "A1000000-0000-0000-0000-000000000004")!
     @State private var selectedRoomID: String?
     @State private var selectedWallID: UUID?
     @State private var selectedOpeningID: UUID?
@@ -18,11 +22,19 @@ struct PrecisionTapUITestFixtureView: View {
     @State private var openingDraft: OpeningMeasurementDraft?
     @State private var openingPreview: OpeningEditPreview?
     @State private var showsOpeningPanel = false
+    @State private var selectedColumnID: UUID?
+    @State private var selectedBeamID: UUID?
+    @State private var structuralDraft = StructuralCreationDraft()
+    @State private var showsStructuralChooser = false
+    @State private var showsStructuralDimensions = false
+    @State private var structuralErrorKey: String?
 
     init() {
         if ProcessInfo.processInfo.arguments.contains("--reset-precision-ui-test") {
             UserDefaults.standard.removeObject(forKey: Self.persistedMetersKey)
             UserDefaults.standard.removeObject(forKey: Self.persistedDoorOffsetKey)
+            UserDefaults.standard.removeObject(forKey: Self.persistedColumnKey)
+            UserDefaults.standard.removeObject(forKey: Self.persistedBeamKey)
         }
         _plan = State(initialValue: Self.fixtureParametricPlan())
     }
@@ -40,8 +52,15 @@ struct PrecisionTapUITestFixtureView: View {
                 precisionPlan: openingPreview?.candidatePlan ?? plan,
                 selectedPrecisionWallID: $selectedWallID,
                 selectedPrecisionOpeningID: $selectedOpeningID,
+                selectedPrecisionColumnID: $selectedColumnID,
+                selectedPrecisionBeamID: $selectedBeamID,
                 onPrecisionWallSelected: selectWall,
-                onPrecisionOpeningSelected: selectOpening
+                onPrecisionOpeningSelected: selectOpening,
+                onAddStructuralElement: { showsStructuralChooser = true },
+                structuralPlacementActive: structuralDraft.isPlacing,
+                onStructuralPointSelected: placeStructuralPoint,
+                onCancelStructuralPlacement: cancelStructural,
+                structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft
             )
         }
         .sheet(isPresented: $showsOpeningPanel, onDismiss: closeOpeningPanel) {
@@ -61,6 +80,20 @@ struct PrecisionTapUITestFixtureView: View {
             }
         }
         .background(Palette.background)
+        .sheet(isPresented: $showsStructuralChooser) {
+            StructuralCreationSheet(
+                draft: $structuralDraft, showsChooser: true, errorKey: nil,
+                onBeginColumn: beginColumn, onBeginBeam: beginBeam,
+                onConfirm: {}, onClose: cancelStructural
+            )
+        }
+        .sheet(isPresented: $showsStructuralDimensions) {
+            StructuralCreationSheet(
+                draft: $structuralDraft, showsChooser: false, errorKey: structuralErrorKey,
+                onBeginColumn: { _ in }, onBeginBeam: {},
+                onConfirm: confirmStructural, onClose: cancelStructural
+            )
+        }
         .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
             InlinePrecisionMeasurementSheet(
                     currentMillimeters: PrecisionMeasurementInput.millimeters(fromMeters: plan.walls.first?.length(in: plan)),
@@ -113,6 +146,49 @@ struct PrecisionTapUITestFixtureView: View {
         plan = preview.candidatePlan
         UserDefaults.standard.set(placement.startOffset, forKey: Self.persistedDoorOffsetKey)
         closeOpeningPanel()
+    }
+
+    private func beginColumn(_ shape: ColumnShape) {
+        structuralDraft.beginColumn(shape: shape)
+        showsStructuralChooser = false
+    }
+
+    private func beginBeam() {
+        structuralDraft.beginBeam()
+        showsStructuralChooser = false
+    }
+
+    private func placeStructuralPoint(_ point: PlanPoint2D) {
+        structuralDraft.place(point)
+        if structuralDraft.placementStep == .dimensions {
+            Task { @MainActor in
+                await Task.yield()
+                showsStructuralDimensions = true
+            }
+        }
+    }
+
+    private func confirmStructural() {
+        let stableID = structuralDraft.kind == .column ? Self.columnID : Self.beamID
+        switch StructuralCreationEngine().candidate(from: structuralDraft, in: plan, id: stableID) {
+        case .failure:
+            structuralErrorKey = "precision.structural.invalidDimension"
+        case .success(let candidate):
+            plan = candidate.plan
+            selectedColumnID = candidate.kind == .column ? candidate.createdID : nil
+            selectedBeamID = candidate.kind == .beam ? candidate.createdID : nil
+            UserDefaults.standard.set(true, forKey: candidate.kind == .column
+                                      ? Self.persistedColumnKey : Self.persistedBeamKey)
+            structuralDraft = .init()
+            showsStructuralDimensions = false
+        }
+    }
+
+    private func cancelStructural() {
+        showsStructuralChooser = false
+        showsStructuralDimensions = false
+        structuralDraft = .init()
+        structuralErrorKey = nil
     }
 
     private func closeMeasurementPanel() {
@@ -168,7 +244,7 @@ struct PrecisionTapUITestFixtureView: View {
                       kind: .width, value: .init(value: 0.9, provenance: provenance), reference: nil, relatedConstraintIDs: [])
             ], completeness: .partial, doorSwing: nil)
         )
-        return ParametricFloorPlan(
+        var plan = ParametricFloorPlan(
             id: UUID(uuidString: "A3000000-0000-0000-0000-000000000001")!,
             projectID: UUID(), roomID: UUID(), sourceScanID: UUID(),
             coordinateSystem: "DEBUG fixture; meters", completeness: .partial,
@@ -180,6 +256,32 @@ struct PrecisionTapUITestFixtureView: View {
             openings: [opening], columns: [], beams: [], floorBoundary: nil, endpointMerges: [],
             revision: .init(number: 1, createdAt: .init(timeIntervalSince1970: 0), source: .manualEntered)
         )
+        if UserDefaults.standard.bool(forKey: persistedColumnKey) {
+            var draft = StructuralCreationDraft()
+            draft.beginColumn(shape: .rectangular)
+            draft.place(.init(x: 2, y: 1.5))
+            draft.widthMillimeters = "300"
+            draft.depthMillimeters = "400"
+            if case .success(let candidate) = StructuralCreationEngine().candidate(
+                from: draft, in: plan, id: columnID
+            ) {
+                plan = candidate.plan
+            }
+        }
+        if UserDefaults.standard.bool(forKey: persistedBeamKey) {
+            var draft = StructuralCreationDraft()
+            draft.beginBeam()
+            draft.place(.init(x: 0.5, y: 1.5))
+            draft.place(.init(x: 3.5, y: 1.5))
+            draft.widthMillimeters = "250"
+            draft.depthMillimeters = "400"
+            if case .success(let candidate) = StructuralCreationEngine().candidate(
+                from: draft, in: plan, id: beamID
+            ) {
+                plan = candidate.plan
+            }
+        }
+        return plan
     }
 }
 #endif
