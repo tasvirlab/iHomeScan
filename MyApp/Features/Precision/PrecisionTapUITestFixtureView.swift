@@ -28,6 +28,10 @@ struct PrecisionTapUITestFixtureView: View {
     @State private var showsStructuralChooser = false
     @State private var showsStructuralDimensions = false
     @State private var structuralErrorKey: String?
+    @State private var structuralPropertiesDraft: StructuralPropertiesDraft?
+    @State private var structuralPropertiesPreview: StructuralPropertiesPreview?
+    @State private var showsStructuralProperties = false
+    @State private var structuralPropertiesErrorKey: String?
 
     init() {
         if ProcessInfo.processInfo.arguments.contains("--reset-precision-ui-test") {
@@ -56,11 +60,14 @@ struct PrecisionTapUITestFixtureView: View {
                 selectedPrecisionBeamID: $selectedBeamID,
                 onPrecisionWallSelected: selectWall,
                 onPrecisionOpeningSelected: selectOpening,
+                onPrecisionColumnSelected: beginColumnProperties,
+                onPrecisionBeamSelected: beginBeamProperties,
                 onAddStructuralElement: { showsStructuralChooser = true },
                 structuralPlacementActive: structuralDraft.isPlacing,
                 onStructuralPointSelected: placeStructuralPoint,
                 onCancelStructuralPlacement: cancelStructural,
-                structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft
+                structuralDraftPreview: structuralDraft.kind == nil ? nil : structuralDraft,
+                onStructuralDrag: handleStructuralDrag
             )
         }
         .sheet(isPresented: $showsOpeningPanel, onDismiss: closeOpeningPanel) {
@@ -93,6 +100,20 @@ struct PrecisionTapUITestFixtureView: View {
                 onBeginColumn: { _ in }, onBeginBeam: {},
                 onConfirm: confirmStructural, onClose: cancelStructural
             )
+        }
+        .sheet(isPresented: $showsStructuralProperties, onDismiss: closeStructuralProperties) {
+            if let draft = structuralPropertiesDraft {
+                StructuralPropertiesSheet(
+                    draft: Binding(
+                        get: { structuralPropertiesDraft ?? draft },
+                        set: updateStructuralProperties
+                    ),
+                    canSave: structuralPropertiesPreview?.changed == true,
+                    errorKey: structuralPropertiesErrorKey,
+                    onConfirm: confirmStructuralProperties,
+                    onClose: closeStructuralProperties
+                )
+            }
         }
         .sheet(isPresented: $showsMeasurementPanel, onDismiss: closeMeasurementPanel) {
             InlinePrecisionMeasurementSheet(
@@ -189,6 +210,53 @@ struct PrecisionTapUITestFixtureView: View {
         showsStructuralDimensions = false
         structuralDraft = .init()
         structuralErrorKey = nil
+    }
+
+    private func handleStructuralDrag(_ event: StructuralDragEvent) {
+        guard let candidate = StructuralDragResolver.candidate(event: event, in: plan) else { return }
+        plan = candidate.plan
+    }
+
+    private func beginColumnProperties(_ id: UUID) {
+        guard let column = plan.columns.first(where: { $0.id == id }) else { return }
+        structuralPropertiesDraft = .make(column: column)
+        structuralPropertiesPreview = nil
+        structuralPropertiesErrorKey = nil
+        showsStructuralProperties = true
+    }
+
+    private func beginBeamProperties(_ id: UUID) {
+        guard let beam = plan.beams.first(where: { $0.id == id }) else { return }
+        structuralPropertiesDraft = .make(beam: beam, in: plan)
+        structuralPropertiesPreview = nil
+        structuralPropertiesErrorKey = nil
+        showsStructuralProperties = true
+    }
+
+    private func updateStructuralProperties(_ draft: StructuralPropertiesDraft) {
+        structuralPropertiesDraft = draft
+        switch StructuralPropertiesEngine().preview(draft: draft, in: plan) {
+        case .success(let preview):
+            structuralPropertiesPreview = preview
+            structuralPropertiesErrorKey = preview.changed ? nil : "precision.structural.noChanges"
+        case .failure(let error):
+            structuralPropertiesPreview = nil
+            structuralPropertiesErrorKey = error == .verticalConflict
+                ? "precision.structural.verticalConflict" : "precision.structural.invalidDimension"
+        }
+    }
+
+    private func confirmStructuralProperties() {
+        guard let preview = structuralPropertiesPreview, preview.changed else { return }
+        plan = preview.plan
+        closeStructuralProperties()
+    }
+
+    private func closeStructuralProperties() {
+        showsStructuralProperties = false
+        structuralPropertiesDraft = nil
+        structuralPropertiesPreview = nil
+        structuralPropertiesErrorKey = nil
     }
 
     private func closeMeasurementPanel() {

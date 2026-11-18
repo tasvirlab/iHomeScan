@@ -90,6 +90,7 @@ struct FloorPlanViewer: View {
     @GestureState private var pinch: CGFloat = 1
     @GestureState private var drag: CGSize = .zero
     @State private var radialMenuLocation: CGPoint?
+    @State private var structuralDragLocation: CGPoint?
 
     private let zoomRange: ClosedRange<CGFloat> = 0.6...3
     /// Keeps the fitted plan clear of the zoom controls on the trailing edge.
@@ -132,6 +133,7 @@ struct FloorPlanViewer: View {
                 openingAccessibilityTargets(in: proxy.size)
                 structuralAccessibilityTargets(in: proxy.size)
                 radialMenu(in: proxy.size)
+                structuralDragMagnifier(in: proxy.size)
             }
             .coordinateSpace(.named("floorPlanCanvas"))
         }
@@ -314,8 +316,14 @@ struct FloorPlanViewer: View {
         transform: CGAffineTransform
     ) -> some Gesture {
         DragGesture(minimumDistance: 4, coordinateSpace: .named("floorPlanCanvas"))
-            .onChanged { value in sendStructuralDrag(target, location: value.location, transform: transform, phase: .changed) }
-            .onEnded { value in sendStructuralDrag(target, location: value.location, transform: transform, phase: .ended) }
+            .onChanged { value in
+                structuralDragLocation = value.location
+                sendStructuralDrag(target, location: value.location, transform: transform, phase: .changed)
+            }
+            .onEnded { value in
+                sendStructuralDrag(target, location: value.location, transform: transform, phase: .ended)
+                withAnimation(.easeOut(duration: 0.15)) { structuralDragLocation = nil }
+            }
     }
 
     private func sendStructuralDrag(
@@ -443,6 +451,47 @@ struct FloorPlanViewer: View {
         return PrecisionWallHitTesting.selectedWall(at: location, targets: targets)
     }
 
+    private func nearestPrecisionWall(at location: CGPoint, transform: CGAffineTransform) -> UUID? {
+        guard let precisionPlan else { return nil }
+        let vertices = Dictionary(uniqueKeysWithValues: precisionPlan.vertices.map { ($0.id, $0.position) })
+        return precisionPlan.walls.compactMap { wall -> (UUID, CGFloat)? in
+            guard let start = vertices[wall.startVertexID], let end = vertices[wall.endVertexID] else { return nil }
+            let a = CGPoint(x: start.x, y: start.y).applying(transform)
+            let b = CGPoint(x: end.x, y: end.y).applying(transform)
+            return (wall.id, distanceSquared(from: location, toSegmentFrom: a, to: b))
+        }
+        .min(by: { $0.1 < $1.1 })?.0
+    }
+
+    private func nearestStructuralElement(at location: CGPoint, transform: CGAffineTransform) -> StructuralHitTarget? {
+        guard let precisionPlan else { return nil }
+        let nearest = StructuralHitTesting.targets(for: precisionPlan, transform: transform)
+            .min { lhs, rhs in
+                let lhsCenter = CGPoint(x: lhs.bounds.midX, y: lhs.bounds.midY)
+                let rhsCenter = CGPoint(x: rhs.bounds.midX, y: rhs.bounds.midY)
+                return squaredDistance(location, lhsCenter) < squaredDistance(location, rhsCenter)
+            }
+        guard let nearest else { return nil }
+        let center = CGPoint(x: nearest.bounds.midX, y: nearest.bounds.midY)
+        return squaredDistance(location, center) <= 88 * 88 ? nearest : nil
+    }
+
+    private func squaredDistance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
+        let dx = lhs.x - rhs.x
+        let dy = lhs.y - rhs.y
+        return dx * dx + dy * dy
+    }
+
+    private func distanceSquared(from point: CGPoint, toSegmentFrom start: CGPoint, to end: CGPoint) -> CGFloat {
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let lengthSquared = dx * dx + dy * dy
+        guard lengthSquared > 0 else { return squaredDistance(point, start) }
+        let projection = ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared
+        let t = min(max(projection, 0), 1)
+        return squaredDistance(point, CGPoint(x: start.x + t * dx, y: start.y + t * dy))
+    }
+
     private func setZoom(_ value: CGFloat) {
         withAnimation(.snappy) { zoom = clampedZoom(value) }
     }
@@ -525,20 +574,16 @@ struct FloorPlanViewer: View {
         if let location = radialMenuLocation {
             RadialMeasurementMenu(
                 onDimension: {
-                    radialMenuLocation = nil
-                    selectNearestWall(at: location, in: size)
+                    performRadialAction { selectNearestWall(at: location, in: size) }
                 },
                 onAdd: {
-                    radialMenuLocation = nil
-                    onAddStructuralElement?()
+                    performRadialAction { onAddStructuralElement?() }
                 },
                 onProperties: {
-                    radialMenuLocation = nil
-                    selectRoom(at: location, in: size)
+                    performRadialAction { selectNearestEditableElement(at: location, in: size) }
                 },
                 onFit: {
-                    radialMenuLocation = nil
-                    withAnimation(.snappy) { zoom = 1; offset = .zero }
+                    performRadialAction { withAnimation(.snappy) { zoom = 1; offset = .zero } }
                 },
                 onClose: { withAnimation(.snappy) { radialMenuLocation = nil } }
             )
@@ -548,7 +593,18 @@ struct FloorPlanViewer: View {
     }
 
     private func radialMenuPosition(_ point: CGPoint, in size: CGSize) -> CGPoint {
-        .init(x: min(max(point.x, 125), size.width - 125), y: min(max(point.y, 90), size.height - 90))
+        let x = min(max(point.x, 145), size.width - 145)
+        let preferredY = point.y - 78
+        let y = preferredY < 72 ? min(point.y + 78, size.height - 72) : preferredY
+        return .init(x: x, y: y)
+    }
+
+    private func performRadialAction(_ action: @escaping @MainActor () -> Void) {
+        withAnimation(.snappy(duration: 0.2)) { radialMenuLocation = nil }
+        Task { @MainActor in
+            await Task.yield()
+            action()
+        }
     }
 
     private func selectNearestWall(at location: CGPoint, in size: CGSize) {
@@ -556,11 +612,73 @@ struct FloorPlanViewer: View {
             for: plan, in: size, insets: planInsets, zoom: effectiveZoom,
             offset: effectiveOffset, rotation: alignmentRotation, precisionPlan: precisionPlan
         )
-        if let wallID = precisionWall(at: location, transform: transform, size: size) {
+        if let wallID = precisionWall(at: location, transform: transform, size: size)
+            ?? nearestPrecisionWall(at: location, transform: transform) {
             selectedPrecisionOpeningID = nil
             selectedPrecisionWallID = wallID
             onPrecisionWallSelected?(wallID)
         }
+    }
+
+    private func selectNearestEditableElement(at location: CGPoint, in size: CGSize) {
+        let transform = FloorPlanCanvas.transform(
+            for: plan, in: size, insets: planInsets, zoom: effectiveZoom,
+            offset: effectiveOffset, rotation: alignmentRotation, precisionPlan: precisionPlan
+        )
+        if let openingID = precisionOpening(at: location, transform: transform) {
+            selectedPrecisionWallID = nil
+            selectedPrecisionOpeningID = openingID
+            onPrecisionOpeningSelected?(openingID)
+            return
+        }
+        if let target = nearestStructuralElement(at: location, transform: transform) {
+            selectedPrecisionWallID = nil
+            selectedPrecisionOpeningID = nil
+            switch target.kind {
+            case .column:
+                selectedPrecisionColumnID = target.id
+                selectedPrecisionBeamID = nil
+                onPrecisionColumnSelected?(target.id)
+            case .beam:
+                selectedPrecisionBeamID = target.id
+                selectedPrecisionColumnID = nil
+                onPrecisionBeamSelected?(target.id)
+            }
+            return
+        }
+        selectNearestWall(at: location, in: size)
+    }
+
+    @ViewBuilder
+    private func structuralDragMagnifier(in size: CGSize) -> some View {
+        if let location = structuralDragLocation {
+            FloorPlanDragMagnifier(
+                plan: plan,
+                labels: labels,
+                precisionPlan: precisionPlan,
+                selectedWallID: selectedPrecisionWallID,
+                selectedOpeningID: selectedPrecisionOpeningID,
+                selectedColumnID: selectedPrecisionColumnID,
+                selectedBeamID: selectedPrecisionBeamID,
+                canvasSize: size,
+                sourceLocation: location,
+                zoom: effectiveZoom,
+                offset: effectiveOffset,
+                rotation: alignmentRotation,
+                contentInsets: planInsets
+            )
+            .position(magnifierPosition(for: location, in: size))
+            .transition(.scale(scale: 0.8).combined(with: .opacity))
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
+    }
+
+    private func magnifierPosition(for location: CGPoint, in size: CGSize) -> CGPoint {
+        let x = min(max(location.x, 58), size.width - 58)
+        let preferredY = location.y - 92
+        let y = preferredY < 58 ? min(location.y + 92, size.height - 58) : preferredY
+        return CGPoint(x: x, y: y)
     }
 
     @ViewBuilder
@@ -609,5 +727,60 @@ struct FloorPlanViewer: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(settings.t(labelKey))
+    }
+}
+
+private struct FloorPlanDragMagnifier: View {
+    let plan: FloorPlan
+    let labels: [String: PlanRoomLabel]
+    let precisionPlan: ParametricFloorPlan?
+    let selectedWallID: UUID?
+    let selectedOpeningID: UUID?
+    let selectedColumnID: UUID?
+    let selectedBeamID: UUID?
+    let canvasSize: CGSize
+    let sourceLocation: CGPoint
+    let zoom: CGFloat
+    let offset: CGSize
+    let rotation: CGFloat
+    let contentInsets: EdgeInsets
+
+    private let diameter: CGFloat = 108
+    private let magnification: CGFloat = 1.8
+
+    var body: some View {
+        ZStack {
+            Palette.surface
+            FloorPlanCanvas(
+                plan: plan,
+                style: .draft,
+                labels: labels,
+                selectedRoomID: nil,
+                zoom: zoom,
+                offset: offset,
+                rotation: rotation,
+                precisionPlan: precisionPlan,
+                selectedPrecisionWallID: selectedWallID,
+                selectedPrecisionOpeningID: selectedOpeningID,
+                selectedPrecisionColumnID: selectedColumnID,
+                selectedPrecisionBeamID: selectedBeamID,
+                contentInsets: contentInsets
+            )
+            .frame(width: canvasSize.width, height: canvasSize.height)
+            .scaleEffect(magnification, anchor: .topLeading)
+            .offset(
+                x: diameter / 2 - sourceLocation.x * magnification,
+                y: diameter / 2 - sourceLocation.y * magnification
+            )
+        }
+        .frame(width: diameter, height: diameter)
+        .clipShape(.circle)
+        .overlay(Circle().strokeBorder(Palette.accent, lineWidth: 3))
+        .overlay {
+            Circle()
+                .strokeBorder(Palette.surface.opacity(0.9), lineWidth: 1)
+                .padding(5)
+        }
+        .shadow(color: .black.opacity(0.22), radius: 12, y: 6)
     }
 }
