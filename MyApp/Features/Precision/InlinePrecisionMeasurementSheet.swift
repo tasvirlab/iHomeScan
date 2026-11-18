@@ -59,22 +59,24 @@ struct InlinePrecisionMeasurementSheet: View {
                     .foregroundStyle(Palette.inkSecondary)
             }
 
-            HStack(spacing: 12) {
-                measurementStepButton(systemImage: "minus", delta: -1)
+            if !inputFocused {
+                HStack(spacing: 12) {
+                    measurementStepButton(systemImage: "minus", delta: -1)
 
-                Picker(settings.t("precision.inline.input"), selection: wheelSelection) {
-                    ForEach(wheelValues, id: \.self) { value in
-                        Text(verbatim: "\(value) mm")
-                            .font(.system(.title3, design: .monospaced, weight: .semibold))
-                            .tag(value)
+                    Picker(settings.t("precision.inline.input"), selection: wheelSelection) {
+                        ForEach(wheelValues, id: \.self) { value in
+                            Text(verbatim: "\(value) mm")
+                                .font(.system(.title3, design: .monospaced, weight: .semibold))
+                                .tag(value)
+                        }
                     }
-                }
-                .pickerStyle(.wheel)
-                .frame(maxWidth: .infinity, minHeight: 108, maxHeight: 108)
-                .clipped()
-                .accessibilityIdentifier("precision.inline.wheel")
+                    .pickerStyle(.wheel)
+                    .frame(maxWidth: .infinity, minHeight: 108, maxHeight: 108)
+                    .clipped()
+                    .accessibilityIdentifier("precision.inline.wheel")
 
-                measurementStepButton(systemImage: "plus", delta: 1)
+                    measurementStepButton(systemImage: "plus", delta: 1)
+                }
             }
 
             if hasConflict {
@@ -107,11 +109,6 @@ struct InlinePrecisionMeasurementSheet: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(Palette.surface)
-        .toolbar {
-            ToolbarItem(placement: .keyboard) {
-                Button(settings.t("common.done")) { inputFocused = false }
-            }
-        }
     }
 
     private func measurementStepButton(systemImage: String, delta: Int) -> some View {

@@ -228,6 +228,12 @@ struct FloorPlanViewer: View {
                 rotation: alignmentRotation, precisionPlan: precisionPlan
             )
             let targets = StructuralHitTesting.targets(for: precisionPlan, transform: transform)
+                .filter { target in
+                    target.bounds.minX.isFinite
+                        && target.bounds.minY.isFinite
+                        && target.bounds.width.isFinite
+                        && target.bounds.height.isFinite
+                }
             ForEach(targets, id: \.id) { target in
                 Button {
                     selectedPrecisionWallID = nil
@@ -243,7 +249,10 @@ struct FloorPlanViewer: View {
                     }
                 } label: {
                     Color.clear
-                        .frame(width: max(target.bounds.width, 44), height: max(target.bounds.height, 44))
+                        .frame(
+                            width: safeHitDimension(target.bounds.width),
+                            height: safeHitDimension(target.bounds.height)
+                        )
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
@@ -266,12 +275,20 @@ struct FloorPlanViewer: View {
                 rotation: alignmentRotation, precisionPlan: precisionPlan
             )
             let targets = PrecisionOpeningHitTesting.targets(for: precisionPlan, transform: transform)
+                .filter { target in
+                    target.start.x.isFinite
+                        && target.start.y.isFinite
+                        && target.end.x.isFinite
+                        && target.end.y.isFinite
+                }
             ForEach(Array(targets.enumerated()), id: \.element.openingID) { index, target in
                 let midpoint = CGPoint(
                     x: (target.start.x + target.end.x) / 2,
                     y: (target.start.y + target.end.y) / 2
                 )
-                let width = max(hypot(target.end.x - target.start.x, target.end.y - target.start.y), 44)
+                let width = safeHitDimension(
+                    hypot(target.end.x - target.start.x, target.end.y - target.start.y)
+                )
                 Button {
                     selectedPrecisionWallID = nil
                     selectedPrecisionOpeningID = target.openingID
@@ -299,6 +316,11 @@ struct FloorPlanViewer: View {
         case .window: return settings.t("precision.opening.windowTitle", String(index + 1))
         case .opening: return settings.t("precision.opening.genericTitle", String(index + 1))
         }
+    }
+
+    private func safeHitDimension(_ value: CGFloat) -> CGFloat {
+        guard value.isFinite, value > 0 else { return 44 }
+        return max(value, 44)
     }
 
     // MARK: - Gestures

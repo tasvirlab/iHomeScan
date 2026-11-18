@@ -1,11 +1,11 @@
 import Foundation
 
-enum GeometryValidationSeverity: String, Codable, Sendable {
+nonisolated enum GeometryValidationSeverity: String, Codable, Sendable {
     case warning
     case error
 }
 
-enum GeometryValidationCode: String, Codable, Sendable {
+nonisolated enum GeometryValidationCode: String, Codable, Sendable {
     case duplicateIdentifier
     case missingVertex
     case nonfiniteCoordinate
@@ -30,7 +30,7 @@ enum GeometryValidationCode: String, Codable, Sendable {
     case incompleteStructuralGeometry
 }
 
-struct GeometryValidationIssue: Codable, Hashable, Identifiable, Sendable {
+nonisolated struct GeometryValidationIssue: Codable, Identifiable, Sendable {
     let id: String
     let severity: GeometryValidationSeverity
     let code: GeometryValidationCode
@@ -38,12 +38,32 @@ struct GeometryValidationIssue: Codable, Hashable, Identifiable, Sendable {
     let detail: String
 }
 
-struct GeometryValidationResult: Codable, Hashable, Sendable {
+nonisolated extension GeometryValidationIssue: Hashable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.id == rhs.id
+            && lhs.severity.rawValue == rhs.severity.rawValue
+            && lhs.code.rawValue == rhs.code.rawValue
+            && lhs.entityID == rhs.entityID
+            && lhs.detail == rhs.detail
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(severity.rawValue)
+        hasher.combine(code.rawValue)
+        hasher.combine(entityID)
+        hasher.combine(detail)
+    }
+}
+
+nonisolated struct GeometryValidationResult: Codable, Sendable {
     let issues: [GeometryValidationIssue]
     var errors: [GeometryValidationIssue] { issues.filter { $0.severity == .error } }
     var warnings: [GeometryValidationIssue] { issues.filter { $0.severity == .warning } }
     var isValid: Bool { errors.isEmpty }
 }
+
+nonisolated extension GeometryValidationResult: Hashable {}
 
 struct ParametricGeometryValidator {
     let minimumWallLength: Double

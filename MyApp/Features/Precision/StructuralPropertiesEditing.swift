@@ -63,9 +63,11 @@ struct StructuralPropertiesDraft: Equatable, Sendable {
         }
     }
 
-    private static func millimeters(_ meters: Double) -> String { decimal(meters * 1_000) }
-    private static func optionalMillimeters(_ meters: Double?) -> String { meters.map(millimeters) ?? "" }
-    private static func decimal(_ value: Double) -> String {
+    nonisolated private static func millimeters(_ meters: Double) -> String { decimal(meters * 1_000) }
+    nonisolated private static func optionalMillimeters(_ meters: Double?) -> String {
+        meters.map { millimeters($0) } ?? ""
+    }
+    nonisolated private static func decimal(_ value: Double) -> String {
         value.rounded() == value ? String(Int(value)) : String(format: "%.1f", value)
     }
 }
