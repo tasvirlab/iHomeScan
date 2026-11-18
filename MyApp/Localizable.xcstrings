@@ -2839,6 +2839,54 @@
         }
       }
     },
+    "precision.structural.axisX" : {
+      "comment" : "Horizontal coordinate axis",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "X"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "X"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "X"
+          }
+        }
+      }
+    },
+    "precision.structural.axisY" : {
+      "comment" : "Vertical coordinate axis",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Y"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Y"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Y"
+          }
+        }
+      }
+    },
     "precision.structural.baseElevation" : {
       "comment" : "Column base elevation",
       "extractionState" : "extracted_with_value",
@@ -2907,6 +2955,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Rigelning boshlanish va tugash nuqtasini belgilang"
+          }
+        }
+      }
+    },
+    "precision.structural.beamProperties" : {
+      "comment" : "Beam properties sheet title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Beam measurements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Размеры ригеля"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Rigel o‘lchamlari"
           }
         }
       }
@@ -3031,6 +3103,30 @@
         }
       }
     },
+    "precision.structural.columnProperties" : {
+      "comment" : "Column properties sheet title",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Column measurements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Размеры колонны"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Ustun o‘lchamlari"
+          }
+        }
+      }
+    },
     "precision.structural.columnTitle" : {
       "comment" : "Column creation dimension sheet title",
       "extractionState" : "extracted_with_value",
@@ -3051,6 +3147,30 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Ustun o‘lchamlari"
+          }
+        }
+      }
+    },
+    "precision.structural.confirmChanges" : {
+      "comment" : "Confirms structural property changes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Confirm measurements"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Подтвердить размеры"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "O‘lchamlarni tasdiqlash"
           }
         }
       }
@@ -3103,6 +3223,30 @@
         }
       }
     },
+    "precision.structural.endPoint" : {
+      "comment" : "Beam end point",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "End point"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Конечная точка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tugash nuqtasi"
+          }
+        }
+      }
+    },
     "precision.structural.height" : {
       "comment" : "Column height",
       "extractionState" : "extracted_with_value",
@@ -3147,6 +3291,54 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Musbat va to‘g‘ri o‘lchamlarni kiriting"
+          }
+        }
+      }
+    },
+    "precision.structural.laserMeasured" : {
+      "comment" : "User-declared structural measurement provenance",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Measured with a laser meter"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Измерено лазерным дальномером"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Lazer metr bilan o‘lchadim"
+          }
+        }
+      }
+    },
+    "precision.structural.noChanges" : {
+      "comment" : "No structural property changes",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Change a measurement to enable confirmation."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Измените размер, чтобы подтвердить."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Tasdiqlash uchun o‘lchamni o‘zgartiring."
           }
         }
       }
@@ -3219,6 +3411,78 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Rejada joylashuvni tanlang"
+          }
+        }
+      }
+    },
+    "precision.structural.position" : {
+      "comment" : "Structural position disclosure",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Position"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Положение"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Joylashuv"
+          }
+        }
+      }
+    },
+    "precision.structural.positionX" : {
+      "comment" : "Column X coordinate",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Position X"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Положение по X"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "X bo‘yicha joylashuv"
+          }
+        }
+      }
+    },
+    "precision.structural.positionY" : {
+      "comment" : "Column Y coordinate",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Position Y"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Положение по Y"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Y bo‘yicha joylashuv"
           }
         }
       }
@@ -3367,6 +3631,30 @@
         }
       }
     },
+    "precision.structural.startPoint" : {
+      "comment" : "Beam start point",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start point"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Начальная точка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Boshlanish nuqtasi"
+          }
+        }
+      }
+    },
     "precision.structural.tapBeamEnd" : {
       "comment" : "Beam end placement instruction",
       "extractionState" : "extracted_with_value",
@@ -3483,6 +3771,54 @@
           "stringUnit" : {
             "state" : "machine_translated",
             "value" : "Yuqori balandlik"
+          }
+        }
+      }
+    },
+    "precision.structural.verticalConflict" : {
+      "comment" : "Beam vertical measurement conflict",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The elevation and depth measurements do not agree."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Отметка и глубина не согласуются."
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Sath va chuqurlik o‘lchamlari mos kelmaydi."
+          }
+        }
+      }
+    },
+    "precision.structural.verticalMeasurements" : {
+      "comment" : "Structural vertical measurements disclosure",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Height and elevation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Высота и отметка"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "machine_translated",
+            "value" : "Balandlik va sath"
           }
         }
       }

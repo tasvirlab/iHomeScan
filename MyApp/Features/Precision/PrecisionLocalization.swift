@@ -164,7 +164,21 @@ enum PrecisionLocalization {
         .init("precision.structural.tapBeamEnd", defaultValue: "Tap the beam end point", comment: "Beam end placement instruction"),
         .init("precision.structural.placeRequired", defaultValue: "Choose a placement on the plan", comment: "Missing placement error"),
         .init("precision.structural.invalidDimension", defaultValue: "Enter valid positive dimensions", comment: "Invalid structural dimension error"),
-        .init("precision.structural.saveFailed", defaultValue: "The change was not saved. Try again.", comment: "Structural creation save failure")
+        .init("precision.structural.saveFailed", defaultValue: "The change was not saved. Try again.", comment: "Structural creation save failure"),
+        .init("precision.structural.columnProperties", defaultValue: "Column measurements", comment: "Column properties sheet title"),
+        .init("precision.structural.beamProperties", defaultValue: "Beam measurements", comment: "Beam properties sheet title"),
+        .init("precision.structural.confirmChanges", defaultValue: "Confirm measurements", comment: "Confirms structural property changes"),
+        .init("precision.structural.laserMeasured", defaultValue: "Measured with a laser meter", comment: "User-declared structural measurement provenance"),
+        .init("precision.structural.position", defaultValue: "Position", comment: "Structural position disclosure"),
+        .init("precision.structural.positionX", defaultValue: "Position X", comment: "Column X coordinate"),
+        .init("precision.structural.positionY", defaultValue: "Position Y", comment: "Column Y coordinate"),
+        .init("precision.structural.startPoint", defaultValue: "Start point", comment: "Beam start point"),
+        .init("precision.structural.endPoint", defaultValue: "End point", comment: "Beam end point"),
+        .init("precision.structural.axisX", defaultValue: "X", comment: "Horizontal coordinate axis"),
+        .init("precision.structural.axisY", defaultValue: "Y", comment: "Vertical coordinate axis"),
+        .init("precision.structural.verticalMeasurements", defaultValue: "Height and elevation", comment: "Structural vertical measurements disclosure"),
+        .init("precision.structural.noChanges", defaultValue: "Change a measurement to enable confirmation.", comment: "No structural property changes"),
+        .init("precision.structural.verticalConflict", defaultValue: "The elevation and depth measurements do not agree.", comment: "Beam vertical measurement conflict")
     ]
 
     static func englishFallback(for key: String) -> String? {
@@ -216,7 +230,20 @@ enum PrecisionLocalization {
             "precision.structural.tapBeamEnd": "Tap the beam end point",
             "precision.structural.placeRequired": "Choose a placement on the plan",
             "precision.structural.invalidDimension": "Enter valid positive dimensions",
-            "precision.structural.saveFailed": "The change was not saved. Try again."
+            "precision.structural.saveFailed": "The change was not saved. Try again.",
+            "precision.structural.columnProperties": "Column measurements",
+            "precision.structural.beamProperties": "Beam measurements",
+            "precision.structural.confirmChanges": "Confirm measurements",
+            "precision.structural.laserMeasured": "Measured with a laser meter",
+            "precision.structural.position": "Position",
+            "precision.structural.positionX": "Position X",
+            "precision.structural.positionY": "Position Y",
+            "precision.structural.startPoint": "Start point",
+            "precision.structural.endPoint": "End point",
+            "precision.structural.axisX": "X", "precision.structural.axisY": "Y",
+            "precision.structural.verticalMeasurements": "Height and elevation",
+            "precision.structural.noChanges": "Change a measurement to enable confirmation.",
+            "precision.structural.verticalConflict": "The elevation and depth measurements do not agree."
         ]
         return values[key]
     }
