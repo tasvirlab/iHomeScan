@@ -2,6 +2,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+.thumbnail
 
 # Xcode user-specific state
 xcuserdata/
