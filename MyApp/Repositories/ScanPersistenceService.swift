@@ -8,23 +8,23 @@ enum ScanPersistenceError: Error, Equatable {
     case missingGeometryMetadata
 }
 
-enum ScanProjectDestination: Equatable {
+enum ScanProjectDestination: Equatable, Codable {
     case new(name: String)
     case existing(projectID: UUID)
 }
 
-enum ScanFloorDestination: Equatable {
+enum ScanFloorDestination: Equatable, Codable {
     case automatic
     case new
     case existing(floorID: UUID)
 }
 
-enum ScanRoomDestination: Equatable {
+enum ScanRoomDestination: Equatable, Codable {
     case new(name: String)
     case existing(roomID: UUID)
 }
 
-struct ScanSaveRequest: Equatable {
+struct ScanSaveRequest: Equatable, Codable {
     let project: ScanProjectDestination
     let floor: ScanFloorDestination
     let room: ScanRoomDestination

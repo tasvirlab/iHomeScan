@@ -44,6 +44,31 @@ struct ProjectsView: View {
                 .padding(.trailing, Spacing.screenEdge)
                 .padding(.top, 4)
 
+                Button { model.path.append(.photoScanDrafts) } label: {
+                    HStack(spacing: 13) {
+                        Image(systemName: "tray")
+                            .font(Typography.cardTitle)
+                            .foregroundStyle(Palette.accentText)
+                            .frame(width: 44, height: 44)
+                            .background(Palette.accentTint, in: .rect(cornerRadius: Radius.small))
+                            .accessibilityHidden(true)
+                        Text(settings.t("photoscan.drafts"))
+                            .font(Typography.cardTitle)
+                            .foregroundStyle(Palette.ink)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Image(systemName: "chevron.right")
+                            .font(Typography.meta)
+                            .foregroundStyle(Palette.inkSecondary)
+                            .accessibilityHidden(true)
+                    }
+                    .padding(13)
+                    .cardSurface()
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("photoscan.drafts.open")
+                .padding(.horizontal, Spacing.screenEdge)
+                .padding(.top, 13)
+
                 if projects.isEmpty {
                     EmptyProjectsCard()
                         .padding(.horizontal, Spacing.screenEdge)

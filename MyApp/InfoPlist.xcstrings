@@ -32,19 +32,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iHomeScan uses the camera and LiDAR Scanner only while you scan a room, to measure walls, doors and windows. Camera images are not saved."
+            "value" : "iHomeScan uses the camera for room scans. Photo Scan keeps the photos and silent videos you take in a draft on this device."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iHomeScan использует камеру и сканер LiDAR только во время сканирования комнаты, чтобы измерить стены, двери и окна. Изображения с камеры не сохраняются."
+            "value" : "iHomeScan использует камеру для сканирования комнат. Photo Scan сохраняет снятые фото и видео без звука в черновике на этом устройстве."
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iHomeScan kamera va LiDAR skaneridan faqat xonani skanerlayotganingizda devorlar, eshiklar va derazalarni oʻlchash uchun foydalanadi. Kamera tasvirlari saqlanmaydi."
+            "value" : "iHomeScan kameradan xonani skanerlash uchun foydalanadi. Photo Scan olingan rasmlar va ovozsiz videolarni shu qurilmadagi draftda saqlaydi."
           }
         }
       }

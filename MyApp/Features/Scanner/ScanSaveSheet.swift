@@ -6,9 +6,25 @@ struct ScanSaveSheet: View {
     let scannerContext: ScannerContext
     let onSaved: (SavedScanAssociation) -> Void
 
-    @Environment(AppSettings.self) private var settings
     @Environment(\.modelContext) private var modelContext
     @Environment(\.fileStorage) private var files
+
+    var body: some View {
+        ScanDestinationSheet(scannerContext: scannerContext) { request in
+            let result = try ScanPersistenceService(context: modelContext, files: files)
+                .save(output: output, request: request)
+            onSaved(result)
+        }
+    }
+}
+
+struct ScanDestinationSheet: View {
+    let scannerContext: ScannerContext
+    var isPhotoDraft = false
+    var onSaveWithoutLocation: (() throws -> Void)? = nil
+    let onSave: (ScanSaveRequest) throws -> Void
+
+    @Environment(AppSettings.self) private var settings
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Project.updatedAt, order: .reverse) private var allProjects: [Project]
 
@@ -33,25 +49,37 @@ struct ScanSaveSheet: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: isPhotoDraft ? 21 : 24) {
                     ScanSaveProjectSection(
                         projects: projects,
-                        choice: $projectChoice,
+                        choice: editing($projectChoice, projectChoiceDidChange),
                         projectName: $projectName,
-                        selectedProjectID: $selectedProjectID
+                        selectedProjectID: editing($selectedProjectID, projectDidChange)
                     )
                     ScanSaveFloorSection(
                         isNewProject: projectChoice == .new,
                         floors: floors,
-                        choice: $floorChoice,
-                        selectedFloorID: $selectedFloorID
+                        choice: editing($floorChoice, floorChoiceDidChange),
+                        selectedFloorID: editing($selectedFloorID, floorDidChange)
                     )
                     ScanSaveRoomSection(
                         rooms: rooms,
-                        choice: $roomChoice,
+                        choice: editing($roomChoice, roomChoiceDidChange),
                         selectedRoomID: $selectedRoomID,
                         roomName: $roomName
                     )
+                    if isPhotoDraft && (projectChoice == .new || floorChoice == .new || roomChoice == .new) {
+                        Text(settings.t("photoscan.location.pending"))
+                            .font(Typography.meta)
+                            .foregroundStyle(Palette.inkSecondary)
+                    }
+                    if let onSaveWithoutLocation {
+                        Button(settings.t("photoscan.location.later")) { performSave(onSaveWithoutLocation) }
+                            .font(Typography.control)
+                            .frame(minHeight: 44, alignment: .leading)
+                            .disabled(isSaving)
+                            .accessibilityIdentifier("photoscan.location.later")
+                    }
                     if let errorKey { ScanSaveError(message: settings.t(errorKey)) }
                 }
                 .padding(.horizontal, Spacing.screenEdge)
@@ -60,7 +88,7 @@ struct ScanSaveSheet: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .background(Palette.background.ignoresSafeArea())
-            .navigationTitle(settings.t("scan.save.title"))
+            .navigationTitle(settings.t(isPhotoDraft ? "photoscan.save" : "scan.save.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -68,15 +96,12 @@ struct ScanSaveSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                ScanSaveActionBar(isSaving: isSaving, isEnabled: canSave, action: save)
+                ScanSaveActionBar(isSaving: isSaving, isEnabled: canSave,
+                                  titleKey: isPhotoDraft ? "photoscan.save" : "scan.save.saveAndView", action: save)
+                    .accessibilityIdentifier(isPhotoDraft ? "photoscan.destination.save" : "scan.destination.save")
             }
             .interactiveDismissDisabled(isSaving)
             .onAppear(perform: initialize)
-            .onChange(of: projectChoice) { _, _ in projectChoiceDidChange() }
-            .onChange(of: selectedProjectID) { _, _ in projectDidChange() }
-            .onChange(of: floorChoice) { _, _ in floorChoiceDidChange() }
-            .onChange(of: selectedFloorID) { _, _ in floorDidChange() }
-            .onChange(of: roomChoice) { _, _ in roomChoiceDidChange() }
         }
     }
 
@@ -105,6 +130,14 @@ struct ScanSaveSheet: View {
             selectedProjectID = projects.first?.id
         }
         projectDidChange()
+    }
+
+    private func editing<Value: Equatable>(_ value: Binding<Value>, _ update: @escaping () -> Void) -> Binding<Value> {
+        Binding(get: { value.wrappedValue }, set: { next in
+            guard next != value.wrappedValue else { return }
+            value.wrappedValue = next
+            update()
+        })
     }
 
     private func projectChoiceDidChange() {
@@ -161,24 +194,25 @@ struct ScanSaveSheet: View {
 
     private func save() {
         guard canSave, let request = makeRequest() else { return }
+        performSave { try onSave(request) }
+    }
+
+    private func performSave(_ action: @escaping () throws -> Void) {
+        guard !isSaving else { return }
         isSaving = true
         errorKey = nil
         Task { @MainActor in
             await Task.yield()
             do {
-                let result = try ScanPersistenceService(
-                    context: modelContext,
-                    files: files
-                ).save(output: output, request: request)
+                try action()
                 isSaving = false
-                onSaved(result)
                 dismiss()
             } catch ScanPersistenceError.duplicateScan {
                 isSaving = false
                 errorKey = "scan.save.error.duplicate"
             } catch {
                 isSaving = false
-                errorKey = "scan.save.error.generic"
+                errorKey = isPhotoDraft ? "photoscan.saveError" : "scan.save.error.generic"
             }
         }
     }
@@ -386,13 +420,14 @@ private struct ScanSaveError: View {
 private struct ScanSaveActionBar: View {
     let isSaving: Bool
     let isEnabled: Bool
+    let titleKey: String
     let action: () -> Void
     @Environment(AppSettings.self) private var settings
     var body: some View {
         Button(action: action) {
             HStack(spacing: 10) {
                 if isSaving { ProgressView().tint(.white) }
-                Text(settings.t("scan.save.saveAndView")).font(.headline)
+                Text(settings.t(titleKey)).font(.headline)
             }
             .foregroundStyle(.white).frame(maxWidth: .infinity, minHeight: 52)
             .background(Palette.accent, in: .rect(cornerRadius: Radius.card))

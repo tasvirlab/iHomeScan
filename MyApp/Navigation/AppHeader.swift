@@ -10,14 +10,19 @@ struct AppHeader: View {
 
         HStack(spacing: 8) {
             if model.selectedTab == .home {
-                HStack(spacing: 9) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 9) {
+                        BrandMark()
+                        Text(verbatim: "iHomeScan")
+                            .font(Typography.brand)
+                            .foregroundStyle(Palette.ink)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
                     BrandMark()
-                    Text(verbatim: "iHomeScan")
-                        .font(Typography.brand)
-                        .foregroundStyle(Palette.ink)
                 }
                 .transition(.opacity)
-                .accessibilityElement(children: .combine)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(Text(verbatim: "iHomeScan"))
                 .accessibilityAddTraits(.isHeader)
             }
 
@@ -40,7 +45,7 @@ struct AppHeader: View {
                 .foregroundStyle(Palette.ink)
                 .padding(.leading, 12)
                 .padding(.trailing, 9)
-                .frame(height: 34)
+                .frame(minHeight: 34)
                 .background(Palette.surface, in: .capsule)
             }
             .accessibilityLabel(settings.t("a11y.language"))
@@ -56,6 +61,6 @@ struct AppHeader: View {
         }
         .padding(.leading, Spacing.titleEdge)
         .padding(.trailing, Spacing.screenEdge)
-        .frame(height: 52)
+        .frame(minHeight: 52)
     }
 }

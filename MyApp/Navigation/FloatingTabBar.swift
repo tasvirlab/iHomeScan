@@ -6,6 +6,7 @@ struct FloatingTabBar: View {
     let onScan: () -> Void
 
     @Environment(AppSettings.self) private var settings
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Namespace private var highlight
 
     var body: some View {
@@ -38,7 +39,7 @@ struct FloatingTabBar: View {
                 Image(systemName: tab.systemImage)
                     .font(.system(size: 19, weight: .medium))
                     .frame(width: 24)
-                if isSelected {
+                if isSelected && !dynamicTypeSize.isAccessibilitySize {
                     Text(settings.t(tab.titleKey))
                         .font(.subheadline.weight(.semibold))
                         .lineLimit(1)
@@ -67,7 +68,7 @@ struct FloatingTabBar: View {
         Button(action: onScan) {
             // On Home the button shows its label when there is room for it
             // (e.g. "Skanerlash" in Uzbek is long); otherwise only the icon.
-            if selection == .home {
+            if selection == .home && !dynamicTypeSize.isAccessibilitySize {
                 ViewThatFits(in: .horizontal) {
                     scanLabel(showsTitle: true)
                     scanLabel(showsTitle: false)

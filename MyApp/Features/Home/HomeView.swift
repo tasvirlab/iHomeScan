@@ -15,9 +15,16 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                ScanStartSection(
+                    onPhotoScan: { model.openPhotoScan() },
+                    onLidarScan: { model.openScanner() }
+                )
+                .padding(.top, 13)
+                .padding(.bottom, 21)
+
                 if let project = projects.first {
                     SectionLabel(title: settings.t("home.continue"))
-                        .padding(.top, 12)
+                        .padding(.top, 0)
                         .padding(.bottom, 10)
 
                     Button { model.open(project) } label: {

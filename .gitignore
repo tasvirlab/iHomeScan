@@ -1,10 +1,14 @@
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
 
 # Xcode user-specific state
 xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
+*.xccheckout
+*.moved-aside
 
 # Build products and test results
 build/
@@ -13,14 +17,35 @@ DerivedData/
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.log
+*.tmp
+*.swp
 
 # Swift Package Manager
 .build/
 .swiftpm/
+.idea/
+.vscode/
 
 # Secrets and signing material — never commit
 *.p12
 *.mobileprovision
 *.pem
+*.cer
+*.p8
+*.key
 .env
 .env.*
+!.env.example
+Local.xcconfig
+*.local.xcconfig
+Secrets.xcconfig
+
+# Local application captures and user-owned working data
+PhotoScanDrafts/
+PhotoScanWorking/
+UserData/
+LocalData/
+
+# Separate experimental reconstruction laboratory; intentionally local-only
+iHomeScan-Reconstruction-Lab/

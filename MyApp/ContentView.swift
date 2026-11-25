@@ -31,7 +31,7 @@ struct ContentView: View {
             .background(Palette.background.ignoresSafeArea())
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 FloatingTabBar(selection: $model.selectedTab) {
-                    model.openScanner()
+                    model.openScanPicker()
                 }
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -40,6 +40,8 @@ struct ContentView: View {
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .project(let id): ProjectDetailScreen(projectID: id)
+                case .photoScanDrafts: PhotoScanDraftsView()
+                case .photoScanDraft(let id): PhotoScanSavedDraftView(draftID: id)
                 case .reports(let id): ReportsScreen(projectID: id)
                 case .savedScan(let projectID, let roomID, let scanID):
                     SavedScanViewerScreen(projectID: projectID, roomID: roomID, scanID: scanID)
@@ -50,6 +52,16 @@ struct ContentView: View {
         .sheet(isPresented: $model.isCreatingProject) {
             NewProjectSheet()
                 .toastOverlay(model, settings: settings)
+        }
+        .sheet(item: $model.scanPicker, onDismiss: model.presentPendingScanDestination) { context in
+            ScanMethodSelectionSheet(
+                context: context,
+                onPhotoScan: { model.choosePhotoScan(from: context) },
+                onLidarScan: { model.chooseLidarScan(from: context) }
+            )
+        }
+        .fullScreenCover(item: $model.photoScan) { context in
+            PhotoScanView(context: context)
         }
         .fullScreenCover(item: $model.scanner) { context in
             ScannerReadinessView(context: context)

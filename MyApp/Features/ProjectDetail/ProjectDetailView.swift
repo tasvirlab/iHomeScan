@@ -336,7 +336,7 @@ struct ProjectDetailView: View {
         } else {
             PlanPlaceholder(systemImage: nil, titleKey: "plan.notScanned", bodyKey: "plan.notScanned.body",
                             actionKey: "plan.scanAction") {
-                model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
+                model.openScanPicker(projectID: project.id, floorID: selectedFloor?.id)
             }
         }
     }
@@ -772,7 +772,7 @@ struct ProjectDetailView: View {
                 model.path.append(.reports(project.id))
             }
             Button(settings.t(plan == nil ? "plan.scanAction" : "project.rescan"), systemImage: "viewfinder") {
-                model.openScanner(projectID: project.id, floorID: selectedFloor?.id)
+                model.openScanPicker(projectID: project.id, floorID: selectedFloor?.id)
             }
             Button(settings.t("project.rename"), systemImage: "pencil") {
                 renaming = project

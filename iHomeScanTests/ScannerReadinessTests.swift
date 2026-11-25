@@ -177,4 +177,51 @@ struct ScannerReadinessTests {
         #expect(project.updatedAt == updatedAt)
         #expect(project.status == .draft)
     }
+
+    @Test("Scan choice preserves project and floor context for FotoScan")
+    func photoChoicePreservesContext() {
+        let projectID = UUID()
+        let floorID = UUID()
+        let appModel = AppModel()
+
+        appModel.openScanPicker(projectID: projectID, floorID: floorID)
+        let context = appModel.scanPicker
+        #expect(context?.projectID == projectID)
+        #expect(context?.floorID == floorID)
+
+        if let context { appModel.choosePhotoScan(from: context) }
+        #expect(appModel.scanPicker == nil)
+        #expect(appModel.photoScan == nil)
+        appModel.presentPendingScanDestination()
+
+        #expect(appModel.photoScan?.projectID == projectID)
+        #expect(appModel.photoScan?.floorID == floorID)
+        #expect(appModel.scanner == nil)
+    }
+
+    @Test("Scan choice preserves project and floor context for LiDARScan")
+    func lidarChoicePreservesContext() {
+        let projectID = UUID()
+        let floorID = UUID()
+        let appModel = AppModel()
+
+        appModel.openScanPicker(projectID: projectID, floorID: floorID)
+        if let context = appModel.scanPicker { appModel.chooseLidarScan(from: context) }
+        appModel.presentPendingScanDestination()
+
+        #expect(appModel.scanner?.projectID == projectID)
+        #expect(appModel.scanner?.floorID == floorID)
+        #expect(appModel.photoScan == nil)
+    }
+
+    @Test("Closing scan choice without selection opens no workflow")
+    func closingChoiceDoesNotNavigate() {
+        let appModel = AppModel()
+        appModel.openScanPicker()
+        appModel.scanPicker = nil
+        appModel.presentPendingScanDestination()
+
+        #expect(appModel.photoScan == nil)
+        #expect(appModel.scanner == nil)
+    }
 }
