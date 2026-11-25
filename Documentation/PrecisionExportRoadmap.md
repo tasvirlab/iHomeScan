@@ -1,86 +1,61 @@
-# iHomeScan Precision Export Roadmap
+# Precision Export — Technical Design Note
 
-Bu hujjat eksport funksiyalarining texnik arxitekturasini belgilaydi. Joriy stage hech qanday PDF, DWG, DXF, IFC, OBJ, FBX yoki USDZ faylini yaratmaydi.
+**Status: proposal.** iHomeScan already generates PDF measurement reports. The extended precision export pipeline described here, including DXF, DWG, IFC, OBJ, FBX, and regenerated USDZ, is **not implemented**.
 
-## 1. Yagona eksport manbasi
+## Export Source of Truth
 
-Eksportlar `PrecisionPlanDocument.currentPlan` dan olinadigan o‘zgarmas `PrecisionExportSnapshot` orqali ishlaydi. Snapshot quyidagilarni saqlaydi:
+Future exporters should read an immutable `PrecisionExportSnapshot` derived from `PrecisionPlanDocument.currentPlan`, rather than directly querying SwiftUI or SwiftData view state. The snapshot should preserve:
 
-- metr va `Double` asosidagi real o‘lchamlar;
-- qavatlar, xonalar va stabil element IDlari;
-- devor, opening, ustun va rigel geometriyasi;
-- balandlik/elevation hamda measurement provenance;
-- coordinate system, loyiha origin’i va o‘q yo‘nalishlari;
-- tahrir reviziyasi va eksport vaqti.
+- Canonical dimensions in meters (`Double`)
+- Projects, floors, rooms, and stable element identifiers
+- Walls, openings, columns, and beams
+- Elevation, measurement provenance, and completeness
+- Coordinate reference, origin, axis conventions, revision, and export timestamp
 
-Original RoomPlan JSON, FloorPlan JSON va USDZ o‘zgartirilmaydi. Eksport adapterlari UI yoki SwiftData modelidan bevosita o‘qimaydi.
+Original RoomPlan JSON and USDZ files must remain unchanged.
 
-## 2. Umumiy pipeline
+## Proposed Pipeline
 
 `PrecisionPlanDocument → ExportSnapshotBuilder → ExportValidator → FormatAdapter → AtomicFileWriter`
 
-`ExportValidator` yopilmagan kontur, nonfinite koordinata, noma’lum majburiy balandlik va birlik/scale muammolarini formatga qarab fatal xato yoki warning sifatida qaytaradi. Har bir eksportda unit metadata yoki aniq scale yoziladi.
+The validator should reject non-finite coordinates, invalid geometry, and missing format-required values. Warnings must remain visible when details are incomplete. All outputs must define units and coordinate transforms explicitly.
 
-## 3. Formatlar
+## Format Considerations
 
-### PDF o‘lchov hisoboti
+| Format | Proposed role | Key requirements |
+|---|---|---|
+| Enhanced PDF | Scaled plans, schedules, dimension chains, provenance | A4/A3, page scale, calibration line, consistent area policy |
+| DXF | First CAD interchange format | Layers for walls/openings/structural elements/dimensions; explicit `INSUNITS` |
+| DWG | Proprietary CAD interoperability | Evaluate licensed SDK or verified conversion; do not hand-roll a purported DWG writer |
+| IFC | BIM exchange | Semantic entities, stable GUID mapping, accurate storeys and openings; never invent unknown structural data |
+| OBJ/MTL | DCC mesh exchange | Units, triangulation, material groups, and clear limits on semantic preservation |
+| FBX | DCC hierarchy/material exchange | Evaluate SDK licensing and feasible platform implementation |
+| USDZ | Updated Apple 3D visualization | Rebuild from the edited parametric model without overwriting source capture |
 
-- qavat va xona planlari;
-- real dimension chainlar;
-- eshik/deraza, ustun va rigel jadvallari;
-- verified/manual/derived holati;
-- maydon siyosati va revision ma’lumoti;
-- A4/A3, scale ko‘rsatkichi va kalibrlash chizig‘i.
+## Coordinates and Validation
 
-### DXF
+- Keep internal lengths in meters and record all output unit conversions.
+- Define floor elevations, local/project origins, and axis transformations.
+- Preserve stable element IDs where the exchange format permits it.
+- Test lengths, openings, orientation, and placement after round-trip import.
+- Keep UI transformations separate from persisted geometry and export transforms.
 
-AutoCAD uchun birinchi ochiq CAD almashinuv formati. Layerlar: walls, openings, columns, beams, dimensions, room labels. Model space metr yoki millimetrda aniq `INSUNITS` bilan yoziladi. Geometriya va annotatsiya alohida layerlarda bo‘ladi.
+## Suggested Implementation Order
 
-### DWG
+1. Export snapshot schema and validator.
+2. Enhanced PDF measurement report.
+3. DXF exporter and AutoCAD round-trip testing.
+4. IFC exporter and Revit interoperability testing.
+5. Mesh/scene exports: OBJ and edited USDZ.
+6. DWG/FBX feasibility, licensing, and implementation.
+7. Export UI, progress, cancellation, and sharing.
 
-Proprietary formatni qo‘lda yozish rejalashtirilmaydi. Keyingi stage’da litsenziyalangan ODA/RealDWG yechimi yoki nazorat qilinadigan server-side konvertatsiya baholanadi. Manba bir xil DXF/CAD snapshot bo‘ladi.
+## Acceptance Criteria
 
-### IFC (Revit/BIM)
-
-IFC asosiy Revit almashinuv yo‘li bo‘ladi: `IfcProject`, `IfcSite`, `IfcBuilding`, `IfcBuildingStorey`, `IfcSpace`, `IfcWall`, `IfcDoor`, `IfcWindow`, `IfcColumn`, `IfcBeam`. Stabil iHomeScan IDlari deterministic IFC GUID mapping oladi. Noma’lum konstruktiv bog‘lanishlar uydirilmaydi.
-
-### OBJ/MTL
-
-3ds Max va umumiy DCC import uchun sodda triangulated geometry. Metr scale, material guruhlari va floor/element nomlari saqlanadi. Parametrik semantika cheklanganligi metadata manifest bilan ko‘rsatiladi.
-
-### FBX
-
-3ds Max hierarchy, transform va material workflow uchun. SDK/litsenziya va iOS’da lokal yozish imkoniyati alohida spike orqali tekshiriladi; zarur bo‘lsa eksport xizmati ishlatiladi.
-
-### USDZ
-
-Apple Quick Look va RealityKit uchun tahrirlangan 3D sahna. Parametrik modeldan qayta quriladi; original scan USDZ ustiga yozilmaydi.
-
-## 4. Real scale va koordinatalar
-
-- ichki canonical unit: metr;
-- CAD chiqishi: konfiguratsiyaga ko‘ra mm yoki metr, metadata majburiy;
-- BIM/DCC o‘qlariga aniq transform matrix;
-- qavat elevationlari va lokal/project origin alohida;
-- rotation export vaqtida geometryga tasodifan bake qilinmaydi;
-- round-trip sinovida uzunlik va koordinata tolerance’i tekshiriladi.
-
-## 5. Rejalashtirilgan bosqichlar
-
-1. `PrecisionExportSnapshot` va umumiy validator.
-2. PDF measurement report v2.
-3. DXF adapter va AutoCAD round-trip QA.
-4. IFC adapter va Revit import QA.
-5. OBJ/MTL hamda USDZ generatorlari.
-6. DWG/FBX SDK va litsenziya qarori, so‘ng adapter.
-7. Export center UI, progress, cancellation va share sheet.
-
-## 6. Acceptance sinovlari
-
-- 1000 mm element target dasturda aynan 1000 mm import qilinadi;
-- diagonal va nostandart xonalar deformatsiyasiz chiqadi;
-- opening, ustun va rigel ID/joylashuvi saqlanadi;
-- PDF maydoni va plan maydoni bir xil area policy’dan foydalanadi;
-- noma’lum qiymatlar uydirilmaydi;
-- eksport original scan assetlarini o‘zgartirmaydi;
-- AutoCAD, Revit va 3ds Max’da real round-trip qo‘lda tasdiqlanadi.
+- A 1,000 mm reference dimension imports as 1,000 mm within the stated tolerance.
+- Non-rectangular rooms retain their geometry.
+- Doors, windows, columns, and beams retain valid placement and identifiers where supported.
+- PDF area calculations use the same documented policy as the editor.
+- Missing measurements are not fabricated.
+- Export never mutates original RoomPlan artifacts.
+- Target-application round trips are verified before claiming format support.
