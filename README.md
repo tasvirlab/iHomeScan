@@ -60,7 +60,7 @@ Read the [architecture guide](docs/ARCHITECTURE.md) for data flow, persistence, 
 
 **Requirements:** macOS with a compatible Xcode version; iOS 17.6 or later for the app target. Live RoomPlan capture requires a LiDAR-capable iPhone or iPad.
 
-1. Clone this private repository.
+1. Clone this repository.
 2. Open `iHomeScan.xcodeproj` in Xcode.
 3. Select the `iHomeScan` scheme and a compatible iPhone Simulator or physical device.
 4. Build and run. A simulator supports non-LiDAR editing and preview flows but cannot perform RoomPlan capture.
