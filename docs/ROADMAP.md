@@ -1,44 +1,29 @@
 # Roadmap
 
-This roadmap describes intended directions, not shipped capabilities. Priorities may change as measurement workflows are validated with architects and supported devices.
+Planned engineering directions for iHomeScan. None of these items should be interpreted as shipped functionality.
 
-## Precision Measurement
+## 1. Measurement and Geometry
 
-- Connect selected commercial Bluetooth laser distance meters through a dedicated CoreBluetooth integration.
-- Record authenticated device provenance separately from manual and user-declared laser measurements.
-- Improve uncertainty, calibration, and conflict-resolution workflows without weakening verified geometry.
+- Integrate selected existing Bluetooth laser distance meters; keep manual measurements available.
+- Record device-origin measurements separately from user-declared values, including provenance and uncertainty where supported.
+- Improve irregular layouts, cross-wall constraints, and dense-plan dimension-label placement.
 
-## Geometry and Editing
+## 2. Architectural Editing and 3D
 
-- Expand irregular multi-room and junction workflows.
-- Add explicit wall thickness and architectural reference-face editing.
-- Improve structural reference measurement UX for columns and overhead beams.
-- Continue collision-aware annotation and dense-plan interaction work.
+- Extend wall-reference and structural-element measurement workflows.
+- Generate a 3D scene from the edited parametric plan while preserving the original RoomPlan USDZ.
+- Validate edited walls, openings, columns, beams, and elevations consistently in 2D and 3D.
 
-## Synchronized 3D
+## 3. Professional Outputs
 
-- Generate an edited 3D scene from the authoritative precision document.
-- Keep wall, opening, column, beam, and elevation revisions synchronized between 2D and 3D.
-- Preserve the original RoomPlan USDZ as immutable source evidence.
+- Improve dimensioned PDF reports and schedules.
+- Evaluate DXF for measured 2D exchange, followed by IFC and other formats based on interoperability tests.
+- Define export coordinates, units, geometry validation, and round-trip acceptance tests before adding formats.
 
-## Photo Reconstruction
+A more detailed [precision export design note](../Documentation/PrecisionExportRoadmap.md) describes the proposed interfaces and format-specific requirements.
 
-- Evaluate an on-device or controlled-service photogrammetry pipeline for existing PhotoScan drafts.
-- Make reconstruction progress, failure, privacy, and storage behavior explicit.
-- Add textured model validation before connecting results to architectural geometry.
+## 4. Photo Reconstruction and Platform Quality
 
-## Professional Exchange
-
-- Extend PDF reports with configurable schedules and measurement provenance.
-- Evaluate DXF for dimensionally accurate 2D exchange.
-- Evaluate IFC for BIM-oriented semantic exchange.
-- Evaluate OBJ/FBX/USDZ for downstream visualization tools.
-- Treat DWG interoperability as a compatibility/export project, not a renamed internal file.
-
-No CAD, BIM, or reconstructed-model export listed above is implemented in the current release.
-
-## Platform Quality
-
-- Increase physical-device RoomPlan regression coverage.
-- Add privacy review and data-retention controls before any cloud capability.
-- Continue accessibility, localization, performance, and migration testing.
+- Evaluate a privacy-conscious reconstruction pipeline for PhotoScan drafts; no Core ML/photo-to-3D pipeline currently exists.
+- Complete physical-device capture validation and reliable simulator test execution.
+- Improve accessibility, localization, performance, migration coverage, and privacy controls as needed.

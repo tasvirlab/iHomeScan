@@ -1,109 +1,80 @@
 # iHomeScan
 
-iHomeScan is a native SwiftUI application for RoomPlan-based room capture and parametric refinement of architectural floor plans.
+A native iOS application for LiDAR room capture and parametric 2D floor-plan editing.
 
-## Overview
-
-Mobile LiDAR is excellent for producing an initial spatial model, but an as-built drawing still benefits from measurements that can be checked and corrected. iHomeScan keeps the original RoomPlan artifacts intact while building an editable precision document on top of them. Users can review a reconstructed 2D plan, revise dimensions, edit doors and windows, add structural elements, inspect the original 3D capture, and generate a measurement report.
-
-The current application also includes a photo-capture draft workflow. It can securely collect and organize photos or a short video, but photo-to-3D reconstruction is not implemented yet.
+iHomeScan uses Apple's RoomPlan to capture an initial room layout, preserves the original scan artifacts, and provides an editable precision document for reviewing and correcting measurements. The app focuses on traceable geometry changes rather than treating a mobile scan as a final as-built drawing.
 
 ## Application Preview
 
-Authentic English-language simulator screenshots are shown below. LiDAR capture itself requires supported physical hardware.
+These are screenshots of the current English-language app running in the iPhone Simulator. LiDAR capture requires a supported physical device.
 
-| Home and scan choices | Scan method sheet | PhotoScan draft entry |
+| Home | Scan methods | PhotoScan drafts |
 |---|---|---|
-| <img src="assets/screenshots/home-scan-options.png" width="280" alt="iHomeScan home screen with Photo Scan and LiDAR Scan choices"> | <img src="assets/screenshots/scan-method-sheet.png" width="280" alt="Scan method selection sheet"> | <img src="assets/screenshots/photo-scan.png" width="280" alt="Photo Scan media capture screen"> |
+| <img src="assets/screenshots/home-scan-options.png" width="260" alt="Project home and scan options"> | <img src="assets/screenshots/scan-method-sheet.png" width="260" alt="Scan method selection"> | <img src="assets/screenshots/photo-scan.png" width="260" alt="PhotoScan draft entry"> |
 
-## Current Features
+## Features
 
-- RoomPlan capture with device-readiness and camera-permission handling
-- Immutable storage of original CapturedRoom JSON, floor-plan JSON, and USDZ artifacts
-- SwiftData project, floor, room, scan, and report persistence
-- Parametric 2D floor plans with shared vertices and wall topology
-- Local wall-length revision with validation, conflict protection, undo, and redo
-- Door and window placement, dimensions, provenance, and vertical measurement relationships
-- Rectangular, square, and circular columns plus overhead beam geometry
-- Structural element creation, selection, dragging, and inline property editing
-- Pan, zoom, rotation, fit-to-screen, hit testing, and dimension annotation rendering
-- Original RoomPlan USDZ visualization with RealityKit and Quick Look
-- PDF measurement report generation, preview, and sharing
-- Localized Uzbek, English, and Russian interfaces
-- Photo/video draft capture and import for a future reconstruction workflow
+- **Room capture:** RoomPlan scanning with device checks, permission handling, and preservation of the source JSON and USDZ artifacts.
+- **Parametric floor plans:** Editable walls and shared vertices, hosted doors and windows, structural columns, and overhead beams.
+- **Precision editing:** Wall-length corrections, opening and structural measurements, constraint validation, previews, undo/redo, and measurement provenance.
+- **2D interaction:** Canvas-based rendering, dimensions, selection, pan, zoom, rotation, and fit-to-screen.
+- **Projects and reports:** Local SwiftData persistence, source-asset integrity checks, and PDF measurement reports.
+- **3D reference:** View the **original** RoomPlan USDZ with RealityKit and Quick Look.
+- **PhotoScan drafts:** Capture/import and organize local media; photo-to-3D reconstruction is not yet implemented.
+- **Localization:** English, Uzbek, and Russian.
 
-See [FEATURES.md](docs/FEATURES.md) for verified status and limitations.
+See [feature status](docs/FEATURES.md) for implementation boundaries.
 
-## Technology Stack
+## Technology
 
-- Swift and SwiftUI
-- SwiftData with a versioned migration plan
-- RoomPlan for supported-device room capture
-- RealityKit and Quick Look for original USDZ visualization
-- PDFKit and UIKit PDF rendering for reports
-- AVFoundation, PhotosUI, ImageIO, and Uniform Type Identifiers for photo-scan drafts
-- CryptoKit for persisted artifact integrity checks
-- Custom computational geometry, constraint resolution, validation, and Canvas rendering
+| Area | Implementation |
+|---|---|
+| App and UI | Swift, SwiftUI, SwiftUI Canvas |
+| Room capture | RoomPlan |
+| Data and files | SwiftData, versioned schemas, local artifact storage, CryptoKit |
+| Geometry | Custom parametric model, constraint solvers, and validators |
+| 3D reference | RealityKit, Quick Look |
+| Reports | PDFKit, UIKit PDF rendering |
+| Media drafts | AVFoundation, PhotosUI, ImageIO |
 
-Core ML and CoreBluetooth are not integrated in the current codebase. The app does not directly import ARKit; RoomPlan provides the capture framework used by the product.
+Core ML inference and Bluetooth laser-meter connectivity are **not** currently integrated.
 
 ## Architecture
 
+The original scan is retained independently of the edited floor-plan document. Geometry changes are validated before becoming the current precision state; the 2D editor and PDF reporting consume that state. The 3D viewer still displays the original capture, **not** a regenerated model of the edits.
+
 ```mermaid
 flowchart LR
-    Capture[RoomPlan capture] --> Artifacts[Original JSON and USDZ artifacts]
-    Artifacts --> Store[SwiftData and local asset repository]
-    Store --> Adapter[Parametric plan adapter]
-    Adapter --> Geometry[Constraint solvers and validators]
-    Geometry --> Canvas[Interactive SwiftUI 2D canvas]
-    Artifacts --> Viewer[RealityKit USDZ viewer]
-    Geometry --> PDF[PDF report service]
-    Photos[Photo and video drafts] --> DraftStore[Local draft archive]
+    Scan[RoomPlan capture] --> Source[Original JSON / USDZ]
+    Source --> Store[Local assets + SwiftData]
+    Store --> Plan[Parametric precision document]
+    Plan --> Solver[Validation + revision]
+    Solver --> Editor[2D editor]
+    Plan --> Report[PDF reports]
+    Source --> Viewer[Original USDZ viewer]
 ```
 
-The precision document is the authoritative edited geometry. Original scan artifacts remain source evidence and are not rewritten. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
+Read the [architecture guide](docs/ARCHITECTURE.md) for data flow, persistence, and geometry details.
 
 ## Getting Started
 
-### Requirements
+**Requirements:** macOS with a compatible Xcode version; iOS 17.6 or later for the app target. Live RoomPlan capture requires a LiDAR-capable iPhone or iPad.
 
-- macOS with a current Xcode release capable of building the project
-- iOS 17.6 or later for the application target
-- A LiDAR-equipped iPhone or iPad for RoomPlan capture
-
-### Build
-
-1. Clone the private repository.
+1. Clone this private repository.
 2. Open `iHomeScan.xcodeproj` in Xcode.
-3. Select the `iHomeScan` scheme.
-4. Choose an iOS Simulator for browsing persisted/sample content, or a supported physical device for RoomPlan capture.
-5. Build and run.
+3. Select the `iHomeScan` scheme and a compatible iPhone Simulator or physical device.
+4. Build and run. A simulator supports non-LiDAR editing and preview flows but cannot perform RoomPlan capture.
 
-The simulator can exercise navigation, editing, persistence, reports, and photo drafts, but it cannot perform a real LiDAR room capture.
+For build and test commands, see [Development](docs/DEVELOPMENT.md).
 
-## Testing
+## Current Limitations
 
-The project contains Swift Testing unit tests and XCUITest coverage. In Xcode, use **Product → Test**, or run:
+- Edits to the 2D precision document do not regenerate the RoomPlan USDZ.
+- Commercial Bluetooth laser-meter integration, Core ML reconstruction, and CAD/BIM export are not implemented.
+- Hardware capture and measurement accuracy require validation on physical devices.
 
-```bash
-xcodebuild test \
-  -project iHomeScan.xcodeproj \
-  -scheme iHomeScan \
-  -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max'
-```
+See the [roadmap](docs/ROADMAP.md) for planned work.
 
-Destination availability depends on installed simulator runtimes. Verified results for the published revision are recorded in the final publication report, not assumed here.
+---
 
-## Roadmap
-
-Planned work includes measurement workflows with commercial Bluetooth laser meters, photo-based 3D reconstruction, edited 2D/3D synchronization, stronger geometry verification, and professional exchange formats such as DXF/IFC. These are not presented as completed functionality. See [ROADMAP.md](docs/ROADMAP.md).
-
-## Project Status
-
-Actively developed as an independent iOS engineering project. Hardware-dependent RoomPlan behavior must be validated on a supported physical device.
-
-## Author and Ownership
-
-Independently developed by [Azizbek Kakhkharov](https://github.com/tasvirlab). iHomeScan is not affiliated with or endorsed by Apple Inc.
-
-No open-source license is granted by this repository.
+Personal iOS engineering project maintained by [tasvirlab](https://github.com/tasvirlab). No open-source license is provided.
